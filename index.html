@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Activaciones - Grupo CER</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --primary: #002060;
+      --primary-hover: #001540;
+      --primary-soft: #f0f4fa;
+      --accent: #2563eb;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --bg-page: #f8fafc;
+      --surface: #ffffff;
+      --border-subtle: #e2e8f0;
+      --pending-bg: #fffbeb;
+      --btn-gray: #f1f5f9;
+      --btn-gray-text: #475569;
+      --btn-gray-hover: #e2e8f0;
+      --btn-del-row: #ef4444;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-card: 0 4px 12px -2px rgba(0, 32, 96, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: var(--bg-page); color: var(--text-main); padding: 30px 20px; line-height: 1.5; }
+
+    .top-toolbar {
+      max-width: 960px;
+      margin: 0 auto 24px auto;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .btn-action-top {
+      height: 46px;
+      padding: 0 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .btn-reset-main { background: #ffffff; color: var(--text-muted); border-color: var(--border-subtle); }
+    .btn-reset-main:hover { background: var(--btn-gray); color: var(--text-main); }
+    .btn-pdf-main { background: var(--primary); color: #ffffff; }
+    .btn-pdf-main:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-send-main { background: #15803d; color: #ffffff; }
+    .btn-send-main:hover { background: #166534; transform: translateY(-1px); }
+
+    .card-canvas {
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .header-branding {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .header-logo {
+      height: 52px;
+      width: auto;
+      margin-bottom: 15px;
+      object-fit: contain;
+    }
+    .header-branding h1 {
+      color: var(--primary);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+    .meta-pills {
+      display: inline-flex;
+      background: var(--primary-soft);
+      padding: 8px 18px;
+      border-radius: 999px;
+      gap: 20px;
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .section-card {
+      padding-top: 28px;
+      margin-top: 28px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .section-card:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .section-num {
+      width: 26px; height: 26px; border-radius: 50%; background: var(--primary);
+      color: #ffffff; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: bold;
+    }
+    .section-title { font-size: 15px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.3px; }
+
+    .form-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+    .col-12 { flex: 0 0 100%; width: 100%; }
+    .col-8  { flex: 0 0 calc(66.666% - 11px); width: calc(66.666% - 11px); }
+    .col-6  { flex: 0 0 calc(50% - 8px); width: calc(50% - 8px); }
+    .col-4  { flex: 0 0 calc(33.333% - 11px); width: calc(33.333% - 11px); }
+    .col-3  { flex: 0 0 calc(25% - 12px); width: calc(25% - 12px); }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.2px; }
+
+    input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea {
+      height: 42px; padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);
+      font-size: 14px; color: var(--text-main); background-color: var(--pending-bg); outline: none; transition: all 0.2s ease; width: 100%;
+    }
+    textarea { height: auto; min-height: 80px; resize: none; overflow: hidden; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); background-color: #ffffff !important; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    .filled { background-color: #ffffff !important; }
+
+    .checkbox-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; width: 100%; }
+    .checkbox-card {
+      display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle); background: var(--surface); cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;
+    }
+    .checkbox-card:hover { border-color: var(--accent); }
+    .checkbox-card input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; }
+    .checkbox-card.checked { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+
+    .subagency-card { background: #fafafa; border-radius: var(--radius-sm); border: 1px dashed var(--border-subtle); padding: 14px 18px; margin-top: 10px; }
+    .subagency-title { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; }
+    .subagency-empty { font-size: 13px; color: var(--text-muted); font-style: italic; }
+
+    .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow: hidden; margin-top: 10px; }
+    .modern-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .modern-table th { background: var(--primary-soft); color: var(--primary); font-weight: 700; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+    .modern-table td { padding: 6px 8px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; background: #ffffff; }
+    .modern-table tr:last-child td { border-bottom: none; }
+
+    .btn-row-delete {
+      width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border-subtle); background: #ffffff;
+      color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: bold; transition: all 0.2s;
+    }
+    .btn-row-delete:hover { background: #fee2e2; color: var(--btn-del-row); border-color: #fca5a5; }
+
+    .btn-tbl-add {
+      height: 36px; padding: 0 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700;
+      background: var(--primary); color: #ffffff; border: none; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 6px; margin-top: 12px; transition: background 0.2s;
+    }
+    .btn-tbl-add:hover { background: var(--primary-hover); }
+
+    .total-banner {
+      display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 16px 20px;
+      background: var(--primary-soft); border-radius: var(--radius-sm); margin-top: 14px; font-weight: 700; color: var(--primary);
+    }
+    .total-amount { font-size: 20px; color: var(--primary); }
+
+    .hidden { display: none !important; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+
+    /* DOSSIER RESUMEN EJECUTIVO (PAGINACIÓN SEGURA) */
+    #plantillaDossier {
+      display: none;
+      background: #ffffff;
+      color: #0f172a;
+      padding: 25px 35px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .dossier-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
+    .dossier-header img { height: 46px; margin-bottom: 8px; }
+    .dossier-header h2 { font-size: 18px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .dossier-bar {
+      display: flex; justify-content: space-between; background: var(--primary-soft);
+      padding: 8px 14px; border-radius: 6px; font-weight: bold; color: var(--primary); font-size: 11px; margin-bottom: 18px;
+    }
+    .dossier-block { margin-bottom: 18px; }
+    .dossier-block-title {
+      font-size: 12px; font-weight: bold; color: var(--primary); text-transform: uppercase;
+      border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 8px;
+    }
+    .dossier-desc {
+      background: #f8fafc; border-left: 3px solid var(--primary); padding: 8px 12px; font-style: italic; color: #334155; margin-bottom: 10px;
+    }
+    .dossier-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px; }
+    .dossier-pill-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; }
+    
+    .dossier-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px; }
+    .dossier-table th { background: #f1f5f9; color: var(--primary); padding: 6px; text-align: left; border: 1px solid #cbd5e1; }
+    .dossier-table td { padding: 6px; border: 1px solid #cbd5e1; }
+
+    /* Prevención estricta de cortes de hoja */
+    .dossier-block,
+    .dossier-grid-2,
+    .dossier-pill-box {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .dossier-table tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-toolbar">
+  <button type="button" class="btn-action-top btn-reset-main" onclick="iniciarNuevoRegistro()">
+    <span>⟲</span> Iniciar Nuevo Registro
+  </button>
+  <button type="button" class="btn-action-top btn-pdf-main" onclick="exportarDossierPDF()">
+    <span>🖨️</span> Exportar PDF Resumen
+  </button>
+  <button type="button" class="btn-action-top btn-send-main" onclick="enviarAutorizacion()">
+    <span>✉️</span> Mandar Proyecto a Autorización
+  </button>
+</div>
+
+<div class="card-canvas" id="areaCaptura">
+
+  <div class="header-branding">
+    <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" class="header-logo" onerror="this.style.display='none'">
+    <h1>Formato Activaciones Grupo CER</h1>
+    <div class="meta-pills">
+      <div>Fecha: <span id="lblFechaReg" style="font-weight: normal;">--/--/----</span></div>
+      <div>Folio: <span id="lblFolio">Act_SinNombre_000000</span></div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 1 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Información General</div>
+    </div>
+    <div class="form-grid">
+      <div class="col-8 form-group">
+        <label class="form-label">Nombre de la Activación *</label>
+        <input type="text" id="nombreAct" placeholder="Ej. Campaña Special Days" oninput="actualizarFolio(); marcarLleno(this)">
+      </div>
+      <div class="col-4 form-group">
+        <label class="form-label">Tipo de Sede *</label>
+        <select id="tipoSede" onchange="gestionarTipoSede(); marcarLleno(this)">
+          <option value="Dentro de Agencia">Dentro de Agencia</option>
+          <option value="Fuera de Agencia">Fuera de Agencia</option>
+        </select>
+      </div>
+      <div class="col-12 form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <label class="form-label">Descripción de la Activación *</label>
+          <span id="contadorPalabras" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">0 / 80 palabras</span>
+        </div>
+        <textarea id="descAct" placeholder="Redacta un breve resumen del evento, objetivos comerciales e intención..." oninput="controlarDescripcion(this); marcarLleno(this)"></textarea>
+      </div>
+
+      <div class="col-12 form-group">
+        <label class="form-label">Distribuidoras Participantes *</label>
+        <div class="checkbox-cards-grid">
+          <label class="checkbox-card" id="cardAuto">
+            <input type="checkbox" id="chkAuto" onchange="sincronizarAgencias()"> Automaya
+          </label>
+          <label class="checkbox-card" id="cardCaribe">
+            <input type="checkbox" id="chkCaribe" onchange="sincronizarAgencias()"> Caribe
+          </label>
+          <label class="checkbox-card" id="cardChetu">
+            <input type="checkbox" id="chkChetu" onchange="sincronizarAgencias()"> Chetumal
+          </label>
+          <label class="checkbox-card" id="cardMillen">
+            <input type="checkbox" id="chkMillen" onchange="sincronizarAgencias()"> Millenium
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2A: DENTRO DE AGENCIA -->
+  <div class="section-card" id="secSedesEnAgencia">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Sedes y Sub-Agencias Participantes</div>
+    </div>
+    <div id="subAgenciasContainer">
+      <div class="subagency-card hidden" id="subAuto">
+        <div class="subagency-title">Automaya - Sub-Agencias</div>
+        <div class="checkbox-cards-grid">
+          <label class="checkbox-card"><input type="checkbox" id="sucMontejo"> Montejo</label>
+          <label class="checkbox-card"><input type="checkbox" id="sucItzaes"> Itzaes</label>
+          <label class="checkbox-card"><input type="checkbox" id="sucValladolid"> Valladolid</label>
+        </div>
+      </div>
+      <div class="subagency-card hidden" id="subCaribe">
+        <div class="subagency-title">Caribe - Sub-Agencias</div>
+        <div class="checkbox-cards-grid">
+          <label class="checkbox-card"><input type="checkbox" id="sucCancun"> Cancún</label>
+          <label class="checkbox-card"><input type="checkbox" id="sucPlaya"> Playa del Carmen</label>
+        </div>
+      </div>
+      <div class="subagency-card hidden" id="subChetu">
+        <div class="subagency-title">Chetumal</div>
+        <div class="subagency-empty">No contiene sub-agencias (Sede Matriz activa)</div>
+      </div>
+      <div class="subagency-card hidden" id="subMillen">
+        <div class="subagency-title">Millenium</div>
+        <div class="subagency-empty">No contiene sub-agencias (Sede Matriz activa)</div>
+      </div>
+      <div id="sinAgenciasMsg" class="subagency-empty" style="padding: 10px 0;">Selecciona una o más distribuidoras en la Sección 1 para configurar las sedes.</div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2B: FUERA DE AGENCIA -->
+  <div class="section-card hidden" id="secSedesForaneo">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Ubicación Foránea</div>
+    </div>
+    <div class="form-grid">
+      <div class="col-6 form-group">
+        <label class="form-label">Estado *</label>
+        <select id="selEstado" onchange="filtrarMunicipios(); marcarLleno(this)">
+          <option value="">Seleccione Estado...</option>
+        </select>
+      </div>
+      <div class="col-6 form-group">
+        <label class="form-label">Municipio *</label>
+        <select id="selMunicipio" onchange="marcarLleno(this)">
+          <option value="">Seleccione Municipio...</option>
+        </select>
+      </div>
+      <div class="col-12 form-group">
+        <label class="form-label">Referencia de Ubicación *</label>
+        <input type="text" id="refUbicacion" placeholder="Centro comercial, explanada, dirección física..." oninput="marcarLleno(this)">
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Calendario y Horarios</div>
+    </div>
+    <div class="form-grid">
+      <div class="col-3 form-group">
+        <label class="form-label">Fecha Inicio *</label>
+        <input type="date" id="fechaInicio" onchange="actualizarDiasDisponibles(); marcarLleno(this)">
+      </div>
+      <div class="col-3 form-group">
+        <label class="form-label">Fecha Fin *</label>
+        <input type="date" id="fechaFin" onchange="actualizarDiasDisponibles(); marcarLleno(this)">
+      </div>
+      <div class="col-3 form-group">
+        <label class="form-label">Hora Entrada *</label>
+        <input type="time" id="horaEntrada" onchange="marcarLleno(this)">
+      </div>
+      <div class="col-3 form-group">
+        <label class="form-label">Hora Salida *</label>
+        <input type="time" id="horaSalida" onchange="marcarLleno(this)">
+      </div>
+      <div class="col-12 form-group">
+        <label class="form-label">Observaciones de Horario</label>
+        <input type="text" id="obsHorario" placeholder="Ej. El martes el horario de atención será especial de 5:00 PM a 7:00 PM..." oninput="marcarLleno(this)">
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 4 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">Unidades en Exhibición</div>
+    </div>
+    <div class="form-grid">
+      <div class="col-4 form-group">
+        <label class="form-label">¿Se requieren unidades?</label>
+        <select id="aplicaUnidades" onchange="gestionarAplicaUnidades(); marcarLleno(this)">
+          <option value="NO">NO</option>
+          <option value="SÍ">SÍ</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="contenedorUnidades" class="hidden">
+      <div class="table-container">
+        <table class="modern-table" id="tblUnidades">
+          <thead>
+            <tr>
+              <th style="width: 35px;" class="text-center">#</th>
+              <th>Distribuidora</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th style="width: 100px;">Año</th>
+              <th style="width: 80px;" class="text-center">Cant.</th>
+              <th style="width: 40px;" class="text-center"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn-tbl-add" onclick="agregarFilaUnidad()">+ Agregar Unidad</button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">Responsables del Evento</div>
+    </div>
+    <div class="table-container">
+      <table class="modern-table" id="tblPersonal">
+        <thead>
+          <tr>
+            <th style="width: 35px;" class="text-center">#</th>
+            <th>Distribuidora</th>
+            <th>Nombre Completo</th>
+            <th>Puesto / Rol</th>
+            <th style="width: 150px;">Asistencia</th>
+            <th style="width: 150px;">Día</th>
+            <th>Comentarios</th>
+            <th style="width: 40px;" class="text-center"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button type="button" class="btn-tbl-add" onclick="agregarFilaPersonal()">+ Agregar Personal</button>
+  </div>
+
+  <!-- SECCIÓN 6 -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div class="section-title">Inversión y Presupuesto</div>
+    </div>
+    <div class="table-container">
+      <table class="modern-table" id="tblInversion">
+        <thead>
+          <tr>
+            <th style="width: 35px;" class="text-center">#</th>
+            <th>Concepto de Gasto</th>
+            <th style="width: 180px;" class="text-right">Monto (MXN)</th>
+            <th style="width: 40px;" class="text-center"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button type="button" class="btn-tbl-add" onclick="agregarFilaInversion()">+ Agregar Concepto</button>
+    <div class="total-banner">
+      <span>Total de Inversión:</span>
+      <span class="total-amount" id="txtTotalInversion">$0.00 MXN</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- PLANTILLA RESUMEN DOSSIER (SIN FIRMAS) -->
+<div id="plantillaDossier">
+  <div class="dossier-header">
+    <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display='none'">
+    <h2>Resumen Ejecutivo de Activación Comercial</h2>
+  </div>
+
+  <div class="dossier-bar">
+    <div>FOLIO: <span id="pFolio"></span></div>
+    <div>FECHA EMISIÓN: <span id="pFecha"></span></div>
+  </div>
+
+  <div class="dossier-block">
+    <div class="dossier-block-title">1. Proyecto y Justificación</div>
+    <div style="font-size: 15px; font-weight: bold; color: var(--primary); margin-bottom: 4px;" id="pNombre"></div>
+    <div class="dossier-desc" id="pDesc"></div>
+  </div>
+
+  <div class="dossier-grid-2">
+    <div class="dossier-pill-box">
+      <div class="dossier-block-title">2. Sede y Distribuidoras</div>
+      <div><strong>Tipo de Sede:</strong> <span id="pTipoSede"></span></div>
+      <div><strong>Participantes:</strong> <span id="pDistribuidoras"></span></div>
+      <div id="pDetalleSede" style="margin-top: 4px; color: #475569;"></div>
+    </div>
+    <div class="dossier-pill-box">
+      <div class="dossier-block-title">3. Temporalidad y Horarios</div>
+      <div><strong>Vigencia:</strong> <span id="pFechas"></span></div>
+      <div><strong>Horario Base:</strong> <span id="pHorarios"></span></div>
+      <div id="pObsHorario" style="margin-top: 4px; color: #475569;"></div>
+    </div>
+  </div>
+
+  <div class="dossier-block" id="pBloqueUnidades">
+    <div class="dossier-block-title">4. Unidades en Exhibición</div>
+    <div id="pListaUnidades"></div>
+  </div>
+
+  <div class="dossier-block">
+    <div class="dossier-block-title">5. Responsables Asignados</div>
+    <table class="dossier-table" id="pTablaPersonal">
+      <thead>
+        <tr>
+          <th>Distribuidora</th>
+          <th>Nombre</th>
+          <th>Puesto</th>
+          <th>Asistencia</th>
+          <th>Día Asignado</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="dossier-block">
+    <div class="dossier-block-title">6. Presupuesto e Inversión Requerida</div>
+    <table class="dossier-table" id="pTablaInversion">
+      <thead>
+        <tr>
+          <th>Concepto</th>
+          <th style="width: 140px; text-align: right;">Monto</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <th style="text-align: right; background: #e2e8f0;">TOTAL SOLICITADO:</th>
+          <th style="text-align: right; background: #e2e8f0; font-size: 13px;" id="pTotalInv"></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<script>
+const BASE_ESTADOS_MUNICIPIOS = {
+  "Campeche": ["Calakmul", "Calkiní", "Campeche", "Candelaria", "Carmen", "Champotón", "Dzitbalché", "Escárcega", "Hecelchakán", "Hopelchén", "Palizada", "Seybaplaya", "Tenabo"],
+  "Quintana Roo": ["Bacalar", "Benito Juárez (Cancún)", "Cozumel", "Felipe Carrillo Puerto", "Isla Mujeres", "José María Morelos", "Lázaro Cárdenas", "Othón P. Blanco (Chetumal)", "Puerto Morelos", "Solidaridad (Playa del Carmen)", "Tulum"],
+  "Yucatán": ["Abalá", "Acanceh", "Akil", "Baca", "Bokobá", "Buctzotz", "Cacalchén", "Calotmul", "Cansahcab", "Cantamayec", "Celestún", "Cenotillo", "Conkal", "Chacsinkín", "Chankom", "Chapab", "Chemax", "Chicxulub Pueblo", "Chichimilá", "Chikindzonot", "Chocholá", "Chumayel", "Dzan", "Dzemul", "Dzidzantún", "Dzilam de Bravo", "Dzilam González", "Dzitás", "Dzoncauich", "Espita", "Halachó", "Hocabá", "Hoctún", "Homún", "Huhí", "Hunucmá", "Ixil", "Izamal", "Kanasín", "Kantunil", "Kaua", "Kinchil", "Kopomá", "Mama", "Maní", "Maxcanú", "Mayapán", "Mérida", "Mocochá", "Motul", "Muna", "Muxupip", "Opichén", "Oxkutzcab", "Panabá", "Peto", "Progreso", "Quintana Roo", "Río Lagartos", "Sacalum", "Samahil", "Sanahcat", "San Felipe", "Santa Elena", "Seyé", "Sinanché", "Sotuta", "Sucilá", "Sudzal", "Suma", "Tahdziú", "Tahmek", "Teabo", "Tecoh", "Tekal de Venegas", "Tekantó", "Tekax", "Tekit", "Tekom", "Telchac Pueblo", "Telchac Puerto", "Temax", "Temozón", "Tepakán", "Tetiz", "Teya", "Ticul", "Timucuy", "Tinum", "Tixcacalcupul", "Tixkokob", "Tixmehuac", "Tixpéhual", "Tizimín", "Tunkás", "Tzucacab", "Uayma", "Ucú", "Umán", "Valladolid", "Xocchel", "Yaxcabá", "Yaxkukul", "Yobaín"]
+};
+
+const MARCAS_GRUPO_CER = ["ALFA ROMEO", "CHRYSLER", "DODGE", "FIAT", "JEEP", "MITSUBISHI", "PEUGEOT", "RAM"];
+const LIMITE_PALABRAS = 80;
+
+window.onload = function() {
+  poblarEstados();
+  iniciarNuevoRegistro();
+};
+
+function marcarLleno(el) {
+  if (el.value && el.value.trim() !== "") el.classList.add("filled");
+  else el.classList.remove("filled");
+}
+
+function controlarDescripcion(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+
+  let palabras = el.value.trim().split(/\s+/).filter(p => p.length > 0);
+  if (palabras.length > LIMITE_PALABRAS) {
+    el.value = palabras.slice(0, LIMITE_PALABRAS).join(" ");
+    palabras = el.value.trim().split(/\s+/).filter(p => p.length > 0);
+  }
+  document.getElementById("contadorPalabras").innerText = `${palabras.length} / ${LIMITE_PALABRAS} palabras`;
+}
+
+function formatearFechaLarga(fechaStr) {
+  if (!fechaStr) return "--";
+  const [y, m, d] = fechaStr.split("-").map(Number);
+  const fecha = new Date(y, m - 1, d);
+  const opciones = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+  let txt = fecha.toLocaleDateString('es-MX', opciones);
+  return txt.replace(/de (\d{4})$/, 'del $1');
+}
+
+function formatearHoraCompleta(horaStr) {
+  if (!horaStr) return "--:--";
+  let [h, m] = horaStr.split(":").map(Number);
+  const ampm = h >= 12 ? 'pm' : 'am';
+  let h12 = h % 12;
+  h12 = h12 ? h12 : 12;
+  const h12Str = String(h12).padStart(2, '0');
+  const h24Str = String(h).padStart(2, '0');
+  const minStr = String(m).padStart(2, '0');
+  return `${h24Str}:${minStr} h (${h12Str}:${minStr} ${ampm})`;
+}
+
+function poblarEstados() {
+  const sel = document.getElementById("selEstado");
+  sel.innerHTML = '<option value="">Seleccione Estado...</option>';
+  Object.keys(BASE_ESTADOS_MUNICIPIOS).sort().forEach(est => {
+    sel.innerHTML += `<option value="${est}">${est}</option>`;
+  });
+}
+
+function filtrarMunicipios() {
+  const est = document.getElementById("selEstado").value;
+  const selMun = document.getElementById("selMunicipio");
+  selMun.innerHTML = '<option value="">Seleccione Municipio...</option>';
+  if (BASE_ESTADOS_MUNICIPIOS[est]) {
+    BASE_ESTADOS_MUNICIPIOS[est].forEach(m => selMun.innerHTML += `<option value="${m}">${m}</option>`);
+  }
+}
+
+function actualizarFolio() {
+  const nombre = document.getElementById("nombreAct").value.trim() || "SinNombre";
+  const hoy = new Date();
+  const d = String(hoy.getDate()).padStart(2, '0');
+  const m = String(hoy.getMonth() + 1).padStart(2, '0');
+  const y = String(hoy.getFullYear()).slice(-2);
+  const folioLimpio = `Act_${nombre.replace(/[^a-zA-Z0-9]/g, '')}_${d}${m}${y}`;
+  document.getElementById("lblFolio").innerText = folioLimpio;
+}
+
+function gestionarTipoSede() {
+  const esEnAgencia = (document.getElementById("tipoSede").value === "Dentro de Agencia");
+  document.getElementById("secSedesEnAgencia").classList.toggle("hidden", !esEnAgencia);
+  document.getElementById("secSedesForaneo").classList.toggle("hidden", esEnAgencia);
+}
+
+function sincronizarAgencias() {
+  const auto = document.getElementById("chkAuto").checked;
+  const caribe = document.getElementById("chkCaribe").checked;
+  const chetu = document.getElementById("chkChetu").checked;
+  const millen = document.getElementById("chkMillen").checked;
+
+  document.getElementById("subAuto").classList.toggle("hidden", !auto);
+  document.getElementById("subCaribe").classList.toggle("hidden", !caribe);
+  document.getElementById("subChetu").classList.toggle("hidden", !chetu);
+  document.getElementById("subMillen").classList.toggle("hidden", !millen);
+
+  document.getElementById("sinAgenciasMsg").classList.toggle("hidden", auto || caribe || chetu || millen);
+  document.getElementById("cardAuto").classList.toggle("checked", auto);
+  document.getElementById("cardCaribe").classList.toggle("checked", caribe);
+  document.getElementById("cardChetu").classList.toggle("checked", chetu);
+  document.getElementById("cardMillen").classList.toggle("checked", millen);
+
+  refrescarDesplegablesDistribuidoras();
+}
+
+function obtenerDistribuidorasActivas(incluirCoorp = false) {
+  let lista = [];
+  if (incluirCoorp) lista.push("Coorp");
+  if (document.getElementById("chkAuto").checked) lista.push("Automaya");
+  if (document.getElementById("chkCaribe").checked) lista.push("Caribe");
+  if (document.getElementById("chkChetu").checked) lista.push("Chetumal");
+  if (document.getElementById("chkMillen").checked) lista.push("Millenium");
+  return lista;
+}
+
+function refrescarDesplegablesDistribuidoras() {
+  const distUnid = obtenerDistribuidorasActivas(false);
+  document.querySelectorAll("#tblUnidades select.sel-dist-unid").forEach(sel => {
+    const valPrev = sel.value;
+    sel.innerHTML = '<option value="">Seleccione...</option>' + distUnid.map(d => `<option value="${d}">${d}</option>`).join("");
+    if (distUnid.includes(valPrev)) sel.value = valPrev;
+  });
+
+  const distPers = obtenerDistribuidorasActivas(true);
+  document.querySelectorAll("#tblPersonal select.sel-dist-pers").forEach(sel => {
+    const valPrev = sel.value;
+    sel.innerHTML = '<option value="">Seleccione...</option>' + distPers.map(d => `<option value="${d}">${d}</option>`).join("");
+    if (distPers.includes(valPrev)) sel.value = valPrev;
+  });
+}
+
+function obtenerDiasEntreFechas() {
+  const fIniVal = document.getElementById("fechaInicio").value;
+  const fFinVal = document.getElementById("fechaFin").value;
+  if (!fIniVal || !fFinVal) return [];
+
+  const fIni = new Date(fIniVal + "T00:00:00");
+  const fFin = new Date(fFinVal + "T00:00:00");
+  if (fFin < fIni) return [];
+
+  let dias = [];
+  let cur = new Date(fIni);
+  while (cur <= fFin) {
+    dias.push(cur.toLocaleDateString("es-MX", { day: '2-digit', month: '2-digit', year: 'numeric' }));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return dias;
+}
+
+function actualizarDiasDisponibles() {
+  document.querySelectorAll("#tblPersonal tr").forEach(tr => {
+    const selTipo = tr.querySelector(".sel-tipo-asistencia");
+    if (selTipo) gestionarAsistenciaFila(selTipo);
+  });
+}
+
+function gestionarAplicaUnidades() {
+  const req = (document.getElementById("aplicaUnidades").value === "SÍ");
+  document.getElementById("contenedorUnidades").classList.toggle("hidden", !req);
+  if (req && document.querySelector("#tblUnidades tbody").rows.length === 0) agregarFilaUnidad();
+}
+
+function agregarFilaUnidad() {
+  const tb = document.querySelector("#tblUnidades tbody");
+  const num = tb.rows.length + 1;
+  const dists = obtenerDistribuidorasActivas(false);
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+    <td class="text-center fw-bold row-num">${num}</td>
+    <td>
+      <select class="sel-dist-unid" onchange="marcarLleno(this)">
+        <option value="">Seleccione...</option>
+        ${dists.map(d => `<option value="${d}">${d}</option>`).join("")}
+      </select>
+    </td>
+    <td>
+      <select class="sel-marca-unid" onchange="marcarLleno(this)">
+        <option value="">Seleccione Marca...</option>
+        ${MARCAS_GRUPO_CER.map(m => `<option value="${m}">${m}</option>`).join("")}
+      </select>
+    </td>
+    <td><input type="text" class="inp-modelo-unid" placeholder="Modelo..." oninput="marcarLleno(this)"></td>
+    <td><input type="number" class="inp-anio-unid" placeholder="Año" min="1990" max="2035" oninput="marcarLleno(this)"></td>
+    <td><input type="number" class="inp-cant-unid text-center filled" value="1" min="1"></td>
+    <td class="text-center">
+      <button type="button" class="btn-row-delete" onclick="eliminarFilaIndividual(this, 'tblUnidades')">✕</button>
+    </td>
+  `;
+  tb.appendChild(tr);
+}
+
+function agregarFilaPersonal() {
+  const tb = document.querySelector("#tblPersonal tbody");
+  const num = tb.rows.length + 1;
+  const dists = obtenerDistribuidorasActivas(true);
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+    <td class="text-center fw-bold row-num">${num}</td>
+    <td>
+      <select class="sel-dist-pers" onchange="marcarLleno(this)">
+        <option value="">Seleccione...</option>
+        ${dists.map(d => `<option value="${d}">${d}</option>`).join("")}
+      </select>
+    </td>
+    <td><input type="text" class="inp-nom-pers" placeholder="Nombre completo" oninput="marcarLleno(this)"></td>
+    <td><input type="text" class="inp-rol-pers" placeholder="Coordinador, Asesor..." oninput="marcarLleno(this)"></td>
+    <td>
+      <select class="sel-tipo-asistencia filled" onchange="gestionarAsistenciaFila(this); marcarLleno(this)">
+        <option value="Todos los días">Todos los días</option>
+        <option value="1 día en específico">1 día en específico</option>
+      </select>
+    </td>
+    <td>
+      <select class="sel-dia-especifico filled" disabled>
+        <option value="">N/A</option>
+      </select>
+    </td>
+    <td><input type="text" class="inp-com-pers" placeholder="Comentarios adicionales..."></td>
+    <td class="text-center">
+      <button type="button" class="btn-row-delete" onclick="eliminarFilaIndividual(this, 'tblPersonal')">✕</button>
+    </td>
+  `;
+  tb.appendChild(tr);
+}
+
+function gestionarAsistenciaFila(selTipo) {
+  const tr = selTipo.closest("tr");
+  const selDia = tr.querySelector(".sel-dia-especifico");
+  const dias = obtenerDiasEntreFechas();
+
+  if (selTipo.value === "1 día en específico") {
+    selDia.disabled = false;
+    selDia.classList.remove("filled");
+    selDia.innerHTML = (dias.length === 0) ? '<option value="">Primero elija fechas</option>' : '<option value="">Seleccione día...</option>' + dias.map(d => `<option value="${d}">${d}</option>`).join("");
+  } else {
+    selDia.disabled = true;
+    selDia.classList.add("filled");
+    selDia.innerHTML = '<option value="">N/A</option>';
+  }
+}
+
+function agregarFilaInversion() {
+  const tb = document.querySelector("#tblInversion tbody");
+  const num = tb.rows.length + 1;
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+    <td class="text-center fw-bold row-num">${num}</td>
+    <td><input type="text" class="inp-con-inv" placeholder="Concepto de inversión..." oninput="marcarLleno(this)"></td>
+    <td><input type="number" class="monto-val text-right" value="0.00" min="0" step="0.01" oninput="validarMontoPositivo(this); calcularTotalInversion(); marcarLleno(this)"></td>
+    <td class="text-center">
+      <button type="button" class="btn-row-delete" onclick="eliminarFilaIndividual(this, 'tblInversion')">✕</button>
+    </td>
+  `;
+  tb.appendChild(tr);
+  calcularTotalInversion();
+}
+
+function validarMontoPositivo(input) {
+  if (parseFloat(input.value) < 0 || isNaN(parseFloat(input.value))) input.value = "0.00";
+}
+
+function calcularTotalInversion() {
+  let total = 0;
+  document.querySelectorAll("#tblInversion .monto-val").forEach(inp => {
+    const val = parseFloat(inp.value) || 0;
+    if (val > 0) total += val;
+  });
+  document.getElementById("txtTotalInversion").innerText = "$" + total.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " MXN";
+}
+
+function eliminarFilaIndividual(btn, tblId) {
+  const tb = document.querySelector(`#${tblId} tbody`);
+  const tr = btn.closest("tr");
+  if (tb.rows.length === 1) {
+    Array.from(tr.querySelectorAll("input, select")).forEach(el => {
+      el.value = (el.type === "number" ? (el.classList.contains("monto-val") ? "0.00" : "1") : "");
+      marcarLleno(el);
+    });
+  } else {
+    tr.remove();
+    Array.from(tb.rows).forEach((row, idx) => { row.querySelector(".row-num").innerText = idx + 1; });
+  }
+  if (tblId === "tblInversion") calcularTotalInversion();
+}
+
+function iniciarNuevoRegistro() {
+  if (document.getElementById("nombreAct").value && !confirm("¿Está seguro de que desea reiniciar el formulario?")) return;
+  const hoy = new Date();
+  document.getElementById("lblFechaReg").innerText = hoy.toLocaleDateString("es-MX");
+
+  document.getElementById("nombreAct").value = "";
+  document.getElementById("descAct").value = "";
+  document.getElementById("descAct").style.height = "auto";
+  document.getElementById("contadorPalabras").innerText = "0 / 80 palabras";
+
+  document.getElementById("tipoSede").value = "Dentro de Agencia";
+  marcarLleno(document.getElementById("tipoSede"));
+  document.getElementById("chkAuto").checked = false;
+  document.getElementById("chkCaribe").checked = false;
+  document.getElementById("chkChetu").checked = false;
+  document.getElementById("chkMillen").checked = false;
+  gestionarTipoSede();
+  sincronizarAgencias();
+  actualizarFolio();
+
+  document.getElementById("selEstado").value = "";
+  document.getElementById("selMunicipio").innerHTML = '<option value="">Seleccione Municipio...</option>';
+  document.getElementById("refUbicacion").value = "";
+
+  document.getElementById("fechaInicio").value = "";
+  document.getElementById("fechaFin").value = "";
+  document.getElementById("horaEntrada").value = "";
+  document.getElementById("horaSalida").value = "";
+  document.getElementById("obsHorario").value = "";
+
+  document.getElementById("aplicaUnidades").value = "NO";
+  marcarLleno(document.getElementById("aplicaUnidades"));
+  document.querySelector("#tblUnidades tbody").innerHTML = "";
+  gestionarAplicaUnidades();
+
+  document.querySelector("#tblPersonal tbody").innerHTML = "";
+  agregarFilaPersonal();
+
+  document.querySelector("#tblInversion tbody").innerHTML = "";
+  agregarFilaInversion();
+
+  document.querySelectorAll("input, select, textarea").forEach(el => marcarLleno(el));
+}
+
+function prepararDatosDossier() {
+  document.getElementById("pFolio").innerText = document.getElementById("lblFolio").innerText;
+  document.getElementById("pFecha").innerText = document.getElementById("lblFechaReg").innerText;
+  document.getElementById("pNombre").innerText = document.getElementById("nombreAct").value.trim() || "Sin Título";
+  document.getElementById("pDesc").innerText = document.getElementById("descAct").value.trim() || "Sin descripción proporcionada.";
+
+  const tipoSede = document.getElementById("tipoSede").value;
+  document.getElementById("pTipoSede").innerText = tipoSede;
+
+  const dists = obtenerDistribuidorasActivas(false).join(", ") || "Ninguna seleccionada";
+  document.getElementById("pDistribuidoras").innerText = dists;
+
+  let detSede = "";
+  if (tipoSede === "Dentro de Agencia") {
+    let subs = [];
+    if (document.getElementById("sucMontejo").checked) subs.push("Montejo");
+    if (document.getElementById("sucItzaes").checked) subs.push("Itzaes");
+    if (document.getElementById("sucValladolid").checked) subs.push("Valladolid");
+    if (document.getElementById("sucCancun").checked) subs.push("Cancún");
+    if (document.getElementById("sucPlaya").checked) subs.push("Playa del Carmen");
+    detSede = subs.length > 0 ? `Sub-Agencias activas: ${subs.join(", ")}` : "Sedes matrices";
+  } else {
+    detSede = `Ubicación: ${document.getElementById("selMunicipio").value || "-"}, ${document.getElementById("selEstado").value || "-"}. Ref: ${document.getElementById("refUbicacion").value || "Sin referencia"}`;
+  }
+  document.getElementById("pDetalleSede").innerText = detSede;
+
+  const fIniLarga = formatearFechaLarga(document.getElementById("fechaInicio").value);
+  const fFinLarga = formatearFechaLarga(document.getElementById("fechaFin").value);
+  document.getElementById("pFechas").innerText = `Del ${fIniLarga} al ${fFinLarga}`;
+
+  const hEntrada = formatearHoraCompleta(document.getElementById("horaEntrada").value);
+  const hSalida = formatearHoraCompleta(document.getElementById("horaSalida").value);
+  document.getElementById("pHorarios").innerText = `De ${hEntrada} a ${hSalida}`;
+
+  document.getElementById("pObsHorario").innerText = document.getElementById("obsHorario").value ? `Observaciones: ${document.getElementById("obsHorario").value}` : "";
+
+  const listaU = document.getElementById("pListaUnidades");
+  listaU.innerHTML = "";
+  if (document.getElementById("aplicaUnidades").value === "SÍ") {
+    let uRows = document.querySelectorAll("#tblUnidades tbody tr");
+    let uHtml = '<table class="dossier-table"><thead><tr><th>Distribuidora</th><th>Marca</th><th>Modelo</th><th>Año</th><th style="width:50px; text-align:center;">Cant.</th></tr></thead><tbody>';
+    uRows.forEach(r => {
+      const dist = r.querySelector(".sel-dist-unid").value || "-";
+      const marca = r.querySelector(".sel-marca-unid").value || "-";
+      const mod = r.querySelector(".inp-modelo-unid").value || "-";
+      const anio = r.querySelector(".inp-anio-unid").value || "-";
+      const cant = r.querySelector(".inp-cant-unid").value || "1";
+      uHtml += `<tr><td>${dist}</td><td>${marca}</td><td>${mod}</td><td>${anio}</td><td style="text-align:center;">${cant}</td></tr>`;
+    });
+    uHtml += '</tbody></table>';
+    listaU.innerHTML = uHtml;
+  } else {
+    listaU.innerHTML = '<div style="font-style:italic; color:#64748b; padding:4px 0;">No se requieren unidades en exhibición para esta activación.</div>';
+  }
+
+  const pTb = document.querySelector("#pTablaPersonal tbody");
+  pTb.innerHTML = "";
+  document.querySelectorAll("#tblPersonal tbody tr").forEach(r => {
+    const dist = r.querySelector(".sel-dist-pers").value || "-";
+    const nom = r.querySelector(".inp-nom-pers").value || "-";
+    const rol = r.querySelector(".inp-rol-pers").value || "-";
+    const tipoAs = r.querySelector(".sel-tipo-asistencia").value;
+    const diaAs = (tipoAs === "1 día en específico") ? (r.querySelector(".sel-dia-especifico").value || "-") : "Todos";
+    pTb.innerHTML += `<tr><td>${dist}</td><td>${nom}</td><td>${rol}</td><td>${tipoAs}</td><td>${diaAs}</td></tr>`;
+  });
+
+  const iTb = document.querySelector("#pTablaInversion tbody");
+  iTb.innerHTML = "";
+  document.querySelectorAll("#tblInversion tbody tr").forEach(r => {
+    const con = r.querySelector(".inp-con-inv").value || "-";
+    const mon = parseFloat(r.querySelector(".monto-val").value) || 0;
+    iTb.innerHTML += `<tr><td>${con}</td><td style="text-align:right;">$${mon.toLocaleString("es-MX", {minimumFractionDigits: 2})}</td></tr>`;
+  });
+  document.getElementById("pTotalInv").innerText = document.getElementById("txtTotalInversion").innerText;
+}
+
+function exportarDossierPDF() {
+  prepararDatosDossier();
+  const elemento = document.getElementById("plantillaDossier");
+  elemento.style.display = "block";
+
+  const folio = document.getElementById("lblFolio").innerText;
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: `${folio}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(elemento).save().then(() => {
+    elemento.style.display = "none";
+  });
+}
+
+function enviarAutorizacion() {
+  const nombre = document.getElementById("nombreAct").value.trim();
+  if (!nombre) {
+    alert("Por favor, ingresa el nombre de la activación antes de solicitar autorización.");
+    return;
+  }
+
+  const fIniLarga = formatearFechaLarga(document.getElementById("fechaInicio").value);
+  const fFinLarga = formatearFechaLarga(document.getElementById("fechaFin").value);
+  const hEntrada = formatearHoraCompleta(document.getElementById("horaEntrada").value);
+  const hSalida = formatearHoraCompleta(document.getElementById("horaSalida").value);
+
+  const payload = {
+    folio: document.getElementById("lblFolio").innerText,
+    nombreActivacion: nombre,
+    descripcion: document.getElementById("descAct").value.trim(),
+    tipoSede: document.getElementById("tipoSede").value,
+    distribuidoras: obtenerDistribuidorasActivas(false).join(", "),
+    fechaInicio: fIniLarga,
+    fechaFin: fFinLarga,
+    horarios: `De ${hEntrada} a ${hSalida}`,
+    totalInversion: document.getElementById("txtTotalInversion").innerText
+  };
+
+  const dataBlob = new Blob([JSON.stringify(payload, null, 2)], { type: "text/plain;charset=utf-8" });
+  const aTxt = document.createElement("a");
+  aTxt.href = URL.createObjectURL(dataBlob);
+  aTxt.download = `Metadata_${payload.folio}.txt`;
+  aTxt.click();
+
+  exportarDossierPDF();
+
+  const destinatarios = "jumartinez@grupocer.com.mx; gcervera@avasa.com.mx; mtellez@avasa.com.mx";
+  const asunto = encodeURIComponent(`Activación | ${payload.nombreActivacion}`);
+  const cuerpo = encodeURIComponent(
+    `Buen día,\n\n` +
+    `Anexo proyecto ${payload.nombreActivacion}.\n\n` +
+    `Descripción:\n` +
+    `${payload.descripcion}\n\n` +
+    `Detalles de la Activación:\n` +
+    `• Organizado por: ${payload.distribuidoras}\n` +
+    `• Sede: ${payload.tipoSede}\n` +
+    `• Vigencia: Del ${payload.fechaInicio} al ${payload.fechaFin}\n` +
+    `• Horario: ${payload.horarios}\n` +
+    `• Inversión Total Solicitada: ${payload.totalInversion}\n\n` +
+    `Para más detalles, se adjunta el PDF formal y el archivo de datos estructurados.\n\n` +
+    `Quedo pendiente de su confirmación y visto bueno.`
+  );
+
+  window.location.href = `mailto:${destinatarios}?subject=${asunto}&body=${cuerpo}`;
+}
+</script>
+</body>
+</html>
