@@ -1,4 +1,171 @@
 {
-  "activaciones": [],
+  "activaciones": [
+    {
+      "@odata.etag": "\"2\"",
+      "Agencia": [
+        {
+          "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference",
+          "Id": 1,
+          "Value": "Fuera de Agencia"
+        }
+      ],
+      "Agencia#Id": [
+        1
+      ],
+      "Agencia#Id@odata.type": "#Collection(Int64)",
+      "Agencia@odata.type": "#Collection(Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference)",
+      "Author": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser",
+        "Claims": "i:0#.f|membership|mtellez@avasa.com.mx",
+        "Department": null,
+        "DisplayName": "Marco Antonio Téllez Ordóñez",
+        "Email": "mtellez@avasa.com.mx",
+        "JobTitle": null,
+        "Picture": "https://hertzmexico-my.sharepoint.com/personal/mtellez_avasa_com_mx/_layouts/15/UserPhoto.aspx?Size=L&AccountName=mtellez@avasa.com.mx"
+      },
+      "Author#Claims": "i:0#.f|membership|mtellez@avasa.com.mx",
+      "ComentariosRevision": "Adelante con el proyecto",
+      "Created": "2026-10-08T15:43:44Z",
+      "Descripci_x00f3_ndelproyecto": "Act_FeriaMaxcan_081026",
+      "Editor": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser",
+        "Claims": "i:0#.f|membership|mtellez@avasa.com.mx",
+        "Department": null,
+        "DisplayName": "Marco Antonio Téllez Ordóñez",
+        "Email": "mtellez@avasa.com.mx",
+        "JobTitle": null,
+        "Picture": "https://hertzmexico-my.sharepoint.com/personal/mtellez_avasa_com_mx/_layouts/15/UserPhoto.aspx?Size=L&AccountName=mtellez@avasa.com.mx"
+      },
+      "Editor#Claims": "i:0#.f|membership|mtellez@avasa.com.mx",
+      "Estatus": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference",
+        "Id": 1,
+        "Value": "Aprobado"
+      },
+      "Estatus#Id": 1,
+      "FechaFin": "domingo, 27 de septiembre del 2026",
+      "FechaInicio": "sábado, 26 de septiembre del 2026",
+      "Horarios": "De 12:00 h (12:00 pm) a 19:00 h (07:00 pm)",
+      "ID": 6,
+      "Inversi_x00f3_nTotal": "$6,920.00 MXN",
+      "ItemInternalId": "6",
+      "Modified": "2026-10-08T15:44:33Z",
+      "OData__ApprovalAssignedTo": [],
+      "OData__ApprovalAssignedTo#Claims": [],
+      "OData__ApprovalAssignedTo#Claims@odata.type": "#Collection(String)",
+      "OData__ApprovalAssignedTo@odata.type": "#Collection(Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser)",
+      "OData__ApprovalRespondedBy": [],
+      "OData__ApprovalRespondedBy#Claims": [],
+      "OData__ApprovalRespondedBy#Claims@odata.type": "#Collection(String)",
+      "OData__ApprovalRespondedBy@odata.type": "#Collection(Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser)",
+      "ObservacionesCierre": "<div class=\"ExternalClassADB2357EE7224B1183A91919D6C7878D\"><p class=\"editor-paragraph\">Automaya, Millenium</p></div>",
+      "Solicitante": "mtellez@avasa.com.mx",
+      "Title": "Feria Maxcanú",
+      "{ApprovalStatus}": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedApprovalStatus",
+        "Label": "Not submitted",
+        "Value": 0
+      },
+      "{ApprovalStatus}#Value": 0,
+      "{ContentType}": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedContentType",
+        "Id": "0x0100751B8C2DB2BDA643ACC926FCB7C283D500D75B868866BC5B4D9F5FA4FE01E3F4EF",
+        "Name": "Item"
+      },
+      "{ContentType}#Id": "0x0100751B8C2DB2BDA643ACC926FCB7C283D500D75B868866BC5B4D9F5FA4FE01E3F4EF",
+      "{FilenameWithExtension}": "Feria Maxcanú",
+      "{FullPath}": "Lists/Activaciones Distribuidoras Automotrices/6_.000",
+      "{HasAttachments}": false,
+      "{Identifier}": "Lists%252fActivaciones%2bDistribuidoras%2bAutomotrices%252f6_.000",
+      "{IsFolder}": false,
+      "{Link}": "https://hertzmexico-my.sharepoint.com/personal/mtellez_avasa_com_mx/_layouts/15/listform.aspx?PageType=4&ListId=05745873%2D06df%2D4632%2D9e1c%2Df1d2c6cae134&ID=6&ContentTypeID=0x0100751B8C2DB2BDA643ACC926FCB7C283D500D75B868866BC5B4D9F5FA4FE01E3F4EF",
+      "{Name}": "Feria Maxcanú",
+      "{Path}": "Lists/Activaciones Distribuidoras Automotrices/",
+      "{VersionNumber}": "2.0"
+    },
+    {
+      "@odata.etag": "\"2\"",
+      "Agencia": [
+        {
+          "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference",
+          "Id": 1,
+          "Value": "Fuera de Agencia"
+        }
+      ],
+      "Agencia#Id": [
+        1
+      ],
+      "Agencia#Id@odata.type": "#Collection(Int64)",
+      "Agencia@odata.type": "#Collection(Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference)",
+      "Author": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser",
+        "Claims": "i:0#.f|membership|mtellez@avasa.com.mx",
+        "Department": null,
+        "DisplayName": "Marco Antonio Téllez Ordóñez",
+        "Email": "mtellez@avasa.com.mx",
+        "JobTitle": null,
+        "Picture": "https://hertzmexico-my.sharepoint.com/personal/mtellez_avasa_com_mx/_layouts/15/UserPhoto.aspx?Size=L&AccountName=mtellez@avasa.com.mx"
+      },
+      "Author#Claims": "i:0#.f|membership|mtellez@avasa.com.mx",
+      "ComentariosRevision": "Bien, adelante",
+      "Created": "2026-10-08T20:54:10Z",
+      "Descripci_x00f3_ndelproyecto": "Act_FeriaMaxcan_081026",
+      "Editor": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser",
+        "Claims": "i:0#.f|membership|mtellez@avasa.com.mx",
+        "Department": null,
+        "DisplayName": "Marco Antonio Téllez Ordóñez",
+        "Email": "mtellez@avasa.com.mx",
+        "JobTitle": null,
+        "Picture": "https://hertzmexico-my.sharepoint.com/personal/mtellez_avasa_com_mx/_layouts/15/UserPhoto.aspx?Size=L&AccountName=mtellez@avasa.com.mx"
+      },
+      "Editor#Claims": "i:0#.f|membership|mtellez@avasa.com.mx",
+      "Estatus": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference",
+        "Id": 1,
+        "Value": "Aprobado"
+      },
+      "Estatus#Id": 1,
+      "FechaFin": "domingo, 27 de septiembre del 2026",
+      "FechaInicio": "sábado, 26 de septiembre del 2026",
+      "Horarios": "De 12:00 h (12:00 pm) a 19:00 h (07:00 pm)",
+      "ID": 7,
+      "Inversi_x00f3_nTotal": "$6,920.00 MXN",
+      "ItemInternalId": "7",
+      "Modified": "2026-10-08T20:54:59Z",
+      "OData__ApprovalAssignedTo": [],
+      "OData__ApprovalAssignedTo#Claims": [],
+      "OData__ApprovalAssignedTo#Claims@odata.type": "#Collection(String)",
+      "OData__ApprovalAssignedTo@odata.type": "#Collection(Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser)",
+      "OData__ApprovalRespondedBy": [],
+      "OData__ApprovalRespondedBy#Claims": [],
+      "OData__ApprovalRespondedBy#Claims@odata.type": "#Collection(String)",
+      "OData__ApprovalRespondedBy@odata.type": "#Collection(Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser)",
+      "ObservacionesCierre": "<div class=\"ExternalClassFA19360A43A3410F9C8DEF98988215A9\"><p class=\"editor-paragraph\">Automaya, Millenium</p></div>",
+      "Solicitante": "mtellez@avasa.com.mx",
+      "Title": "Feria Maxcanú",
+      "{ApprovalStatus}": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedApprovalStatus",
+        "Label": "Not submitted",
+        "Value": 0
+      },
+      "{ApprovalStatus}#Value": 0,
+      "{ContentType}": {
+        "@odata.type": "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedContentType",
+        "Id": "0x0100751B8C2DB2BDA643ACC926FCB7C283D500D75B868866BC5B4D9F5FA4FE01E3F4EF",
+        "Name": "Item"
+      },
+      "{ContentType}#Id": "0x0100751B8C2DB2BDA643ACC926FCB7C283D500D75B868866BC5B4D9F5FA4FE01E3F4EF",
+      "{FilenameWithExtension}": "Feria Maxcanú",
+      "{FullPath}": "Lists/Activaciones Distribuidoras Automotrices/7_.000",
+      "{HasAttachments}": false,
+      "{Identifier}": "Lists%252fActivaciones%2bDistribuidoras%2bAutomotrices%252f7_.000",
+      "{IsFolder}": false,
+      "{Link}": "https://hertzmexico-my.sharepoint.com/personal/mtellez_avasa_com_mx/_layouts/15/listform.aspx?PageType=4&ListId=05745873%2D06df%2D4632%2D9e1c%2Df1d2c6cae134&ID=7&ContentTypeID=0x0100751B8C2DB2BDA643ACC926FCB7C283D500D75B868866BC5B4D9F5FA4FE01E3F4EF",
+      "{Name}": "Feria Maxcanú",
+      "{Path}": "Lists/Activaciones Distribuidoras Automotrices/",
+      "{VersionNumber}": "2.0"
+    }
+  ],
   "ventas": []
 }
