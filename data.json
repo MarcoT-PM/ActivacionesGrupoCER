@@ -1,27 +1,4 @@
 {
-  "activaciones": [
-    {
-      "folio": "Act_FeriaMaxcanu_061026",
-      "nombreActivacion": "Feria Comercial Maxcanú",
-      "distribuidoras": "Automaya, Caribe",
-      "tipoSede": "Fuera de Agencia",
-      "fechaInicio": "lunes, 6 de octubre del 2026",
-      "fechaFin": "domingo, 12 de octubre del 2026",
-      "inversion": 6920.00,
-      "estatus": "Activo"
-    }
-  ],
-  "ventas": [
-    {
-      "id": 1,
-      "folio": "Act_FeriaMaxcanu_061026",
-      "fecha": "2026-10-07",
-      "distribuidora": "Automaya",
-      "marca": "RAM",
-      "modelo": "Ram 700 Bighorn",
-      "anio": "2026",
-      "factura": "F-89321",
-      "utilidad": 18500.00
-    }
-  ]
+  "activaciones": [],
+  "ventas": []
 }
