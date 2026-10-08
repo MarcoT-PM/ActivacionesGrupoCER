@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal de Activaciones - Grupo CER</title>
+  <title>Suite de Activaciones - Grupo CER</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
@@ -27,18 +27,54 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { background-color: var(--bg-page); color: var(--text-main); padding: 30px 20px; line-height: 1.5; }
+    body { background-color: var(--bg-page); color: var(--text-main); padding: 25px 20px; line-height: 1.5; }
 
+    /* NAVBAR INSTITUCIONAL */
+    .main-navbar {
+      max-width: 960px;
+      margin: 0 auto 20px auto;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 6px 10px;
+      display: flex;
+      gap: 8px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-subtle);
+    }
+    .nav-tab-btn {
+      flex: 1;
+      height: 42px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .nav-tab-btn:hover { background: var(--btn-gray); color: var(--text-main); }
+    .nav-tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 32, 96, 0.2);
+    }
+
+    /* BARRA DE BOTONES SUPERIOR */
     .top-toolbar {
       max-width: 960px;
-      margin: 0 auto 24px auto;
+      margin: 0 auto 20px auto;
       display: flex;
       flex-wrap: wrap;
       justify-content: flex-end;
       gap: 10px;
     }
     .btn-action-top {
-      height: 44px;
+      height: 42px;
       padding: 0 16px;
       border-radius: var(--radius-sm);
       font-size: 13px;
@@ -64,21 +100,21 @@
       margin: 0 auto;
       background: var(--surface);
       border-radius: var(--radius-lg);
-      padding: 40px;
+      padding: 35px;
       box-shadow: var(--shadow-card);
       border: 1px solid var(--border-subtle);
     }
 
     .header-branding {
       text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 25px;
+      margin-bottom: 25px;
+      padding-bottom: 20px;
       border-bottom: 1px solid var(--border-subtle);
     }
     .header-logo {
-      height: 52px;
+      height: 48px;
       width: auto;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       object-fit: contain;
     }
     .header-branding h1 {
@@ -87,20 +123,21 @@
       font-weight: 800;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
     }
     .meta-pills {
       display: inline-flex;
       flex-wrap: wrap;
       justify-content: center;
       background: var(--primary-soft);
-      padding: 8px 18px;
+      padding: 6px 16px;
       border-radius: 999px;
       gap: 15px;
       font-size: 13px;
       color: var(--primary);
       font-weight: 600;
       transition: all 0.3s ease;
+      margin-top: 10px;
     }
     .meta-pills.locked-mode {
       background: #eff6ff;
@@ -108,26 +145,59 @@
       color: #1e40af;
     }
 
+    /* KPI DASHBOARD */
+    .kpi-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .kpi-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 22px; font-weight: 800; color: var(--primary); }
+    .kpi-subtext { font-size: 11px; color: var(--text-muted); }
+
+    .roi-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .roi-negative { background: #fee2e2; color: #b91c1c; }
+    .roi-neutral  { background: #fef3c7; color: #b45309; }
+    .roi-positive { background: #dcfce7; color: #15803d; }
+
     .section-card {
-      padding-top: 28px;
-      margin-top: 28px;
+      padding-top: 25px;
+      margin-top: 25px;
       border-top: 1px solid var(--border-subtle);
     }
     .section-card:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
-    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
     .section-num {
       width: 26px; height: 26px; border-radius: 50%; background: var(--primary);
       color: #ffffff; display: flex; align-items: center; justify-content: center;
       font-size: 12px; font-weight: bold;
     }
-    .section-title { font-size: 15px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.3px; }
+    .section-title { font-size: 14px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.3px; }
 
-    .form-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+    .form-grid { display: flex; flex-wrap: wrap; gap: 14px; }
     .col-12 { flex: 0 0 100%; width: 100%; }
-    .col-8  { flex: 0 0 calc(66.666% - 11px); width: calc(66.666% - 11px); }
-    .col-6  { flex: 0 0 calc(50% - 8px); width: calc(50% - 8px); }
-    .col-4  { flex: 0 0 calc(33.333% - 11px); width: calc(33.333% - 11px); }
-    .col-3  { flex: 0 0 calc(25% - 12px); width: calc(25% - 12px); }
+    .col-8  { flex: 0 0 calc(66.666% - 10px); width: calc(66.666% - 10px); }
+    .col-6  { flex: 0 0 calc(50% - 7px); width: calc(50% - 7px); }
+    .col-4  { flex: 0 0 calc(33.333% - 10px); width: calc(33.333% - 10px); }
+    .col-3  { flex: 0 0 calc(25% - 11px); width: calc(25% - 11px); }
 
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.2px; }
@@ -156,7 +226,7 @@
     .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow: hidden; margin-top: 10px; }
     .modern-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .modern-table th { background: var(--primary-soft); color: var(--primary); font-weight: 700; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
-    .modern-table td { padding: 6px 8px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; background: #ffffff; }
+    .modern-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; background: #ffffff; }
     .modern-table tr:last-child td { border-bottom: none; }
 
     .btn-row-delete {
@@ -174,7 +244,7 @@
     .btn-tbl-add:hover { background: var(--primary-hover); }
 
     .total-banner {
-      display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 16px 20px;
+      display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 14px 20px;
       background: var(--primary-soft); border-radius: var(--radius-sm); margin-top: 14px; font-weight: 700; color: var(--primary);
     }
     .total-amount { font-size: 20px; color: var(--primary); }
@@ -185,65 +255,37 @@
 
     /* DOSSIER RESUMEN EJECUTIVO (PAGINACIÓN SEGURA) */
     #plantillaDossier {
-      display: none;
-      background: #ffffff;
-      color: #0f172a;
-      padding: 25px 35px;
-      font-size: 12px;
-      line-height: 1.45;
+      display: none; background: #ffffff; color: #0f172a; padding: 25px 35px; font-size: 12px; line-height: 1.45;
     }
     .dossier-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
     .dossier-header img { height: 46px; margin-bottom: 8px; }
     .dossier-header h2 { font-size: 18px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-    
     .dossier-bar {
       display: flex; justify-content: space-between; background: var(--primary-soft);
       padding: 8px 14px; border-radius: 6px; font-weight: bold; color: var(--primary); font-size: 11px; margin-bottom: 18px;
     }
-    .dossier-block { margin-bottom: 18px; }
+    .dossier-block { margin-bottom: 18px; break-inside: avoid; page-break-inside: avoid; }
     .dossier-block-title {
       font-size: 12px; font-weight: bold; color: var(--primary); text-transform: uppercase;
       border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 8px;
     }
-    .dossier-desc {
-      background: #f8fafc; border-left: 3px solid var(--primary); padding: 8px 12px; font-style: italic; color: #334155; margin-bottom: 10px;
-    }
-    .dossier-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px; }
-    .dossier-pill-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; }
-    
+    .dossier-desc { background: #f8fafc; border-left: 3px solid var(--primary); padding: 8px 12px; font-style: italic; color: #334155; margin-bottom: 10px; }
+    .dossier-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px; break-inside: avoid; page-break-inside: avoid; }
+    .dossier-pill-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; break-inside: avoid; page-break-inside: avoid; }
     .dossier-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px; }
     .dossier-table th { background: #f1f5f9; color: var(--primary); padding: 6px; text-align: left; border: 1px solid #cbd5e1; }
     .dossier-table td { padding: 6px; border: 1px solid #cbd5e1; }
-
-    .dossier-block, .dossier-grid-2, .dossier-pill-box { break-inside: avoid; page-break-inside: avoid; }
     .dossier-table tr { break-inside: avoid; page-break-inside: avoid; }
 
-    /* CONTENEDOR DE TOASTS MODERNOS */
+    /* TOASTS MODERNOS */
     #toastContainer {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: none;
+      position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
     }
     .toast {
-      pointer-events: auto;
-      min-width: 280px;
-      max-width: 420px;
-      padding: 14px 18px;
-      border-radius: var(--radius-sm);
-      background: #ffffff;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-      border-left: 5px solid var(--primary);
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      transform: translateX(120%);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-      opacity: 0;
+      pointer-events: auto; min-width: 280px; max-width: 420px; padding: 14px 18px; border-radius: var(--radius-sm);
+      background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border-left: 5px solid var(--primary);
+      display: flex; align-items: flex-start; gap: 12px; transform: translateX(120%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; opacity: 0;
     }
     .toast.show { transform: translateX(0); opacity: 1; }
     .toast-icon { font-size: 18px; line-height: 1; }
@@ -251,36 +293,19 @@
     .toast-title { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
     .toast-msg { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
     .toast.success { border-left-color: #10b981; }
-    .toast.success .toast-icon { color: #10b981; }
     .toast.warning { border-left-color: #f59e0b; }
-    .toast.warning .toast-icon { color: #f59e0b; }
     .toast.info { border-left-color: #2563eb; }
-    .toast.info .toast-icon { color: #2563eb; }
 
-    /* MODAL DE CONFIRMACIÓN ELEGANTE */
+    /* MODAL RESET */
     .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.45);
-      backdrop-filter: blur(3px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 10000;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
     .modal-box {
-      background: #ffffff;
-      border-radius: var(--radius-md);
-      max-width: 440px;
-      width: 90%;
-      padding: 24px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-      transform: scale(0.95);
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      background: #ffffff; border-radius: var(--radius-md); max-width: 440px; width: 90%; padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15); transform: scale(0.95); transition: transform 0.2s ease;
     }
     .modal-overlay.open .modal-box { transform: scale(1); }
     .modal-title { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
@@ -289,7 +314,6 @@
     .btn-modal { height: 38px; padding: 0 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
     .btn-modal-cancel { background: var(--btn-gray); color: var(--btn-gray-text); }
     .btn-modal-confirm { background: #ef4444; color: #ffffff; }
-    .btn-modal-confirm:hover { background: #dc2626; }
   </style>
 </head>
 <body>
@@ -308,265 +332,477 @@
   </div>
 </div>
 
-<div class="top-toolbar">
-  <button type="button" class="btn-action-top btn-reset-main" onclick="solicitarReinicio()">
-    <span>⟲</span> Iniciar Nuevo Registro
+<!-- NAVBAR DE 3 VISTAS -->
+<nav class="main-navbar">
+  <button type="button" class="nav-tab-btn active" onclick="cambiarVista('dashboard')">
+    <span>📊</span> Dashboard General
   </button>
-  
-  <input type="file" id="fileImportar" accept=".txt,.json" style="display: none;" onchange="importarBorradorDesdeArchivo(this)">
-  <button type="button" class="btn-action-top btn-secondary-main" onclick="document.getElementById('fileImportar').click()">
-    <span>📂</span> Cargar Borrador (.txt)
+  <button type="button" class="nav-tab-btn" onclick="cambiarVista('captura')">
+    <span>➕</span> Solicitar Activación
   </button>
+  <button type="button" class="nav-tab-btn" onclick="cambiarVista('seguimiento')">
+    <span>📈</span> Seguimiento de Ventas & ROI
+  </button>
+</nav>
 
-  <button type="button" class="btn-action-top btn-secondary-main" onclick="descargarRespaldoManual()">
-    <span>💾</span> Descargar Respaldo (.txt)
-  </button>
+<!-- ========================================== -->
+<!-- VISTA 1: DASHBOARD GENERAL (HOME)          -->
+<!-- ========================================== -->
+<div id="viewDashboard" class="view-section">
+  <div class="card-canvas">
+    <div class="header-branding">
+      <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" class="header-logo" onerror="this.style.display='none'">
+      <h1>Tablero Ejecutivo de Activaciones</h1>
+      <p style="font-size: 13px; color: var(--text-muted);">Monitoreo integral de presupuesto, proyectos en curso y retorno de inversión comercial</p>
+    </div>
 
-  <button type="button" class="btn-action-top btn-pdf-main" onclick="exportarDossierPDF()">
-    <span>🖨️</span> Exportar PDF Resumen
-  </button>
+    <!-- TARJETAS KPI -->
+    <div class="kpi-container">
+      <div class="kpi-card">
+        <span class="kpi-title">Inversión Comprometida</span>
+        <span class="kpi-value" id="kpiTotalInversion">$0.00 MXN</span>
+        <span class="kpi-subtext">Total proyectos aprobados</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">Proyectos Registrados</span>
+        <span class="kpi-value" id="kpiProyectosActivos">0</span>
+        <span class="kpi-subtext">En planeación o ejecución</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">Unidades Facturadas</span>
+        <span class="kpi-value" id="kpiUnidadesVendidas">0</span>
+        <span class="kpi-subtext">Cierres comerciales acumulados</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">ROI Promedio</span>
+        <span class="kpi-value" id="kpiRoiPromedio">0.0%</span>
+        <span class="kpi-subtext">Retorno comercial global</span>
+      </div>
+    </div>
 
-  <button type="button" class="btn-action-top btn-send-main" onclick="enviarAutorizacion()">
-    <span>✉️</span> Mandar Proyecto a Autorización
-  </button>
+    <!-- TABLA MAESTRA DE ACTIVACIONES -->
+    <div class="section-card">
+      <div class="section-header" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="section-num">📋</div>
+          <div class="section-title">Portafolio de Activaciones</div>
+        </div>
+        <button type="button" class="btn-action-top btn-send-main" style="height: 36px;" onclick="cambiarVista('captura')">
+          <span>+</span> Nueva Solicitud
+        </button>
+      </div>
+
+      <div class="table-container">
+        <table class="modern-table" id="tblProyectosDashboard">
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Activación</th>
+              <th>Distribuidoras</th>
+              <th style="width: 130px;">Inversión</th>
+              <th style="width: 80px; text-align: center;">Autos</th>
+              <th style="width: 100px; text-align: center;">ROI (%)</th>
+              <th style="width: 140px; text-align: center;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="7" class="text-center" style="padding: 20px; color: var(--text-muted); font-style: italic;">
+                No hay activaciones registradas en el sistema.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="card-canvas" id="areaCaptura">
-
-  <div class="header-branding">
-    <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" class="header-logo" onerror="this.style.display='none'">
-    <h1>Formato Activaciones Grupo CER</h1>
-    <div class="meta-pills" id="contenedorPills">
-      <div>Fecha: <span id="lblFechaReg" style="font-weight: normal;">--/--/----</span></div>
-      <div>Folio: <span id="lblFolio">Act_SinNombre_000000</span></div>
-    </div>
+<!-- ========================================== -->
+<!-- VISTA 2: CAPTURA (FORMULARIO PRINCIPAL)    -->
+<!-- ========================================== -->
+<div id="viewCaptura" class="view-section hidden">
+  <div class="top-toolbar">
+    <button type="button" class="btn-action-top btn-reset-main" onclick="solicitarReinicio()">
+      <span>⟲</span> Iniciar Nuevo Registro
+    </button>
+    <input type="file" id="fileImportar" accept=".txt,.json" style="display: none;" onchange="importarBorradorDesdeArchivo(this)">
+    <button type="button" class="btn-action-top btn-secondary-main" onclick="document.getElementById('fileImportar').click()">
+      <span>📂</span> Cargar Borrador (.txt)
+    </button>
+    <button type="button" class="btn-action-top btn-secondary-main" onclick="descargarRespaldoManual()">
+      <span>💾</span> Descargar Respaldo (.txt)
+    </button>
+    <button type="button" class="btn-action-top btn-pdf-main" onclick="exportarDossierPDF()">
+      <span>🖨️</span> Exportar PDF Resumen
+    </button>
+    <button type="button" class="btn-action-top btn-send-main" onclick="enviarAutorizacion()">
+      <span>✉️</span> Mandar Proyecto a Autorización
+    </button>
   </div>
 
-  <!-- SECCIÓN 1 -->
-  <div class="section-card">
-    <div class="section-header">
-      <div class="section-num">1</div>
-      <div class="section-title">Información General</div>
+  <div class="card-canvas" id="areaCaptura">
+    <div class="header-branding">
+      <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" class="header-logo" onerror="this.style.display='none'">
+      <h1>Formato Activaciones Grupo CER</h1>
+      <div class="meta-pills" id="contenedorPills">
+        <div>Fecha: <span id="lblFechaReg" style="font-weight: normal;">--/--/----</span></div>
+        <div>Folio: <span id="lblFolio">Act_SinNombre_000000</span></div>
+      </div>
     </div>
-    <div class="form-grid">
-      <div class="col-8 form-group">
-        <label class="form-label">Nombre de la Activación *</label>
-        <input type="text" id="nombreAct" placeholder="Ej. Campaña Special Days" oninput="actualizarFolio(); marcarLleno(this)">
-      </div>
-      <div class="col-4 form-group">
-        <label class="form-label">Tipo de Sede *</label>
-        <select id="tipoSede" onchange="gestionarTipoSede(); marcarLleno(this)">
-          <option value="Dentro de Agencia">Dentro de Agencia</option>
-          <option value="Fuera de Agencia">Fuera de Agencia</option>
-        </select>
-      </div>
-      <div class="col-12 form-group">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <label class="form-label">Descripción de la Activación *</label>
-          <span id="contadorPalabras" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">0 / 80 palabras</span>
-        </div>
-        <textarea id="descAct" placeholder="Redacta un breve resumen del evento, objetivos comerciales e intención..." oninput="controlarDescripcion(this); marcarLleno(this)"></textarea>
-      </div>
 
-      <div class="col-12 form-group">
-        <label class="form-label">Distribuidoras Participantes *</label>
-        <div class="checkbox-cards-grid">
-          <label class="checkbox-card" id="cardAuto">
-            <input type="checkbox" id="chkAuto" onchange="sincronizarAgencias()"> Automaya
-          </label>
-          <label class="checkbox-card" id="cardCaribe">
-            <input type="checkbox" id="chkCaribe" onchange="sincronizarAgencias()"> Caribe
-          </label>
-          <label class="checkbox-card" id="cardChetu">
-            <input type="checkbox" id="chkChetu" onchange="sincronizarAgencias()"> Chetumal
-          </label>
-          <label class="checkbox-card" id="cardMillen">
-            <input type="checkbox" id="chkMillen" onchange="sincronizarAgencias()"> Millenium
-          </label>
-        </div>
+    <!-- SECCIÓN 1 -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div class="section-title">Información General</div>
       </div>
-    </div>
-  </div>
+      <div class="form-grid">
+        <div class="col-8 form-group">
+          <label class="form-label">Nombre de la Activación *</label>
+          <input type="text" id="nombreAct" placeholder="Ej. Campaña Special Days" oninput="actualizarFolio(); marcarLleno(this)">
+        </div>
+        <div class="col-4 form-group">
+          <label class="form-label">Tipo de Sede *</label>
+          <select id="tipoSede" onchange="gestionarTipoSede(); marcarLleno(this)">
+            <option value="Dentro de Agencia">Dentro de Agencia</option>
+            <option value="Fuera de Agencia">Fuera de Agencia</option>
+          </select>
+        </div>
+        <div class="col-12 form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label class="form-label">Descripción de la Activación *</label>
+            <span id="contadorPalabras" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">0 / 80 palabras</span>
+          </div>
+          <textarea id="descAct" placeholder="Redacta un breve resumen del evento, objetivos comerciales e intención..." oninput="controlarDescripcion(this); marcarLleno(this)"></textarea>
+        </div>
 
-  <!-- SECCIÓN 2A: DENTRO DE AGENCIA -->
-  <div class="section-card" id="secSedesEnAgencia">
-    <div class="section-header">
-      <div class="section-num">2</div>
-      <div class="section-title">Sedes y Sub-Agencias Participantes</div>
-    </div>
-    <div id="subAgenciasContainer">
-      <div class="subagency-card hidden" id="subAuto">
-        <div class="subagency-title">Automaya - Sub-Agencias</div>
-        <div class="checkbox-cards-grid">
-          <label class="checkbox-card"><input type="checkbox" id="sucMontejo"> Montejo</label>
-          <label class="checkbox-card"><input type="checkbox" id="sucItzaes"> Itzaes</label>
-          <label class="checkbox-card"><input type="checkbox" id="sucValladolid"> Valladolid</label>
-        </div>
-      </div>
-      <div class="subagency-card hidden" id="subCaribe">
-        <div class="subagency-title">Caribe - Sub-Agencias</div>
-        <div class="checkbox-cards-grid">
-          <label class="checkbox-card"><input type="checkbox" id="sucCancun"> Cancún</label>
-          <label class="checkbox-card"><input type="checkbox" id="sucPlaya"> Playa del Carmen</label>
+        <div class="col-12 form-group">
+          <label class="form-label">Distribuidoras Participantes *</label>
+          <div class="checkbox-cards-grid">
+            <label class="checkbox-card" id="cardAuto">
+              <input type="checkbox" id="chkAuto" onchange="sincronizarAgencias()"> Automaya
+            </label>
+            <label class="checkbox-card" id="cardCaribe">
+              <input type="checkbox" id="chkCaribe" onchange="sincronizarAgencias()"> Caribe
+            </label>
+            <label class="checkbox-card" id="cardChetu">
+              <input type="checkbox" id="chkChetu" onchange="sincronizarAgencias()"> Chetumal
+            </label>
+            <label class="checkbox-card" id="cardMillen">
+              <input type="checkbox" id="chkMillen" onchange="sincronizarAgencias()"> Millenium
+            </label>
+          </div>
         </div>
       </div>
-      <div class="subagency-card hidden" id="subChetu">
-        <div class="subagency-title">Chetumal</div>
-        <div class="subagency-empty">No contiene sub-agencias (Sede Matriz activa)</div>
-      </div>
-      <div class="subagency-card hidden" id="subMillen">
-        <div class="subagency-title">Millenium</div>
-        <div class="subagency-empty">No contiene sub-agencias (Sede Matriz activa)</div>
-      </div>
-      <div id="sinAgenciasMsg" class="subagency-empty" style="padding: 10px 0;">Selecciona una o más distribuidoras en la Sección 1 para configurar las sedes.</div>
     </div>
-  </div>
 
-  <!-- SECCIÓN 2B: FUERA DE AGENCIA -->
-  <div class="section-card hidden" id="secSedesForaneo">
-    <div class="section-header">
-      <div class="section-num">2</div>
-      <div class="section-title">Ubicación Foránea</div>
-    </div>
-    <div class="form-grid">
-      <div class="col-6 form-group">
-        <label class="form-label">Estado *</label>
-        <select id="selEstado" onchange="filtrarMunicipios(); marcarLleno(this)">
-          <option value="">Seleccione Estado...</option>
-        </select>
+    <!-- SECCIÓN 2A: DENTRO DE AGENCIA -->
+    <div class="section-card" id="secSedesEnAgencia">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title">Sedes y Sub-Agencias Participantes</div>
       </div>
-      <div class="col-6 form-group">
-        <label class="form-label">Municipio *</label>
-        <select id="selMunicipio" onchange="marcarLleno(this)">
-          <option value="">Seleccione Municipio...</option>
-        </select>
-      </div>
-      <div class="col-12 form-group">
-        <label class="form-label">Referencia de Ubicación *</label>
-        <input type="text" id="refUbicacion" placeholder="Centro comercial, explanada, dirección física..." oninput="marcarLleno(this)">
-      </div>
-    </div>
-  </div>
-
-  <!-- SECCIÓN 3 -->
-  <div class="section-card">
-    <div class="section-header">
-      <div class="section-num">3</div>
-      <div class="section-title">Calendario y Horarios</div>
-    </div>
-    <div class="form-grid">
-      <div class="col-3 form-group">
-        <label class="form-label">Fecha Inicio *</label>
-        <input type="date" id="fechaInicio" onchange="actualizarDiasDisponibles(); marcarLleno(this)">
-      </div>
-      <div class="col-3 form-group">
-        <label class="form-label">Fecha Fin *</label>
-        <input type="date" id="fechaFin" onchange="actualizarDiasDisponibles(); marcarLleno(this)">
-      </div>
-      <div class="col-3 form-group">
-        <label class="form-label">Hora Entrada *</label>
-        <input type="time" id="horaEntrada" onchange="marcarLleno(this)">
-      </div>
-      <div class="col-3 form-group">
-        <label class="form-label">Hora Salida *</label>
-        <input type="time" id="horaSalida" onchange="marcarLleno(this)">
-      </div>
-      <div class="col-12 form-group">
-        <label class="form-label">Observaciones de Horario</label>
-        <input type="text" id="obsHorario" placeholder="Ej. El martes el horario de atención será especial de 5:00 PM a 7:00 PM..." oninput="marcarLleno(this)">
-      </div>
-    </div>
-  </div>
-
-  <!-- SECCIÓN 4 -->
-  <div class="section-card">
-    <div class="section-header">
-      <div class="section-num">4</div>
-      <div class="section-title">Unidades en Exhibición</div>
-    </div>
-    <div class="form-grid">
-      <div class="col-4 form-group">
-        <label class="form-label">¿Se requieren unidades?</label>
-        <select id="aplicaUnidades" onchange="gestionarAplicaUnidades(); marcarLleno(this)">
-          <option value="NO">NO</option>
-          <option value="SÍ">SÍ</option>
-        </select>
+      <div id="subAgenciasContainer">
+        <div class="subagency-card hidden" id="subAuto">
+          <div class="subagency-title">Automaya - Sub-Agencias</div>
+          <div class="checkbox-cards-grid">
+            <label class="checkbox-card"><input type="checkbox" id="sucMontejo"> Montejo</label>
+            <label class="checkbox-card"><input type="checkbox" id="sucItzaes"> Itzaes</label>
+            <label class="checkbox-card"><input type="checkbox" id="sucValladolid"> Valladolid</label>
+          </div>
+        </div>
+        <div class="subagency-card hidden" id="subCaribe">
+          <div class="subagency-title">Caribe - Sub-Agencias</div>
+          <div class="checkbox-cards-grid">
+            <label class="checkbox-card"><input type="checkbox" id="sucCancun"> Cancún</label>
+            <label class="checkbox-card"><input type="checkbox" id="sucPlaya"> Playa del Carmen</label>
+          </div>
+        </div>
+        <div class="subagency-card hidden" id="subChetu">
+          <div class="subagency-title">Chetumal</div>
+          <div class="subagency-empty">No contiene sub-agencias (Sede Matriz activa)</div>
+        </div>
+        <div class="subagency-card hidden" id="subMillen">
+          <div class="subagency-title">Millenium</div>
+          <div class="subagency-empty">No contiene sub-agencias (Sede Matriz activa)</div>
+        </div>
+        <div id="sinAgenciasMsg" class="subagency-empty" style="padding: 10px 0;">Selecciona una o más distribuidoras en la Sección 1 para configurar las sedes.</div>
       </div>
     </div>
 
-    <div id="contenedorUnidades" class="hidden">
+    <!-- SECCIÓN 2B: FUERA DE AGENCIA -->
+    <div class="section-card hidden" id="secSedesForaneo">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title">Ubicación Foránea</div>
+      </div>
+      <div class="form-grid">
+        <div class="col-6 form-group">
+          <label class="form-label">Estado *</label>
+          <select id="selEstado" onchange="filtrarMunicipios(); marcarLleno(this)">
+            <option value="">Seleccione Estado...</option>
+          </select>
+        </div>
+        <div class="col-6 form-group">
+          <label class="form-label">Municipio *</label>
+          <select id="selMunicipio" onchange="marcarLleno(this)">
+            <option value="">Seleccione Municipio...</option>
+          </select>
+        </div>
+        <div class="col-12 form-group">
+          <label class="form-label">Referencia de Ubicación *</label>
+          <input type="text" id="refUbicacion" placeholder="Centro comercial, explanada, dirección física..." oninput="marcarLleno(this)">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3 -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div class="section-title">Calendario y Horarios</div>
+      </div>
+      <div class="form-grid">
+        <div class="col-3 form-group">
+          <label class="form-label">Fecha Inicio *</label>
+          <input type="date" id="fechaInicio" onchange="actualizarDiasDisponibles(); marcarLleno(this)">
+        </div>
+        <div class="col-3 form-group">
+          <label class="form-label">Fecha Fin *</label>
+          <input type="date" id="fechaFin" onchange="actualizarDiasDisponibles(); marcarLleno(this)">
+        </div>
+        <div class="col-3 form-group">
+          <label class="form-label">Hora Entrada *</label>
+          <input type="time" id="horaEntrada" onchange="marcarLleno(this)">
+        </div>
+        <div class="col-3 form-group">
+          <label class="form-label">Hora Salida *</label>
+          <input type="time" id="horaSalida" onchange="marcarLleno(this)">
+        </div>
+        <div class="col-12 form-group">
+          <label class="form-label">Observaciones de Horario</label>
+          <input type="text" id="obsHorario" placeholder="Ej. El martes el horario de atención será especial de 5:00 PM a 7:00 PM..." oninput="marcarLleno(this)">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4 -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div class="section-title">Unidades en Exhibición</div>
+      </div>
+      <div class="form-grid">
+        <div class="col-4 form-group">
+          <label class="form-label">¿Se requieren unidades?</label>
+          <select id="aplicaUnidades" onchange="gestionarAplicaUnidades(); marcarLleno(this)">
+            <option value="NO">NO</option>
+            <option value="SÍ">SÍ</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="contenedorUnidades" class="hidden">
+        <div class="table-container">
+          <table class="modern-table" id="tblUnidades">
+            <thead>
+              <tr>
+                <th style="width: 35px;" class="text-center">#</th>
+                <th>Distribuidora</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th style="width: 100px;">Año</th>
+                <th style="width: 80px;" class="text-center">Cant.</th>
+                <th style="width: 40px;" class="text-center"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <button type="button" class="btn-tbl-add" onclick="agregarFilaUnidad()">+ Agregar Unidad</button>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5 -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div class="section-title">Responsables del Evento</div>
+      </div>
       <div class="table-container">
-        <table class="modern-table" id="tblUnidades">
+        <table class="modern-table" id="tblPersonal">
           <thead>
             <tr>
               <th style="width: 35px;" class="text-center">#</th>
               <th>Distribuidora</th>
-              <th>Marca</th>
-              <th>Modelo</th>
-              <th style="width: 100px;">Año</th>
-              <th style="width: 80px;" class="text-center">Cant.</th>
+              <th>Nombre Completo</th>
+              <th>Puesto / Rol</th>
+              <th style="width: 150px;">Asistencia</th>
+              <th style="width: 150px;">Día</th>
+              <th>Comentarios</th>
               <th style="width: 40px;" class="text-center"></th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
-      <button type="button" class="btn-tbl-add" onclick="agregarFilaUnidad()">+ Agregar Unidad</button>
+      <button type="button" class="btn-tbl-add" onclick="agregarFilaPersonal()">+ Agregar Personal</button>
+    </div>
+
+    <!-- SECCIÓN 6 -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <div class="section-title">Inversión y Presupuesto</div>
+      </div>
+      <div class="table-container">
+        <table class="modern-table" id="tblInversion">
+          <thead>
+            <tr>
+              <th style="width: 35px;" class="text-center">#</th>
+              <th>Concepto de Gasto</th>
+              <th style="width: 180px;" class="text-right">Monto (MXN)</th>
+              <th style="width: 40px;" class="text-center"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn-tbl-add" onclick="agregarFilaInversion()">+ Agregar Concepto</button>
+      <div class="total-banner">
+        <span>Total de Inversión:</span>
+        <span class="total-amount" id="txtTotalInversion">$0.00 MXN</span>
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- SECCIÓN 5 -->
-  <div class="section-card">
-    <div class="section-header">
-      <div class="section-num">5</div>
-      <div class="section-title">Responsables del Evento</div>
+<!-- ========================================== -->
+<!-- VISTA 3: SEGUIMIENTO DE VENTAS & ROI       -->
+<!-- ========================================== -->
+<div id="viewSeguimiento" class="view-section hidden">
+  <div class="card-canvas">
+    <div class="header-branding">
+      <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" class="header-logo" onerror="this.style.display='none'">
+      <h1>Registro Comercial y Medición de ROI</h1>
+      <p style="font-size: 13px; color: var(--text-muted);">Asigna ventas facturadas a cada activación para actualizar el retorno real de la inversión</p>
     </div>
-    <div class="table-container">
-      <table class="modern-table" id="tblPersonal">
-        <thead>
-          <tr>
-            <th style="width: 35px;" class="text-center">#</th>
-            <th>Distribuidora</th>
-            <th>Nombre Completo</th>
-            <th>Puesto / Rol</th>
-            <th style="width: 150px;">Asistencia</th>
-            <th style="width: 150px;">Día</th>
-            <th>Comentarios</th>
-            <th style="width: 40px;" class="text-center"></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+
+    <!-- SELECTOR DE ACTIVACIÓN -->
+    <div class="section-card" style="padding-top: 0; margin-top: 0; border-top: none;">
+      <div class="form-grid">
+        <div class="col-8 form-group">
+          <label class="form-label">Seleccionar Activación *</label>
+          <select id="selProyectoVentas" onchange="seleccionarProyectoParaVenta(this.value); marcarLleno(this)">
+            <option value="">Selecciona un proyecto...</option>
+          </select>
+        </div>
+        <div class="col-4 form-group">
+          <label class="form-label">O Buscar por Folio</label>
+          <input type="text" id="inpBuscarFolio" placeholder="Ej. Act_FeriaMaxcanu_061026" oninput="buscarFolioDirecto(this.value)">
+        </div>
+      </div>
     </div>
-    <button type="button" class="btn-tbl-add" onclick="agregarFilaPersonal()">+ Agregar Personal</button>
+
+    <!-- RESUMEN FINANCIERO Y CÁLCULO DE ROI -->
+    <div id="boxDetalleROI" class="hidden" style="margin-top: 20px;">
+      <div class="kpi-container">
+        <div class="kpi-card">
+          <span class="kpi-title">Inversión Autorizada</span>
+          <span class="kpi-value" id="roiInversion">$0.00 MXN</span>
+          <span class="kpi-subtext" id="roiProyectoNombre">--</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Utilidad Bruta Acumulada</span>
+          <span class="kpi-value" id="roiUtilidadAcum">$0.00 MXN</span>
+          <span class="kpi-subtext" id="roiUnidadesConteo">0 unidades facturadas</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Retorno (ROI Actual)</span>
+          <span class="kpi-value" id="roiPorcentaje">0.0%</span>
+          <span class="kpi-subtext" id="roiDiagnostico">Pendiente de ventas</span>
+        </div>
+      </div>
+
+      <!-- FORMULARIO DE CAPTURA DE VENTA -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-num">+</div>
+          <div class="section-title">Reportar Cierre de Unidad Facturada</div>
+        </div>
+        <div class="form-grid">
+          <div class="col-3 form-group">
+            <label class="form-label">Fecha Facturación *</label>
+            <input type="date" id="vtaFecha" onchange="marcarLleno(this)">
+          </div>
+          <div class="col-3 form-group">
+            <label class="form-label">Distribuidora *</label>
+            <select id="vtaDistribuidora" onchange="marcarLleno(this)">
+              <option value="">Seleccione...</option>
+            </select>
+          </div>
+          <div class="col-3 form-group">
+            <label class="form-label">Marca *</label>
+            <select id="vtaMarca" onchange="marcarLleno(this)">
+              <option value="">Seleccione Marca...</option>
+            </select>
+          </div>
+          <div class="col-3 form-group">
+            <label class="form-label">Modelo *</label>
+            <input type="text" id="vtaModelo" placeholder="Ej. Ram 700" oninput="marcarLleno(this)">
+          </div>
+          <div class="col-3 form-group">
+            <label class="form-label">Año *</label>
+            <input type="number" id="vtaAnio" placeholder="Ej. 2026" min="1990" max="2035" oninput="marcarLleno(this)">
+          </div>
+          <div class="col-3 form-group">
+            <label class="form-label">Núm. Factura / Pedido *</label>
+            <input type="text" id="vtaFactura" placeholder="Ej. F-94821" oninput="marcarLleno(this)">
+          </div>
+          <div class="col-3 form-group">
+            <label class="form-label">Utilidad Bruta (MXN) *</label>
+            <input type="number" id="vtaUtilidad" placeholder="Ej. 18500.00" min="0.01" step="0.01" oninput="marcarLleno(this)">
+          </div>
+          <div class="col-3 form-group" style="justify-content: flex-end;">
+            <button type="button" class="btn-action-top btn-send-main" style="width: 100%; justify-content: center;" onclick="guardarCierreUnidad()">
+              <span>💾</span> Guardar Cierre de Unidad
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BITÁCORA HISTÓRICA DE VENTAS -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-num">📜</div>
+          <div class="section-title">Bitácora de Unidades Facturadas de este Evento</div>
+        </div>
+        <div class="table-container">
+          <table class="modern-table" id="tblVentasProyecto">
+            <thead>
+              <tr>
+                <th style="width: 35px;" class="text-center">#</th>
+                <th>Fecha</th>
+                <th>Distribuidora</th>
+                <th>Marca y Modelo</th>
+                <th>Año</th>
+                <th>Factura</th>
+                <th style="text-align: right;">Utilidad Bruta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="7" class="text-center" style="padding: 16px; color: var(--text-muted); font-style: italic;">
+                  No hay ventas registradas aún para este folio.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <!-- SECCIÓN 6 -->
-  <div class="section-card">
-    <div class="section-header">
-      <div class="section-num">6</div>
-      <div class="section-title">Inversión y Presupuesto</div>
-    </div>
-    <div class="table-container">
-      <table class="modern-table" id="tblInversion">
-        <thead>
-          <tr>
-            <th style="width: 35px;" class="text-center">#</th>
-            <th>Concepto de Gasto</th>
-            <th style="width: 180px;" class="text-right">Monto (MXN)</th>
-            <th style="width: 40px;" class="text-center"></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <button type="button" class="btn-tbl-add" onclick="agregarFilaInversion()">+ Agregar Concepto</button>
-    <div class="total-banner">
-      <span>Total de Inversión:</span>
-      <span class="total-amount" id="txtTotalInversion">$0.00 MXN</span>
-    </div>
-  </div>
-
 </div>
 
 <!-- PLANTILLA RESUMEN DOSSIER -->
@@ -656,26 +892,48 @@ const LIMITE_PALABRAS = 80;
 window.onload = function() {
   poblarEstados();
   inicializarFormularioBase();
+  poblarMarcasVentas();
 
+  // Restaurar borrador de la sesión anterior
   const guardado = localStorage.getItem("borradorActivacion");
   if (guardado) {
     try {
       const data = JSON.parse(guardado);
       if (data.nombreAct || data.descAct || data.folio) {
         restaurarFormularioDesdeData(data);
-        mostrarToast("Borrador restaurado", "Se recuperaron los datos de tu sesión anterior en este equipo.", "info");
       }
     } catch (e) {
-      console.error("Error al restaurar borrador de localStorage", e);
+      console.error("Error al restaurar borrador", e);
     }
   }
+
+  // Refrescar datos del Dashboard y selector de seguimiento
+  actualizarDashboard();
+  refrescarSelectorProyectosVentas();
 };
+
+// --- NAVEGACIÓN SPA ---
+function cambiarVista(vista) {
+  document.getElementById("viewDashboard").classList.toggle("hidden", vista !== 'dashboard');
+  document.getElementById("viewCaptura").classList.toggle("hidden", vista !== 'captura');
+  document.getElementById("viewSeguimiento").classList.toggle("hidden", vista !== 'seguimiento');
+
+  document.querySelectorAll(".nav-tab-btn").forEach((btn, idx) => {
+    btn.classList.toggle("active", 
+      (vista === 'dashboard' && idx === 0) ||
+      (vista === 'captura' && idx === 1) ||
+      (vista === 'seguimiento' && idx === 2)
+    );
+  });
+
+  if (vista === 'dashboard') actualizarDashboard();
+  if (vista === 'seguimiento') refrescarSelectorProyectosVentas();
+}
 
 function mostrarToast(titulo, mensaje, tipo = "info") {
   const cont = document.getElementById("toastContainer");
   const t = document.createElement("div");
   t.className = `toast ${tipo}`;
-  
   let icon = "ℹ️";
   if (tipo === "success") icon = "✅";
   if (tipo === "warning") icon = "⚠️";
@@ -689,7 +947,6 @@ function mostrarToast(titulo, mensaje, tipo = "info") {
   `;
   cont.appendChild(t);
   setTimeout(() => t.classList.add("show"), 10);
-
   setTimeout(() => {
     t.classList.remove("show");
     setTimeout(() => t.remove(), 300);
@@ -704,7 +961,6 @@ function marcarLleno(el) {
 function controlarDescripcion(el) {
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
-
   let palabras = el.value.trim().split(/\s+/).filter(p => p.length > 0);
   if (palabras.length > LIMITE_PALABRAS) {
     el.value = palabras.slice(0, LIMITE_PALABRAS).join(" ");
@@ -992,7 +1248,7 @@ function ejecutarReinicioTotal() {
   localStorage.removeItem("borradorActivacion");
   localStorage.removeItem("folioCongelado");
   inicializarFormularioBase();
-  mostrarToast("Formulario reiniciado", "Se han limpiado todos los datos y liberado el folio.", "info");
+  mostrarToast("Formulario reiniciado", "Se han limpiado los datos y liberado el folio para un nuevo proyecto.", "info");
 }
 
 function inicializarFormularioBase() {
@@ -1042,7 +1298,7 @@ function prepararDatosDossier() {
   document.getElementById("pFolio").innerText = document.getElementById("lblFolio").innerText;
   document.getElementById("pFecha").innerText = document.getElementById("lblFechaReg").innerText;
   document.getElementById("pNombre").innerText = document.getElementById("nombreAct").value.trim() || "Sin Título";
-  document.getElementById("pDesc").innerText = document.getElementById("descAct").value.trim() || "Sin descripción proporcionada.";
+  document.getElementById("pDesc").innerText = document.getElementById("descAct").value.trim() || "Sin descripción.";
 
   const tipoSede = document.getElementById("tipoSede").value;
   document.getElementById("pTipoSede").innerText = tipoSede;
@@ -1167,11 +1423,12 @@ function construirPayloadCompleto() {
   });
 
   const inversionArr = [];
+  let sumaInversionNum = 0;
   document.querySelectorAll("#tblInversion tbody tr").forEach(r => {
-    inversionArr.push({
-      concepto: r.querySelector(".inp-con-inv") ? r.querySelector(".inp-con-inv").value : "",
-      monto: r.querySelector(".monto-val") ? r.querySelector(".monto-val").value : "0.00"
-    });
+    const con = r.querySelector(".inp-con-inv") ? r.querySelector(".inp-con-inv").value : "";
+    const mon = parseFloat(r.querySelector(".monto-val") ? r.querySelector(".monto-val").value : 0) || 0;
+    sumaInversionNum += mon;
+    inversionArr.push({ concepto: con, monto: mon.toFixed(2) });
   });
 
   return {
@@ -1184,6 +1441,7 @@ function construirPayloadCompleto() {
     fechaFin: fFinLarga,
     horarios: `De ${hEntrada} a ${hSalida}`,
     totalInversion: document.getElementById("txtTotalInversion").innerText,
+    inversionNumerica: sumaInversionNum,
     raw: {
       chkAuto: document.getElementById("chkAuto").checked,
       chkCaribe: document.getElementById("chkCaribe").checked,
@@ -1213,7 +1471,7 @@ function construirPayloadCompleto() {
 function descargarRespaldoManual() {
   const payload = construirPayloadCompleto();
   if (!payload.nombreActivacion) {
-    mostrarToast("Campo requerido", "Por favor ingresa al menos el nombre de la activación para crear el respaldo.", "warning");
+    mostrarToast("Nombre Requerido", "Ingresa el nombre de la activación para crear el respaldo.", "warning");
     return;
   }
   const dataBlob = new Blob([JSON.stringify(payload, null, 2)], { type: "text/plain;charset=utf-8" });
@@ -1221,22 +1479,24 @@ function descargarRespaldoManual() {
   aTxt.href = URL.createObjectURL(dataBlob);
   aTxt.download = `Metadata_${payload.folio}.txt`;
   aTxt.click();
-  mostrarToast("Respaldo descargado", `Se generó Metadata_${payload.folio}.txt con todos los datos del proyecto.`, "success");
+  mostrarToast("Respaldo Descargado", `Se generó Metadata_${payload.folio}.txt con la estructura integral.`, "success");
 }
 
 function enviarAutorizacion() {
   const nombre = document.getElementById("nombreAct").value.trim();
   if (!nombre) {
-    mostrarToast("Nombre requerido", "Ingresa el nombre de la activación antes de solicitar autorización.", "warning");
+    mostrarToast("Campo Requerido", "Ingresa el nombre de la activación antes de solicitar autorización.", "warning");
     return;
   }
 
   const payload = construirPayloadCompleto();
 
-  // Congelar folio en modo corrección permanente para este borrador
   localStorage.setItem("folioCongelado", payload.folio);
   actualizarFolio();
   guardarEnLocalStorage();
+
+  // Registrar en el catálogo maestro local de activaciones
+  registrarActivacionEnCatalogo(payload);
 
   const dataBlob = new Blob([JSON.stringify(payload, null, 2)], { type: "text/plain;charset=utf-8" });
   const aTxt = document.createElement("a");
@@ -1263,11 +1523,9 @@ function enviarAutorizacion() {
     `Quedo pendiente de su confirmación y visto bueno.`
   );
 
-  mostrarToast("Ventana de correo abierta", "Adjunta el PDF y el archivo Metadata generado a tu correo.", "info");
+  mostrarToast("Ventana de correo lista", "Adjunta el PDF y Metadata generados a tu mensaje.", "info");
   window.location.href = `mailto:${destinatarios}?subject=${asunto}&body=${cuerpo}`;
 }
-
-// --- PERSISTENCIA Y RESTAURACIÓN ROBUSTA ---
 
 function guardarEnLocalStorage() {
   const payload = construirPayloadCompleto();
@@ -1382,18 +1640,281 @@ function importarBorradorDesdeArchivo(input) {
     try {
       const data = JSON.parse(e.target.result);
       if (!data.folio && !data.nombreActivacion && !data.raw) {
-        throw new Error("Estructura inválida");
+        throw new Error("Formato inválido");
       }
       restaurarFormularioDesdeData(data);
       guardarEnLocalStorage();
-      mostrarToast("Borrador importado", `Se cargó el proyecto con folio ${document.getElementById("lblFolio").innerText}`, "success");
+      registrarActivacionEnCatalogo(data);
+      mostrarToast("Borrador Importado", `Proyecto cargado con folio ${document.getElementById("lblFolio").innerText}`, "success");
     } catch (err) {
-      mostrarToast("Archivo no compatible", "El archivo seleccionado no corresponde a un respaldo válido de Grupo CER.", "warning");
+      mostrarToast("Archivo Incompatible", "El archivo no contiene una estructura válida de Grupo CER.", "warning");
     }
     input.value = "";
   };
   reader.readAsText(file);
 }
-</script>
-</body>
-</html>
+
+// ===================================================
+// LÓGICA DE DATOS: SEGUIMIENTO DE VENTAS Y ROI (ENTREGA B)
+// ===================================================
+
+function obtenerCatalogoActivaciones() {
+  const raw = localStorage.getItem("dbActivaciones");
+  return raw ? JSON.parse(raw) : [];
+}
+
+function guardarCatalogoActivaciones(lista) {
+  localStorage.setItem("dbActivaciones", JSON.stringify(lista));
+}
+
+function obtenerBitacoraVentas() {
+  const raw = localStorage.getItem("dbVentas");
+  return raw ? JSON.parse(raw) : [];
+}
+
+function guardarBitacoraVentas(lista) {
+  localStorage.setItem("dbVentas", JSON.stringify(lista));
+}
+
+function registrarActivacionEnCatalogo(payload) {
+  let catalogo = obtenerCatalogoActivaciones();
+  const idx = catalogo.findIndex(item => item.folio === payload.folio);
+  
+  const registro = {
+    folio: payload.folio,
+    nombreActivacion: payload.nombreActivacion,
+    distribuidoras: payload.distribuidoras,
+    totalInversion: payload.totalInversion,
+    inversionNumerica: payload.inversionNumerica || parseFloat(payload.totalInversion.replace(/[^0-9.-]+/g,"")) || 0
+  };
+
+  if (idx >= 0) catalogo[idx] = registro;
+  else catalogo.push(registro);
+
+  guardarCatalogoActivaciones(catalogo);
+  actualizarDashboard();
+  refrescarSelectorProyectosVentas();
+}
+
+function poblarMarcasVentas() {
+  const sel = document.getElementById("vtaMarca");
+  sel.innerHTML = '<option value="">Seleccione Marca...</option>' + 
+    MARCAS_GRUPO_CER.map(m => `<option value="${m}">${m}</option>`).join("");
+}
+
+function refrescarSelectorProyectosVentas() {
+  const catalogo = obtenerCatalogoActivaciones();
+  const sel = document.getElementById("selProyectoVentas");
+  const valPrev = sel.value;
+
+  sel.innerHTML = '<option value="">Selecciona un proyecto registrado...</option>' + 
+    catalogo.map(p => `<option value="${p.folio}">${p.nombreActivacion} (${p.folio})</option>`).join("");
+
+  if (valPrev && catalogo.some(p => p.folio === valPrev)) {
+    sel.value = valPrev;
+  }
+}
+
+function buscarFolioDirecto(folioIngresado) {
+  const query = folioIngresado.trim().toLowerCase();
+  const catalogo = obtenerCatalogoActivaciones();
+  const coincidencia = catalogo.find(p => p.folio.toLowerCase() === query);
+
+  if (coincidencia) {
+    document.getElementById("selProyectoVentas").value = coincidencia.folio;
+    seleccionarProyectoParaVenta(coincidencia.folio);
+  }
+}
+
+let proyectoActivoEnVentas = null;
+
+function seleccionarProyectoParaVenta(folio) {
+  if (!folio) {
+    document.getElementById("boxDetalleROI").classList.add("hidden");
+    proyectoActivoEnVentas = null;
+    return;
+  }
+
+  const catalogo = obtenerCatalogoActivaciones();
+  const p = catalogo.find(item => item.folio === folio);
+  if (!p) return;
+
+  proyectoActivoEnVentas = p;
+  document.getElementById("boxDetalleROI").classList.remove("hidden");
+
+  // Poblar desplegable de distribuidoras participantes
+  const distArr = p.distribuidoras.split(",").map(d => d.trim()).filter(d => d);
+  const selDist = document.getElementById("vtaDistribuidora");
+  selDist.innerHTML = '<option value="">Seleccione...</option>' + 
+    distArr.map(d => `<option value="${d}">${d}</option>`).join("");
+
+  document.getElementById("roiProyectoNombre").innerText = p.nombreActivacion;
+  document.getElementById("roiInversion").innerText = "$" + p.inversionNumerica.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
+
+  // Fecha por defecto: hoy
+  document.getElementById("vtaFecha").value = new Date().toISOString().split("T")[0];
+  marcarLleno(document.getElementById("vtaFecha"));
+
+  renderizarBitacoraVentasProyecto();
+}
+
+function guardarCierreUnidad() {
+  if (!proyectoActivoEnVentas) return;
+
+  const fecha = document.getElementById("vtaFecha").value;
+  const dist = document.getElementById("vtaDistribuidora").value;
+  const marca = document.getElementById("vtaMarca").value;
+  const modelo = document.getElementById("vtaModelo").value.trim();
+  const anio = document.getElementById("vtaAnio").value.trim();
+  const factura = document.getElementById("vtaFactura").value.trim();
+  const utilidad = parseFloat(document.getElementById("vtaUtilidad").value) || 0;
+
+  if (!fecha || !dist || !marca || !modelo || !factura || utilidad <= 0) {
+    mostrarToast("Datos Incompletos", "Completa todos los campos obligatorios y asegura que la Utilidad Bruta sea mayor a 0.", "warning");
+    return;
+  }
+
+  const nuevaVenta = {
+    id: Date.now(),
+    folio: proyectoActivoEnVentas.folio,
+    fecha,
+    dist,
+    marca,
+    modelo,
+    anio: anio || "-",
+    factura,
+    utilidad
+  };
+
+  const ventas = obtenerBitacoraVentas();
+  ventas.push(nuevaVenta);
+  guardarBitacoraVentas(ventas);
+
+  // Limpiar campos de captura de venta
+  document.getElementById("vtaModelo").value = "";
+  document.getElementById("vtaAnio").value = "";
+  document.getElementById("vtaFactura").value = "";
+  document.getElementById("vtaUtilidad").value = "";
+  marcarLleno(document.getElementById("vtaModelo"));
+  marcarLleno(document.getElementById("vtaFactura"));
+  marcarLleno(document.getElementById("vtaUtilidad"));
+
+  mostrarToast("Venta Registrada", `Se asignó la unidad ${modelo} con $${utilidad.toLocaleString("es-MX", {minimumFractionDigits: 2})} de utilidad.`, "success");
+
+  renderizarBitacoraVentasProyecto();
+  actualizarDashboard();
+}
+
+function renderizarBitacoraVentasProyecto() {
+  if (!proyectoActivoEnVentas) return;
+
+  const ventas = obtenerBitacoraVentas().filter(v => v.folio === proyectoActivoEnVentas.folio);
+  const tb = document.querySelector("#tblVentasProyecto tbody");
+  tb.innerHTML = "";
+
+  let sumaUtilidad = 0;
+
+  if (ventas.length === 0) {
+    tb.innerHTML = `<tr><td colspan="7" class="text-center" style="padding: 16px; color: var(--text-muted); font-style: italic;">No hay ventas registradas aún para este folio.</td></tr>`;
+  } else {
+    ventas.forEach((v, idx) => {
+      sumaUtilidad += v.utilidad;
+      tb.innerHTML += `
+        <tr>
+          <td class="text-center fw-bold">${idx + 1}</td>
+          <td>${v.fecha}</td>
+          <td>${v.dist}</td>
+          <td><strong>${v.marca}</strong> ${v.modelo}</td>
+          <td>${v.anio}</td>
+          <td>${v.factura}</td>
+          <td style="text-align: right; font-weight: 700; color: #15803d;">+$${v.utilidad.toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+        </tr>
+      `;
+    });
+  }
+
+  // Actualizar indicadores del bloque ROI
+  const inv = proyectoActivoEnVentas.inversionNumerica;
+  document.getElementById("roiUtilidadAcum").innerText = "$" + sumaUtilidad.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
+  document.getElementById("roiUnidadesConteo").innerText = `${ventas.length} unidad(es) facturada(s)`;
+
+  let roiCalc = 0;
+  let diag = "Sin ventas registradas";
+  let colorClass = "roi-neutral";
+
+  if (inv > 0) {
+    roiCalc = ((sumaUtilidad - inv) / inv) * 100;
+    if (ventas.length === 0) {
+      diag = "Pendiente de ventas";
+      colorClass = "roi-neutral";
+    } else if (roiCalc < 0) {
+      diag = "Retorno negativo (Inversión aún no amortizada)";
+      colorClass = "roi-negative";
+    } else {
+      diag = "Proyecto rentable (Inversión recuperada con ganancia)";
+      colorClass = "roi-positive";
+    }
+  }
+
+  const roiEl = document.getElementById("roiPorcentaje");
+  roiEl.innerText = (roiCalc >= 0 ? "+" : "") + roiCalc.toFixed(1) + "%";
+  roiEl.className = `kpi-value ${colorClass}`;
+  document.getElementById("roiDiagnostico").innerText = diag;
+}
+
+function abrirSeguimientoDesdeDashboard(folio) {
+  cambiarVista('seguimiento');
+  document.getElementById("selProyectoVentas").value = folio;
+  seleccionarProyectoParaVenta(folio);
+}
+
+function actualizarDashboard() {
+  const catalogo = obtenerCatalogoActivaciones();
+  const todasVentas = obtenerBitacoraVentas();
+
+  let sumaTotalInversion = 0;
+  let sumaTotalUtilidad = 0;
+
+  const tb = document.querySelector("#tblProyectosDashboard tbody");
+  tb.innerHTML = "";
+
+  if (catalogo.length === 0) {
+    tb.innerHTML = `<tr><td colspan="7" class="text-center" style="padding: 20px; color: var(--text-muted); font-style: italic;">No hay activaciones registradas en el sistema.</td></tr>`;
+  } else {
+    catalogo.forEach(p => {
+      sumaTotalInversion += p.inversionNumerica;
+      const ventasP = todasVentas.filter(v => v.folio === p.folio);
+      const utilidadP = ventasP.reduce((acc, cur) => acc + cur.utilidad, 0);
+      sumaTotalUtilidad += utilidadP;
+
+      let roi = 0;
+      let badgeClass = "roi-neutral";
+      if (p.inversionNumerica > 0) {
+        roi = ((utilidadP - p.inversionNumerica) / p.inversionNumerica) * 100;
+        if (ventasP.length === 0) badgeClass = "roi-neutral";
+        else if (roi < 0) badgeClass = "roi-negative";
+        else badgeClass = "roi-positive";
+      }
+
+      tb.innerHTML += `
+        <tr>
+          <td><span style="font-family: monospace; font-weight: 700; color: var(--primary);">${p.folio}</span></td>
+          <td><strong>${p.nombreActivacion}</strong></td>
+          <td><span style="font-size: 11px; color: var(--text-muted);">${p.distribuidoras || '-'}</span></td>
+          <td>$${p.inversionNumerica.toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+          <td class="text-center"><strong>${ventasP.length}</strong></td>
+          <td class="text-center"><span class="roi-badge ${badgeClass}">${(roi >= 0 ? "+" : "") + roi.toFixed(1)}%</span></td>
+          <td class="text-center">
+            <button type="button" class="btn-action-top btn-secondary-main" style="height: 30px; padding: 0 10px; font-size: 11px;" onclick="abrirSeguimientoDesdeDashboard('${p.folio}')">
+              📈 Cargar Venta / ROI
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  // Actualizar Tarjetas KPI Globales
+  document.getElementById("kpiTotalInversion").innerText = "$" + sumaTotalInversion.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
+  document.getElementById("kpiProyectosActivos").innerText = catalogo.length;
+  document.getElementById("kpiUnidadesVendidas").innerText =
