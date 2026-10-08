@@ -880,6 +880,29 @@
 </div>
 
 <script>
+// Definida al inicio para disponibilidad global
+function cambiarVista(vista) {
+  var vDash = document.getElementById("viewDashboard");
+  var vCap = document.getElementById("viewCaptura");
+  var vSeg = document.getElementById("viewSeguimiento");
+
+  if (vDash) vDash.classList.toggle("hidden", vista !== 'dashboard');
+  if (vCap) vCap.classList.toggle("hidden", vista !== 'captura');
+  if (vSeg) vSeg.classList.toggle("hidden", vista !== 'seguimiento');
+
+  var tabs = document.querySelectorAll(".nav-tab-btn");
+  tabs.forEach(function(btn, idx) {
+    btn.classList.toggle("active", 
+      (vista === 'dashboard' && idx === 0) ||
+      (vista === 'captura' && idx === 1) ||
+      (vista === 'seguimiento' && idx === 2)
+    );
+  });
+
+  if (vista === 'dashboard' && typeof actualizarDashboard === "function") actualizarDashboard();
+  if (vista === 'seguimiento' && typeof refrescarSelectorProyectosVentas === "function") refrescarSelectorProyectosVentas();
+}
+
 const BASE_ESTADOS_MUNICIPIOS = {
   "Campeche": ["Calakmul", "Calkiní", "Campeche", "Candelaria", "Carmen", "Champotón", "Dzitbalché", "Escárcega", "Hecelchakán", "Hopelchén", "Palizada", "Seybaplaya", "Tenabo"],
   "Quintana Roo": ["Bacalar", "Benito Juárez (Cancún)", "Cozumel", "Felipe Carrillo Puerto", "Isla Mujeres", "José María Morelos", "Lázaro Cárdenas", "Othón P. Blanco (Chetumal)", "Puerto Morelos", "Solidaridad (Playa del Carmen)", "Tulum"],
@@ -890,26 +913,28 @@ const MARCAS_GRUPO_CER = ["ALFA ROMEO", "CHRYSLER", "DODGE", "FIAT", "JEEP", "MI
 const LIMITE_PALABRAS = 80;
 
 window.onload = function() {
-  poblarEstados();
-  inicializarFormularioBase();
-  poblarMarcasVentas();
+  try {
+    poblarEstados();
+    inicializarFormularioBase();
+    poblarMarcasVentas();
 
-  // Restaurar borrador de la sesión anterior
-  const guardado = localStorage.getItem("borradorActivacion");
-  if (guardado) {
-    try {
-      const data = JSON.parse(guardado);
-      if (data.nombreAct || data.descAct || data.folio) {
-        restaurarFormularioDesdeData(data);
+    const guardado = localStorage.getItem("borradorActivacion");
+    if (guardado) {
+      try {
+        const data = JSON.parse(guardado);
+        if (data && (data.nombreAct || data.descAct || data.folio)) {
+          restaurarFormularioDesdeData(data);
+        }
+      } catch (e) {
+        console.warn("Borrador anterior no compatible, omitiendo...", e);
       }
-    } catch (e) {
-      console.error("Error al restaurar borrador", e);
     }
-  }
 
-  // Refrescar datos del Dashboard y selector de seguimiento
-  actualizarDashboard();
-  refrescarSelectorProyectosVentas();
+    actualizarDashboard();
+    refrescarSelectorProyectosVentas();
+  } catch (err) {
+    console.error("Error controlado en carga inicial:", err);
+  }
 };
 
 // --- NAVEGACIÓN SPA ---
@@ -1876,21 +1901,24 @@ function actualizarDashboard() {
   let sumaTotalUtilidad = 0;
 
   const tb = document.querySelector("#tblProyectosDashboard tbody");
+  if (!tb) return;
   tb.innerHTML = "";
 
-  if (catalogo.length === 0) {
+  if (!catalogo || catalogo.length === 0) {
     tb.innerHTML = `<tr><td colspan="7" class="text-center" style="padding: 20px; color: var(--text-muted); font-style: italic;">No hay activaciones registradas en el sistema.</td></tr>`;
   } else {
     catalogo.forEach(p => {
-      sumaTotalInversion += p.inversionNumerica;
-      const ventasP = todasVentas.filter(v => v.folio === p.folio);
-      const utilidadP = ventasP.reduce((acc, cur) => acc + cur.utilidad, 0);
+      const invNum = parseFloat(p.inversionNumerica) || 0;
+      sumaTotalInversion += invNum;
+      
+      const ventasP = Array.isArray(todasVentas) ? todasVentas.filter(v => v.folio === p.folio) : [];
+      const utilidadP = ventasP.reduce((acc, cur) => acc + (parseFloat(cur.utilidad) || 0), 0);
       sumaTotalUtilidad += utilidadP;
 
       let roi = 0;
       let badgeClass = "roi-neutral";
-      if (p.inversionNumerica > 0) {
-        roi = ((utilidadP - p.inversionNumerica) / p.inversionNumerica) * 100;
+      if (invNum > 0) {
+        roi = ((utilidadP - invNum) / invNum) * 100;
         if (ventasP.length === 0) badgeClass = "roi-neutral";
         else if (roi < 0) badgeClass = "roi-negative";
         else badgeClass = "roi-positive";
@@ -1898,10 +1926,10 @@ function actualizarDashboard() {
 
       tb.innerHTML += `
         <tr>
-          <td><span style="font-family: monospace; font-weight: 700; color: var(--primary);">${p.folio}</span></td>
-          <td><strong>${p.nombreActivacion}</strong></td>
+          <td><span style="font-family: monospace; font-weight: 700; color: var(--primary);">${p.folio || '-'}</span></td>
+          <td><strong>${p.nombreActivacion || 'Sin título'}</strong></td>
           <td><span style="font-size: 11px; color: var(--text-muted);">${p.distribuidoras || '-'}</span></td>
-          <td>$${p.inversionNumerica.toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+          <td>$${invNum.toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
           <td class="text-center"><strong>${ventasP.length}</strong></td>
           <td class="text-center"><span class="roi-badge ${badgeClass}">${(roi >= 0 ? "+" : "") + roi.toFixed(1)}%</span></td>
           <td class="text-center">
@@ -1913,6 +1941,26 @@ function actualizarDashboard() {
       `;
     });
   }
+
+  // Actualizar Tarjetas KPI Globales
+  const elTotalInv = document.getElementById("kpiTotalInversion");
+  const elProyAct = document.getElementById("kpiProyectosActivos");
+  const elUnidVend = document.getElementById("kpiUnidadesVendidas");
+  const roiPromEl = document.getElementById("kpiRoiPromedio");
+
+  if (elTotalInv) elTotalInv.innerText = "$" + sumaTotalInversion.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
+  if (elProyAct) elProyAct.innerText = catalogo.length;
+  if (elUnidVend) elUnidVend.innerText = Array.isArray(todasVentas) ? todasVentas.length : 0;
+
+  let roiGlobal = 0;
+  if (sumaTotalInversion > 0) {
+    roiGlobal = ((sumaTotalUtilidad - sumaTotalInversion) / sumaTotalInversion) * 100;
+  }
+  if (roiPromEl) {
+    roiPromEl.innerText = (roiGlobal >= 0 ? "+" : "") + roiGlobal.toFixed(1) + "%";
+    roiPromEl.style.color = (!todasVentas || todasVentas.length === 0 ? "var(--primary)" : (roiGlobal >= 0 ? "#15803d" : "#b91c1c"));
+  }
+}
 
   // Actualizar Tarjetas KPI Globales
   document.getElementById("kpiTotalInversion").innerText = "$" + sumaTotalInversion.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
