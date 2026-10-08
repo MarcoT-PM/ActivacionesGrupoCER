@@ -19,7 +19,6 @@
       --pending-bg: #fffbeb;
       --btn-gray: #f1f5f9;
       --btn-gray-text: #475569;
-      --btn-gray-hover: #e2e8f0;
       --btn-del-row: #ef4444;
       --radius-sm: 8px;
       --radius-md: 12px;
@@ -34,12 +33,13 @@
       max-width: 960px;
       margin: 0 auto 24px auto;
       display: flex;
+      flex-wrap: wrap;
       justify-content: flex-end;
-      gap: 12px;
+      gap: 10px;
     }
     .btn-action-top {
-      height: 46px;
-      padding: 0 20px;
+      height: 44px;
+      padding: 0 16px;
       border-radius: var(--radius-sm);
       font-size: 13px;
       font-weight: 600;
@@ -52,6 +52,8 @@
     }
     .btn-reset-main { background: #ffffff; color: var(--text-muted); border-color: var(--border-subtle); }
     .btn-reset-main:hover { background: var(--btn-gray); color: var(--text-main); }
+    .btn-secondary-main { background: #f8fafc; color: var(--primary); border-color: #cbd5e1; }
+    .btn-secondary-main:hover { background: #e2e8f0; }
     .btn-pdf-main { background: var(--primary); color: #ffffff; }
     .btn-pdf-main:hover { background: var(--primary-hover); transform: translateY(-1px); }
     .btn-send-main { background: #15803d; color: #ffffff; }
@@ -89,13 +91,21 @@
     }
     .meta-pills {
       display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
       background: var(--primary-soft);
       padding: 8px 18px;
       border-radius: 999px;
-      gap: 20px;
+      gap: 15px;
       font-size: 13px;
       color: var(--primary);
       font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .meta-pills.locked-mode {
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
     }
 
     .section-card {
@@ -205,28 +215,117 @@
     .dossier-table th { background: #f1f5f9; color: var(--primary); padding: 6px; text-align: left; border: 1px solid #cbd5e1; }
     .dossier-table td { padding: 6px; border: 1px solid #cbd5e1; }
 
-    /* Prevención estricta de cortes de hoja */
-    .dossier-block,
-    .dossier-grid-2,
-    .dossier-pill-box {
-      break-inside: avoid;
-      page-break-inside: avoid;
+    .dossier-block, .dossier-grid-2, .dossier-pill-box { break-inside: avoid; page-break-inside: avoid; }
+    .dossier-table tr { break-inside: avoid; page-break-inside: avoid; }
+
+    /* CONTENEDOR DE TOASTS MODERNOS */
+    #toastContainer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
     }
-    .dossier-table tr {
-      break-inside: avoid;
-      page-break-inside: avoid;
+    .toast {
+      pointer-events: auto;
+      min-width: 280px;
+      max-width: 420px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      border-left: 5px solid var(--primary);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transform: translateX(120%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      opacity: 0;
     }
+    .toast.show { transform: translateX(0); opacity: 1; }
+    .toast-icon { font-size: 18px; line-height: 1; }
+    .toast-content { flex: 1; }
+    .toast-title { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+    .toast-msg { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    .toast.success { border-left-color: #10b981; }
+    .toast.success .toast-icon { color: #10b981; }
+    .toast.warning { border-left-color: #f59e0b; }
+    .toast.warning .toast-icon { color: #f59e0b; }
+    .toast.info { border-left-color: #2563eb; }
+    .toast.info .toast-icon { color: #2563eb; }
+
+    /* MODAL DE CONFIRMACIÓN ELEGANTE */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      max-width: 440px;
+      width: 90%;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+      transform: scale(0.95);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.open .modal-box { transform: scale(1); }
+    .modal-title { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+    .modal-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .btn-modal { height: 38px; padding: 0 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+    .btn-modal-cancel { background: var(--btn-gray); color: var(--btn-gray-text); }
+    .btn-modal-confirm { background: #ef4444; color: #ffffff; }
+    .btn-modal-confirm:hover { background: #dc2626; }
   </style>
 </head>
 <body>
 
+<div id="toastContainer"></div>
+
+<!-- Modal Confirmación Reinicio -->
+<div class="modal-overlay" id="modalConfirmReset">
+  <div class="modal-box">
+    <div class="modal-title">¿Reiniciar Formulario?</div>
+    <div class="modal-desc">Esta acción limpiará todos los campos y eliminará el borrador guardado en la memoria local. Tendrás un formulario completamente en blanco para un proyecto nuevo.</div>
+    <div class="modal-actions">
+      <button type="button" class="btn-modal btn-modal-cancel" onclick="cerrarModalReset()">Cancelar</button>
+      <button type="button" class="btn-modal btn-modal-confirm" onclick="ejecutarReinicioTotal()">Sí, reiniciar</button>
+    </div>
+  </div>
+</div>
+
 <div class="top-toolbar">
-  <button type="button" class="btn-action-top btn-reset-main" onclick="iniciarNuevoRegistro()">
+  <button type="button" class="btn-action-top btn-reset-main" onclick="solicitarReinicio()">
     <span>⟲</span> Iniciar Nuevo Registro
   </button>
+  
+  <input type="file" id="fileImportar" accept=".txt,.json" style="display: none;" onchange="importarBorradorDesdeArchivo(this)">
+  <button type="button" class="btn-action-top btn-secondary-main" onclick="document.getElementById('fileImportar').click()">
+    <span>📂</span> Cargar Borrador (.txt)
+  </button>
+
+  <button type="button" class="btn-action-top btn-secondary-main" onclick="descargarRespaldoManual()">
+    <span>💾</span> Descargar Respaldo (.txt)
+  </button>
+
   <button type="button" class="btn-action-top btn-pdf-main" onclick="exportarDossierPDF()">
     <span>🖨️</span> Exportar PDF Resumen
   </button>
+
   <button type="button" class="btn-action-top btn-send-main" onclick="enviarAutorizacion()">
     <span>✉️</span> Mandar Proyecto a Autorización
   </button>
@@ -237,7 +336,7 @@
   <div class="header-branding">
     <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" class="header-logo" onerror="this.style.display='none'">
     <h1>Formato Activaciones Grupo CER</h1>
-    <div class="meta-pills">
+    <div class="meta-pills" id="contenedorPills">
       <div>Fecha: <span id="lblFechaReg" style="font-weight: normal;">--/--/----</span></div>
       <div>Folio: <span id="lblFolio">Act_SinNombre_000000</span></div>
     </div>
@@ -470,7 +569,7 @@
 
 </div>
 
-<!-- PLANTILLA RESUMEN DOSSIER (SIN FIRMAS) -->
+<!-- PLANTILLA RESUMEN DOSSIER -->
 <div id="plantillaDossier">
   <div class="dossier-header">
     <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display='none'">
@@ -556,8 +655,46 @@ const LIMITE_PALABRAS = 80;
 
 window.onload = function() {
   poblarEstados();
-  iniciarNuevoRegistro();
+  inicializarFormularioBase();
+
+  const guardado = localStorage.getItem("borradorActivacion");
+  if (guardado) {
+    try {
+      const data = JSON.parse(guardado);
+      if (data.nombreAct || data.descAct || data.folio) {
+        restaurarFormularioDesdeData(data);
+        mostrarToast("Borrador restaurado", "Se recuperaron los datos de tu sesión anterior en este equipo.", "info");
+      }
+    } catch (e) {
+      console.error("Error al restaurar borrador de localStorage", e);
+    }
+  }
 };
+
+function mostrarToast(titulo, mensaje, tipo = "info") {
+  const cont = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast ${tipo}`;
+  
+  let icon = "ℹ️";
+  if (tipo === "success") icon = "✅";
+  if (tipo === "warning") icon = "⚠️";
+
+  t.innerHTML = `
+    <div class="toast-icon">${icon}</div>
+    <div class="toast-content">
+      <div class="toast-title">${titulo}</div>
+      <div class="toast-msg">${mensaje}</div>
+    </div>
+  `;
+  cont.appendChild(t);
+  setTimeout(() => t.classList.add("show"), 10);
+
+  setTimeout(() => {
+    t.classList.remove("show");
+    setTimeout(() => t.remove(), 300);
+  }, 4000);
+}
 
 function marcarLleno(el) {
   if (el.value && el.value.trim() !== "") el.classList.add("filled");
@@ -615,6 +752,14 @@ function filtrarMunicipios() {
 }
 
 function actualizarFolio() {
+  const folioCongelado = localStorage.getItem("folioCongelado");
+  const pBox = document.getElementById("contenedorPills");
+  if (folioCongelado) {
+    document.getElementById("lblFolio").innerText = folioCongelado;
+    pBox.classList.add("locked-mode");
+    return;
+  }
+  pBox.classList.remove("locked-mode");
   const nombre = document.getElementById("nombreAct").value.trim() || "SinNombre";
   const hoy = new Date();
   const d = String(hoy.getDate()).padStart(2, '0');
@@ -716,20 +861,20 @@ function agregarFilaUnidad() {
   tr.innerHTML = `
     <td class="text-center fw-bold row-num">${num}</td>
     <td>
-      <select class="sel-dist-unid" onchange="marcarLleno(this)">
+      <select class="sel-dist-unid" onchange="marcarLleno(this); guardarEnLocalStorage();">
         <option value="">Seleccione...</option>
         ${dists.map(d => `<option value="${d}">${d}</option>`).join("")}
       </select>
     </td>
     <td>
-      <select class="sel-marca-unid" onchange="marcarLleno(this)">
+      <select class="sel-marca-unid" onchange="marcarLleno(this); guardarEnLocalStorage();">
         <option value="">Seleccione Marca...</option>
         ${MARCAS_GRUPO_CER.map(m => `<option value="${m}">${m}</option>`).join("")}
       </select>
     </td>
     <td><input type="text" class="inp-modelo-unid" placeholder="Modelo..." oninput="marcarLleno(this)"></td>
     <td><input type="number" class="inp-anio-unid" placeholder="Año" min="1990" max="2035" oninput="marcarLleno(this)"></td>
-    <td><input type="number" class="inp-cant-unid text-center filled" value="1" min="1"></td>
+    <td><input type="number" class="inp-cant-unid text-center filled" value="1" min="1" oninput="guardarEnLocalStorage();"></td>
     <td class="text-center">
       <button type="button" class="btn-row-delete" onclick="eliminarFilaIndividual(this, 'tblUnidades')">✕</button>
     </td>
@@ -746,7 +891,7 @@ function agregarFilaPersonal() {
   tr.innerHTML = `
     <td class="text-center fw-bold row-num">${num}</td>
     <td>
-      <select class="sel-dist-pers" onchange="marcarLleno(this)">
+      <select class="sel-dist-pers" onchange="marcarLleno(this); guardarEnLocalStorage();">
         <option value="">Seleccione...</option>
         ${dists.map(d => `<option value="${d}">${d}</option>`).join("")}
       </select>
@@ -754,17 +899,17 @@ function agregarFilaPersonal() {
     <td><input type="text" class="inp-nom-pers" placeholder="Nombre completo" oninput="marcarLleno(this)"></td>
     <td><input type="text" class="inp-rol-pers" placeholder="Coordinador, Asesor..." oninput="marcarLleno(this)"></td>
     <td>
-      <select class="sel-tipo-asistencia filled" onchange="gestionarAsistenciaFila(this); marcarLleno(this)">
+      <select class="sel-tipo-asistencia filled" onchange="gestionarAsistenciaFila(this); marcarLleno(this); guardarEnLocalStorage();">
         <option value="Todos los días">Todos los días</option>
         <option value="1 día en específico">1 día en específico</option>
       </select>
     </td>
     <td>
-      <select class="sel-dia-especifico filled" disabled>
+      <select class="sel-dia-especifico filled" disabled onchange="guardarEnLocalStorage();">
         <option value="">N/A</option>
       </select>
     </td>
-    <td><input type="text" class="inp-com-pers" placeholder="Comentarios adicionales..."></td>
+    <td><input type="text" class="inp-com-pers" placeholder="Comentarios adicionales..." oninput="guardarEnLocalStorage();"></td>
     <td class="text-center">
       <button type="button" class="btn-row-delete" onclick="eliminarFilaIndividual(this, 'tblPersonal')">✕</button>
     </td>
@@ -831,10 +976,26 @@ function eliminarFilaIndividual(btn, tblId) {
     Array.from(tb.rows).forEach((row, idx) => { row.querySelector(".row-num").innerText = idx + 1; });
   }
   if (tblId === "tblInversion") calcularTotalInversion();
+  guardarEnLocalStorage();
 }
 
-function iniciarNuevoRegistro() {
-  if (document.getElementById("nombreAct").value && !confirm("¿Está seguro de que desea reiniciar el formulario?")) return;
+function solicitarReinicio() {
+  document.getElementById("modalConfirmReset").classList.add("open");
+}
+
+function cerrarModalReset() {
+  document.getElementById("modalConfirmReset").classList.remove("open");
+}
+
+function ejecutarReinicioTotal() {
+  cerrarModalReset();
+  localStorage.removeItem("borradorActivacion");
+  localStorage.removeItem("folioCongelado");
+  inicializarFormularioBase();
+  mostrarToast("Formulario reiniciado", "Se han limpiado todos los datos y liberado el folio.", "info");
+}
+
+function inicializarFormularioBase() {
   const hoy = new Date();
   document.getElementById("lblFechaReg").innerText = hoy.toLocaleDateString("es-MX");
 
@@ -970,32 +1131,112 @@ function exportarDossierPDF() {
 
   html2pdf().set(opt).from(elemento).save().then(() => {
     elemento.style.display = "none";
+    mostrarToast("PDF Exportado", `Se generó el archivo ${folio}.pdf correctamente.`, "success");
   });
 }
 
-function enviarAutorizacion() {
-  const nombre = document.getElementById("nombreAct").value.trim();
-  if (!nombre) {
-    alert("Por favor, ingresa el nombre de la activación antes de solicitar autorización.");
-    return;
-  }
-
+function construirPayloadCompleto() {
   const fIniLarga = formatearFechaLarga(document.getElementById("fechaInicio").value);
   const fFinLarga = formatearFechaLarga(document.getElementById("fechaFin").value);
   const hEntrada = formatearHoraCompleta(document.getElementById("horaEntrada").value);
   const hSalida = formatearHoraCompleta(document.getElementById("horaSalida").value);
 
-  const payload = {
+  const unidadesArr = [];
+  if (document.getElementById("aplicaUnidades").value === "SÍ") {
+    document.querySelectorAll("#tblUnidades tbody tr").forEach(r => {
+      unidadesArr.push({
+        dist: r.querySelector(".sel-dist-unid") ? r.querySelector(".sel-dist-unid").value : "",
+        marca: r.querySelector(".sel-marca-unid") ? r.querySelector(".sel-marca-unid").value : "",
+        modelo: r.querySelector(".inp-modelo-unid") ? r.querySelector(".inp-modelo-unid").value : "",
+        anio: r.querySelector(".inp-anio-unid") ? r.querySelector(".inp-anio-unid").value : "",
+        cant: r.querySelector(".inp-cant-unid") ? r.querySelector(".inp-cant-unid").value : "1"
+      });
+    });
+  }
+
+  const personalArr = [];
+  document.querySelectorAll("#tblPersonal tbody tr").forEach(r => {
+    personalArr.push({
+      dist: r.querySelector(".sel-dist-pers") ? r.querySelector(".sel-dist-pers").value : "",
+      nom: r.querySelector(".inp-nom-pers") ? r.querySelector(".inp-nom-pers").value : "",
+      rol: r.querySelector(".inp-rol-pers") ? r.querySelector(".inp-rol-pers").value : "",
+      asistencia: r.querySelector(".sel-tipo-asistencia") ? r.querySelector(".sel-tipo-asistencia").value : "Todos los días",
+      dia: r.querySelector(".sel-dia-especifico") ? r.querySelector(".sel-dia-especifico").value : "",
+      com: r.querySelector(".inp-com-pers") ? r.querySelector(".inp-com-pers").value : ""
+    });
+  });
+
+  const inversionArr = [];
+  document.querySelectorAll("#tblInversion tbody tr").forEach(r => {
+    inversionArr.push({
+      concepto: r.querySelector(".inp-con-inv") ? r.querySelector(".inp-con-inv").value : "",
+      monto: r.querySelector(".monto-val") ? r.querySelector(".monto-val").value : "0.00"
+    });
+  });
+
+  return {
     folio: document.getElementById("lblFolio").innerText,
-    nombreActivacion: nombre,
+    nombreActivacion: document.getElementById("nombreAct").value.trim(),
     descripcion: document.getElementById("descAct").value.trim(),
     tipoSede: document.getElementById("tipoSede").value,
     distribuidoras: obtenerDistribuidorasActivas(false).join(", "),
     fechaInicio: fIniLarga,
     fechaFin: fFinLarga,
     horarios: `De ${hEntrada} a ${hSalida}`,
-    totalInversion: document.getElementById("txtTotalInversion").innerText
+    totalInversion: document.getElementById("txtTotalInversion").innerText,
+    raw: {
+      chkAuto: document.getElementById("chkAuto").checked,
+      chkCaribe: document.getElementById("chkCaribe").checked,
+      chkChetu: document.getElementById("chkChetu").checked,
+      chkMillen: document.getElementById("chkMillen").checked,
+      sucMontejo: document.getElementById("sucMontejo") ? document.getElementById("sucMontejo").checked : false,
+      sucItzaes: document.getElementById("sucItzaes") ? document.getElementById("sucItzaes").checked : false,
+      sucValladolid: document.getElementById("sucValladolid") ? document.getElementById("sucValladolid").checked : false,
+      sucCancun: document.getElementById("sucCancun") ? document.getElementById("sucCancun").checked : false,
+      sucPlaya: document.getElementById("sucPlaya") ? document.getElementById("sucPlaya").checked : false,
+      selEstado: document.getElementById("selEstado").value,
+      selMunicipio: document.getElementById("selMunicipio").value,
+      refUbicacion: document.getElementById("refUbicacion").value,
+      fechaInicioRaw: document.getElementById("fechaInicio").value,
+      fechaFinRaw: document.getElementById("fechaFin").value,
+      horaEntradaRaw: document.getElementById("horaEntrada").value,
+      horaSalidaRaw: document.getElementById("horaSalida").value,
+      obsHorario: document.getElementById("obsHorario").value,
+      aplicaUnidades: document.getElementById("aplicaUnidades").value,
+      unidades: unidadesArr,
+      personal: personalArr,
+      inversion: inversionArr
+    }
   };
+}
+
+function descargarRespaldoManual() {
+  const payload = construirPayloadCompleto();
+  if (!payload.nombreActivacion) {
+    mostrarToast("Campo requerido", "Por favor ingresa al menos el nombre de la activación para crear el respaldo.", "warning");
+    return;
+  }
+  const dataBlob = new Blob([JSON.stringify(payload, null, 2)], { type: "text/plain;charset=utf-8" });
+  const aTxt = document.createElement("a");
+  aTxt.href = URL.createObjectURL(dataBlob);
+  aTxt.download = `Metadata_${payload.folio}.txt`;
+  aTxt.click();
+  mostrarToast("Respaldo descargado", `Se generó Metadata_${payload.folio}.txt con todos los datos del proyecto.`, "success");
+}
+
+function enviarAutorizacion() {
+  const nombre = document.getElementById("nombreAct").value.trim();
+  if (!nombre) {
+    mostrarToast("Nombre requerido", "Ingresa el nombre de la activación antes de solicitar autorización.", "warning");
+    return;
+  }
+
+  const payload = construirPayloadCompleto();
+
+  // Congelar folio en modo corrección permanente para este borrador
+  localStorage.setItem("folioCongelado", payload.folio);
+  actualizarFolio();
+  guardarEnLocalStorage();
 
   const dataBlob = new Blob([JSON.stringify(payload, null, 2)], { type: "text/plain;charset=utf-8" });
   const aTxt = document.createElement("a");
@@ -1022,7 +1263,136 @@ function enviarAutorizacion() {
     `Quedo pendiente de su confirmación y visto bueno.`
   );
 
+  mostrarToast("Ventana de correo abierta", "Adjunta el PDF y el archivo Metadata generado a tu correo.", "info");
   window.location.href = `mailto:${destinatarios}?subject=${asunto}&body=${cuerpo}`;
+}
+
+// --- PERSISTENCIA Y RESTAURACIÓN ROBUSTA ---
+
+function guardarEnLocalStorage() {
+  const payload = construirPayloadCompleto();
+  localStorage.setItem("borradorActivacion", JSON.stringify(payload));
+}
+
+document.getElementById("areaCaptura").addEventListener("input", guardarEnLocalStorage);
+document.getElementById("areaCaptura").addEventListener("change", guardarEnLocalStorage);
+
+function restaurarFormularioDesdeData(data) {
+  if (data.folio) {
+    document.getElementById("lblFolio").innerText = data.folio;
+    localStorage.setItem("folioCongelado", data.folio);
+    actualizarFolio();
+  }
+
+  const raw = data.raw || data;
+
+  document.getElementById("nombreAct").value = data.nombreActivacion || raw.nombreAct || "";
+  document.getElementById("descAct").value = data.descripcion || raw.descAct || "";
+  controlarDescripcion(document.getElementById("descAct"));
+
+  document.getElementById("tipoSede").value = raw.tipoSede || "Dentro de Agencia";
+  document.getElementById("chkAuto").checked = !!raw.chkAuto;
+  document.getElementById("chkCaribe").checked = !!raw.chkCaribe;
+  document.getElementById("chkChetu").checked = !!raw.chkChetu;
+  document.getElementById("chkMillen").checked = !!raw.chkMillen;
+
+  gestionarTipoSede();
+  sincronizarAgencias();
+
+  if (document.getElementById("sucMontejo")) document.getElementById("sucMontejo").checked = !!raw.sucMontejo;
+  if (document.getElementById("sucItzaes")) document.getElementById("sucItzaes").checked = !!raw.sucItzaes;
+  if (document.getElementById("sucValladolid")) document.getElementById("sucValladolid").checked = !!raw.sucValladolid;
+  if (document.getElementById("sucCancun")) document.getElementById("sucCancun").checked = !!raw.sucCancun;
+  if (document.getElementById("sucPlaya")) document.getElementById("sucPlaya").checked = !!raw.sucPlaya;
+
+  if (raw.selEstado) {
+    document.getElementById("selEstado").value = raw.selEstado;
+    filtrarMunicipios();
+    document.getElementById("selMunicipio").value = raw.selMunicipio || "";
+  }
+  document.getElementById("refUbicacion").value = raw.refUbicacion || "";
+
+  document.getElementById("fechaInicio").value = raw.fechaInicioRaw || raw.fechaInicio || "";
+  document.getElementById("fechaFin").value = raw.fechaFinRaw || raw.fechaFin || "";
+  document.getElementById("horaEntrada").value = raw.horaEntradaRaw || raw.horaEntrada || "";
+  document.getElementById("horaSalida").value = raw.horaSalidaRaw || raw.horaSalida || "";
+  document.getElementById("obsHorario").value = raw.obsHorario || "";
+
+  const aplicaU = raw.aplicaUnidades || (raw.unidades && raw.unidades.length > 0 ? "SÍ" : "NO");
+  document.getElementById("aplicaUnidades").value = aplicaU;
+  gestionarAplicaUnidades();
+  const tbU = document.querySelector("#tblUnidades tbody");
+  tbU.innerHTML = "";
+  if (aplicaU === "SÍ" && raw.unidades && raw.unidades.length > 0) {
+    raw.unidades.forEach(u => {
+      agregarFilaUnidad();
+      const r = tbU.lastElementChild;
+      if (r.querySelector(".sel-dist-unid")) r.querySelector(".sel-dist-unid").value = u.dist || "";
+      if (r.querySelector(".sel-marca-unid")) r.querySelector(".sel-marca-unid").value = u.marca || "";
+      if (r.querySelector(".inp-modelo-unid")) r.querySelector(".inp-modelo-unid").value = u.modelo || "";
+      if (r.querySelector(".inp-anio-unid")) r.querySelector(".inp-anio-unid").value = u.anio || "";
+      if (r.querySelector(".inp-cant-unid")) r.querySelector(".inp-cant-unid").value = u.cant || "1";
+    });
+  }
+
+  const tbP = document.querySelector("#tblPersonal tbody");
+  tbP.innerHTML = "";
+  if (raw.personal && raw.personal.length > 0) {
+    raw.personal.forEach(p => {
+      agregarFilaPersonal();
+      const r = tbP.lastElementChild;
+      if (r.querySelector(".sel-dist-pers")) r.querySelector(".sel-dist-pers").value = p.dist || "";
+      if (r.querySelector(".inp-nom-pers")) r.querySelector(".inp-nom-pers").value = p.nom || "";
+      if (r.querySelector(".inp-rol-pers")) r.querySelector(".inp-rol-pers").value = p.rol || "";
+      const selAs = r.querySelector(".sel-tipo-asistencia");
+      if (selAs) {
+        selAs.value = p.asistencia || "Todos los días";
+        gestionarAsistenciaFila(selAs);
+      }
+      if (r.querySelector(".sel-dia-especifico")) r.querySelector(".sel-dia-especifico").value = p.dia || "";
+      if (r.querySelector(".inp-com-pers")) r.querySelector(".inp-com-pers").value = p.com || "";
+    });
+  } else {
+    agregarFilaPersonal();
+  }
+
+  const tbI = document.querySelector("#tblInversion tbody");
+  tbI.innerHTML = "";
+  if (raw.inversion && raw.inversion.length > 0) {
+    raw.inversion.forEach(inv => {
+      agregarFilaInversion();
+      const r = tbI.lastElementChild;
+      if (r.querySelector(".inp-con-inv")) r.querySelector(".inp-con-inv").value = inv.concepto || "";
+      if (r.querySelector(".monto-val")) r.querySelector(".monto-val").value = inv.monto || "0.00";
+    });
+  } else {
+    agregarFilaInversion();
+  }
+
+  calcularTotalInversion();
+  document.querySelectorAll("input, select, textarea").forEach(el => marcarLleno(el));
+}
+
+function importarBorradorDesdeArchivo(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.folio && !data.nombreActivacion && !data.raw) {
+        throw new Error("Estructura inválida");
+      }
+      restaurarFormularioDesdeData(data);
+      guardarEnLocalStorage();
+      mostrarToast("Borrador importado", `Se cargó el proyecto con folio ${document.getElementById("lblFolio").innerText}`, "success");
+    } catch (err) {
+      mostrarToast("Archivo no compatible", "El archivo seleccionado no corresponde a un respaldo válido de Grupo CER.", "warning");
+    }
+    input.value = "";
+  };
+  reader.readAsText(file);
 }
 </script>
 </body>
