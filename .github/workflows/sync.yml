@@ -1,0 +1,26 @@
+name: Sincronizar Data JSON
+
+on:
+  repository_dispatch:
+    types: [sync-data]
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Escribir nuevo data.json
+        run: |
+          echo '${{ toJson(github.event.client_payload) }}' > data.json
+
+      - name: Confirmar y subir cambios
+        run: |
+          git config --global user.name "PowerAutomate-Bot"
+          git config --global user.email "bot@grupocer.com.mx"
+          git add data.json
+          git commit -m "Auto-sync: Actualización de data.json desde Power Automate" || exit 0
+          git push
