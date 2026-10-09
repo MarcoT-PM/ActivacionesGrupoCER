@@ -1,13 +1,111 @@
 {
   "activaciones": [
     {
-      "distribuidoras": "<div class=\"ExternalClass87275AB8E02A48A2944E6F8A9E9C3D5F\"><p class=\"editor-paragraph\">Automaya, Millenium",
+      "distribuidoras": "<div class=\"ExternalClass2E9518F929FC47BFACF85F8AC092CAF8\"><p class=\"editor-paragraph\">Automaya, Millenium",
       "estatus": "Aprobado",
       "fechaFin": "domingo, 27 de septiembre del 2026",
       "fechaInicio": "sábado, 26 de septiembre del 2026",
       "folio": "Act_FeriaMaxcan_081026",
       "inversion": "$6,920.00 MXN",
       "nombreActivacion": "Feria Maxcanú",
+      "raw": {
+        "descripcion": "Acercar a las familias, comerciantes y trabajadores del municipio alternativas de movilidad, planes de financiamiento accesibles y asesoría automotriz personalizada.",
+        "distribuidoras": "Automaya, Millenium",
+        "fechaFin": "domingo, 27 de septiembre del 2026",
+        "fechaInicio": "sábado, 26 de septiembre del 2026",
+        "folio": "Act_FeriaMaxcan_081026",
+        "horarios": "De 12:00 h (12:00 pm) a 19:00 h (07:00 pm)",
+        "inversion": 6920,
+        "nombreActivacion": "Feria Maxcanú",
+        "raw": {
+          "aplicaUnidades": "SÍ",
+          "chkAuto": true,
+          "chkCaribe": false,
+          "chkChetu": false,
+          "chkMillen": true,
+          "fechaFinRaw": "2026-09-27",
+          "fechaInicioRaw": "2026-09-26",
+          "horaEntradaRaw": "12:00",
+          "horaSalidaRaw": "19:00",
+          "inversion": [
+            {
+              "concepto": "Perifoneo",
+              "monto": "1440.00"
+            },
+            {
+              "concepto": "Bocina, Carpa, Mesas, Sillas",
+              "monto": "5480.00"
+            }
+          ],
+          "obsHorario": "",
+          "personal": [
+            {
+              "asistencia": "1 día en específico",
+              "com": "",
+              "dia": "27/09/2026",
+              "dist": "Millenium",
+              "nom": "Donato Aguilar",
+              "rol": "gerente general"
+            },
+            {
+              "asistencia": "Todos los días",
+              "com": "",
+              "dia": "",
+              "dist": "Automaya",
+              "nom": "Nadim Daher",
+              "rol": "gerente ventas"
+            },
+            {
+              "asistencia": "1 día en específico",
+              "com": "",
+              "dia": "26/09/2026",
+              "dist": "Millenium",
+              "nom": "Nilvia Rivera",
+              "rol": "gerente ventas"
+            }
+          ],
+          "refUbicacion": "Área frontal exterior del Palacio Municipal (frente / explanada).",
+          "selEstado": "Yucatán",
+          "selMunicipio": "Maxcanú",
+          "sucCancun": false,
+          "sucItzaes": false,
+          "sucMontejo": false,
+          "sucPlaya": false,
+          "sucValladolid": false,
+          "unidades": [
+            {
+              "anio": "2026",
+              "cant": "1",
+              "dist": "Automaya",
+              "marca": "FIAT",
+              "modelo": "PULSE"
+            },
+            {
+              "anio": "2026",
+              "cant": "1",
+              "dist": "Automaya",
+              "marca": "RAM",
+              "modelo": "RAM 700"
+            },
+            {
+              "anio": "2026",
+              "cant": "1",
+              "dist": "Millenium",
+              "marca": "MITSUBISHI",
+              "modelo": "XPANDER"
+            },
+            {
+              "anio": "2026",
+              "cant": "1",
+              "dist": "Millenium",
+              "marca": "MITSUBISHI",
+              "modelo": "L200"
+            }
+          ]
+        },
+        "tipoSede": "Fuera de Agencia",
+        "totalInversion": "$6,920.00 MXN"
+      },
       "tipoSede": "Fuera de Agencia"
     }
   ],
