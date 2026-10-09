@@ -271,6 +271,10 @@
     .roi-neutral  { background: #fef3c7; color: #b45309; }
     .roi-positive { background: #dcfce7; color: #15803d; }
 
+    .status-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+    .status-synced { background: #dcfce7; color: #15803d; }
+    .status-pending { background: #fef3c7; color: #b45309; }
+
     .hidden { display: none !important; }
     .text-center { text-align: center; }
     .text-right { text-align: right; }
@@ -486,7 +490,6 @@
   <!-- VISTA 2: CAPTURA (FORMULARIO PRINCIPAL)    -->
   <!-- ========================================== -->
   <div id="viewCaptura" class="view-section hidden">
-    <!-- BARRA DE HERRAMIENTAS AJUSTADA -->
     <div class="top-toolbar">
       <button type="button" class="btn-action-top btn-reset-main" onclick="solicitarReinicio()">
         <span>⟲</span> Iniciar Nuevo Registro
@@ -753,7 +756,7 @@
           </div>
           <div class="col-4 form-group">
             <label class="form-label">O Buscar por Folio</label>
-            <input type="text" id="inpBuscarFolio" placeholder="Ej. Act_FeriaMaxcanu_061026" oninput="buscarFolioDirecto(this.value)">
+            <input type="text" id="inpBuscarFolio" placeholder="Ej. Act_FeriaMaxcan_081026" oninput="buscarFolioDirecto(this.value)">
           </div>
         </div>
       </div>
@@ -782,7 +785,7 @@
         <div class="section-card">
           <div class="section-header">
             <div class="section-num">+</div>
-            <div class="section-title">Reportar Cierre de Unidad Facturada</div>
+            <div class="section-title">Agregar Unidad a la Bitácora</div>
           </div>
           <div class="form-grid">
             <div class="col-3 form-group">
@@ -818,18 +821,23 @@
               <input type="number" id="vtaUtilidad" placeholder="Ej. 18500.00" min="0.01" step="0.01" oninput="marcarLleno(this)">
             </div>
             <div class="col-3 form-group" style="justify-content: flex-end;">
-              <button type="button" class="btn-action-top btn-send-main" style="width: 100%; justify-content: center;" onclick="guardarCierreUnidad()">
-                <span>💾</span> Guardar Cierre de Unidad
+              <button type="button" class="btn-action-top btn-secondary-main" style="width: 100%; justify-content: center;" onclick="guardarCierreUnidad()">
+                <span>➕</span> Agregar a la Lista
               </button>
             </div>
           </div>
         </div>
 
-        <!-- BITÁCORA CON BOTÓN DE QUITAR FILA -->
+        <!-- BITÁCORA Y ENVÍO POR LOTE -->
         <div class="section-card">
-          <div class="section-header">
-            <div class="section-num">📜</div>
-            <div class="section-title">Bitácora de Unidades Facturadas de este Evento</div>
+          <div class="section-header" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="section-num">📜</div>
+              <div class="section-title">Bitácora de Unidades Facturadas</div>
+            </div>
+            <button type="button" class="btn-action-top btn-send-main" id="btnEnviarLote" onclick="enviarLoteVentas()">
+              <span>✉️</span> Sincronizar Lote de Ventas
+            </button>
           </div>
           <div class="table-container">
             <table class="modern-table" id="tblVentasProyecto">
@@ -842,12 +850,13 @@
                   <th>Año</th>
                   <th>Factura</th>
                   <th style="text-align: right;">Utilidad Bruta</th>
+                  <th style="width: 80px; text-align: center;">Estatus</th>
                   <th style="width: 40px;" class="text-center"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td colspan="8" class="text-center" style="padding: 16px; color: var(--text-muted); font-style: italic;">
+                  <td colspan="9" class="text-center" style="padding: 16px; color: var(--text-muted); font-style: italic;">
                     No hay ventas registradas aún para este folio.
                   </td>
                 </tr>
@@ -860,9 +869,6 @@
   </div>
 
 </main>
-
-<!-- PLANTILLA OCULTA PARA IMPRESIÓN/GENERACIÓN DEL PDF -->
-<div id="plantillaDossier" style="display: none;"></div>
 
 <script>
 var BASE_ESTADOS_MUNICIPIOS = {
@@ -894,14 +900,10 @@ function cargarDatosCentrales() {
     })
     .then(function(data) {
       memoriaGlobal.activaciones = (data.activaciones || []).map(function(a) {
-        // Limpieza de inversión: quita $, MXN y comas para obtener número flotante puro
         var rawInv = (a.inversion !== undefined) ? a.inversion : (a.totalInversion || 0);
         var invNum = typeof rawInv === 'number' ? rawInv : parseFloat(String(rawInv).replace(/[^0-9.-]+/g, "")) || 0;
-
-        // Limpieza de distribuidoras si traen HTML de SharePoint
         var distLimpia = String(a.distribuidoras || "-").replace(/<[^>]*>?/gm, '').trim();
 
-        // Si raw viene anidado dos veces (raw.raw), aplanarlo
         var rawData = a.raw || {};
         if (rawData.raw) {
           rawData = Object.assign({}, rawData, rawData.raw);
@@ -932,7 +934,8 @@ function cargarDatosCentrales() {
           modelo: v.modelo || v.Modelo || "-",
           anio: v.anio || v.Anio || "-",
           factura: v.factura || v.NumFactura || "-",
-          utilidad: utilNum
+          utilidad: utilNum,
+          pendienteEnvio: false
         };
       });
 
@@ -1514,7 +1517,6 @@ function enviarAutorizacion() {
   a.download = "Metadata_" + payload.folio + ".txt";
   a.click();
 
-  // Descarga del PDF únicamente al momento de autorizar
   payloadEnModal = payload;
   descargarPDFDesdeModal();
 
@@ -1741,12 +1743,12 @@ function guardarCierreUnidad() {
     modelo: modelo,
     anio: anio || "-",
     factura: factura,
-    utilidad: utilidad
+    utilidad: utilidad,
+    pendienteEnvio: true // Marca para lote
   };
 
   memoriaGlobal.ventas.push(nuevaVenta);
 
-  // Limpiar campos
   document.getElementById("vtaModelo").value = "";
   document.getElementById("vtaAnio").value = "";
   document.getElementById("vtaFactura").value = "";
@@ -1755,18 +1757,49 @@ function guardarCierreUnidad() {
   marcarLleno(document.getElementById("vtaFactura"));
   marcarLleno(document.getElementById("vtaUtilidad"));
 
-  mostrarToast("Venta Registrada", "Unidad " + modelo + " añadida con éxito.", "success");
-
-  // DISPARO DE CORREO ESTRUCTURADO PARA POWER AUTOMATE (FLUJO 2)
-  var destinatarioVentas = "jumartinez@grupocer.com.mx";
-  var asuntoVenta = encodeURIComponent("Venta Activación | " + nuevaVenta.folio);
-  var bodyVenta = encodeURIComponent(JSON.stringify(nuevaVenta, null, 2));
-  
-  // Abrir cliente de correo silencioso / preparado
-  window.location.href = "mailto:" + destinatarioVentas + "?subject=" + asuntoVenta + "&body=" + bodyVenta;
+  mostrarToast("Unidad Agregada a la Lista", "Lista para sincronizar por lote.", "success");
 
   renderizarBitacoraVentasProyecto();
   renderizarDashboard();
+}
+
+function enviarLoteVentas() {
+  if (!proyectoActivoEnVentas) return;
+
+  var pendientes = memoriaGlobal.ventas.filter(function(v) {
+    return v.folio === proyectoActivoEnVentas.folio && v.pendienteEnvio === true;
+  });
+
+  if (pendientes.length === 0) {
+    mostrarToast("Sin Unidades Pendientes", "No hay unidades nuevas por sincronizar.", "warning");
+    return;
+  }
+
+  // Prepara el arreglo limpio para el correo
+  var loteParaEnviar = pendientes.map(function(v) {
+    return {
+      id: v.id,
+      folio: v.folio,
+      fecha: v.fecha,
+      distribuidora: v.distribuidora,
+      marca: v.marca,
+      modelo: v.modelo,
+      anio: v.anio,
+      factura: v.factura,
+      utilidad: v.utilidad
+    };
+  });
+
+  var destinatario = "mtellez@avasa.com.mx";
+  var asunto = encodeURIComponent("Ventas Activación | " + proyectoActivoEnVentas.folio);
+  var cuerpo = encodeURIComponent(JSON.stringify(loteParaEnviar, null, 2));
+
+  // Marca como enviadas en la interfaz local
+  pendientes.forEach(function(v) { v.pendienteEnvio = false; });
+  renderizarBitacoraVentasProyecto();
+
+  mostrarToast("Ventana de Correo Abierta", "Envía el correo para registrar el lote en el sistema.", "info");
+  window.location.href = "mailto:" + destinatario + "?subject=" + asunto + "&body=" + cuerpo;
 }
 
 function eliminarVentaBitacora(idVenta) {
@@ -1784,12 +1817,19 @@ function renderizarBitacoraVentasProyecto() {
   tb.innerHTML = "";
 
   var sumaUtilidad = 0;
+  var hayPendientes = false;
 
   if (ventas.length === 0) {
-    tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 16px; color: var(--text-muted); font-style: italic;">No hay ventas registradas aún para este folio.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="9" class="text-center" style="padding: 16px; color: var(--text-muted); font-style: italic;">No hay ventas registradas aún para este folio.</td></tr>';
   } else {
     ventas.forEach(function(v, idx) {
       sumaUtilidad += parseFloat(v.utilidad) || 0;
+      if (v.pendienteEnvio) hayPendientes = true;
+
+      var badgeEstatus = v.pendienteEnvio 
+        ? '<span class="status-badge status-pending">Pendiente</span>'
+        : '<span class="status-badge status-synced">Sincronizado</span>';
+
       tb.innerHTML += '<tr>' +
         '<td class="text-center fw-bold">' + (idx + 1) + '</td>' +
         '<td>' + v.fecha + '</td>' +
@@ -1798,11 +1838,17 @@ function renderizarBitacoraVentasProyecto() {
         '<td>' + v.anio + '</td>' +
         '<td>' + v.factura + '</td>' +
         '<td style="text-align: right; font-weight: 700; color: #15803d;">+$' + (parseFloat(v.utilidad) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2}) + '</td>' +
+        '<td class="text-center">' + badgeEstatus + '</td>' +
         '<td class="text-center">' +
           '<button type="button" class="btn-row-delete" title="Eliminar registro" onclick="eliminarVentaBitacora(' + v.id + ')">✕</button>' +
         '</td>' +
         '</tr>';
     });
+  }
+
+  var btnLote = document.getElementById("btnEnviarLote");
+  if (btnLote) {
+    btnLote.style.opacity = hayPendientes ? "1" : "0.6";
   }
 
   var inv = parseFloat(proyectoActivoEnVentas.inversion) || 0;
@@ -1862,7 +1908,6 @@ function renderizarDashboard() {
       var invNum = parseFloat(p.inversion) || 0;
       sumaTotalInversion += invNum;
 
-      // Determinación dinámica de estatus por fecha
       var esConcluido = false;
       var fRaw = (p.raw && p.raw.fechaFinRaw) ? p.raw.fechaFinRaw : null;
       if (fRaw) {
@@ -1906,7 +1951,6 @@ function renderizarDashboard() {
     });
   }
 
-  // Actualizar Tarjetas KPI
   document.getElementById("kpiTotalInversion").innerText = "$" + sumaTotalInversion.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
   document.getElementById("kpiProyectosTotales").innerText = catalogo.length;
   document.getElementById("kpiProyectosDesglose").innerHTML = "🟢 " + activosCount + " Activos &nbsp;|&nbsp; 🏁 " + concluidosCount + " Concluidos";
