@@ -107,6 +107,73 @@
         "totalInversion": "$6,920.00 MXN"
       },
       "tipoSede": "Fuera de Agencia"
+    },
+    {
+      "distribuidoras": "<div class=\"ExternalClass9A0C807700A0425A90A47EDA82C3727C\"><p class=\"editor-paragraph\">Caribe",
+      "estatus": "Aprobado",
+      "fechaFin": "domingo, 27 de septiembre del 2026",
+      "fechaInicio": "sábado, 26 de septiembre del 2026",
+      "folio": "Act_SpecialDays_091026",
+      "inversion": "$211,400.00 MXN",
+      "nombreActivacion": "Special Days",
+      "raw": {
+        "descripcion": "Agente de IA que hace citas con clientes y atrae los mejores prospectos",
+        "distribuidoras": "Caribe",
+        "fechaFin": "domingo, 27 de septiembre del 2026",
+        "fechaInicio": "sábado, 26 de septiembre del 2026",
+        "folio": "Act_SpecialDays_091026",
+        "horarios": "De 09:00 h (09:00 am) a 18:00 h (06:00 pm)",
+        "inversion": 211400,
+        "nombreActivacion": "Special Days",
+        "raw": {
+          "aplicaUnidades": "NO",
+          "chkAuto": false,
+          "chkCaribe": true,
+          "chkChetu": false,
+          "chkMillen": false,
+          "fechaFinRaw": "2026-09-27",
+          "fechaInicioRaw": "2026-09-26",
+          "horaEntradaRaw": "09:00",
+          "horaSalidaRaw": "18:00",
+          "inversion": [
+            {
+              "concepto": "Optima Mkt",
+              "monto": "178000.00"
+            },
+            {
+              "concepto": "Redes Sociales",
+              "monto": "4000.00"
+            },
+            {
+              "concepto": "Radio",
+              "monto": "29400.00"
+            }
+          ],
+          "obsHorario": "",
+          "personal": [
+            {
+              "asistencia": "Todos los días",
+              "com": "",
+              "dia": "",
+              "dist": "Caribe",
+              "nom": "Dante Díaz",
+              "rol": "gerente general"
+            }
+          ],
+          "refUbicacion": "",
+          "selEstado": "Campeche",
+          "selMunicipio": "",
+          "sucCancun": true,
+          "sucItzaes": false,
+          "sucMontejo": false,
+          "sucPlaya": true,
+          "sucValladolid": false,
+          "unidades": []
+        },
+        "tipoSede": "Dentro de Agencia",
+        "totalInversion": "$211,400.00 MXN"
+      },
+      "tipoSede": "Dentro de Agencia"
     }
   ],
   "ventas": []
