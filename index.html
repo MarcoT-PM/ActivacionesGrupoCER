@@ -893,22 +893,36 @@ function cargarDatosCentrales() {
       return res.json();
     })
     .then(function(data) {
-      // Normalizar datos vengan de SharePoint (Title) o estándar (folio)
       memoriaGlobal.activaciones = (data.activaciones || []).map(function(a) {
+        // Limpieza de inversión: quita $, MXN y comas para obtener número flotante puro
+        var rawInv = (a.inversion !== undefined) ? a.inversion : (a.totalInversion || 0);
+        var invNum = typeof rawInv === 'number' ? rawInv : parseFloat(String(rawInv).replace(/[^0-9.-]+/g, "")) || 0;
+
+        // Limpieza de distribuidoras si traen HTML de SharePoint
+        var distLimpia = String(a.distribuidoras || "-").replace(/<[^>]*>?/gm, '').trim();
+
+        // Si raw viene anidado dos veces (raw.raw), aplanarlo
+        var rawData = a.raw || {};
+        if (rawData.raw) {
+          rawData = Object.assign({}, rawData, rawData.raw);
+        }
+
         return {
           folio: a.folio || a.Title || a.Folio || "SinFolio",
           nombreActivacion: a.nombreActivacion || a.NombreActivacion || "Sin Título",
-          distribuidoras: a.distribuidoras || a.Distribuidoras || "-",
+          distribuidoras: distLimpia,
           tipoSede: a.tipoSede || a.TipoSede || "-",
           fechaInicio: a.fechaInicio || a.FechaInicio || "-",
           fechaFin: a.fechaFin || a.FechaFin || "-",
-          inversion: parseFloat(a.inversion || a.Inversion || a.totalInversion || 0) || 0,
+          inversion: invNum,
           estatus: a.estatus || a.Estatus || "Activo",
-          raw: a.raw || null
+          raw: rawData
         };
       });
 
       memoriaGlobal.ventas = (data.ventas || []).map(function(v) {
+        var rawUtil = (v.utilidad !== undefined) ? v.utilidad : (v.UtilidadBruta || 0);
+        var utilNum = typeof rawUtil === 'number' ? rawUtil : parseFloat(String(rawUtil).replace(/[^0-9.-]+/g, "")) || 0;
         return {
           id: v.id || v.ID || Date.now(),
           folio: v.folio || v.Title || v.Folio || "",
@@ -918,7 +932,7 @@ function cargarDatosCentrales() {
           modelo: v.modelo || v.Modelo || "-",
           anio: v.anio || v.Anio || "-",
           factura: v.factura || v.NumFactura || "-",
-          utilidad: parseFloat(v.utilidad || v.UtilidadBruta || 0) || 0
+          utilidad: utilNum
         };
       });
 
@@ -1326,49 +1340,56 @@ function construirPayloadCompleto() {
 }
 
 function generarHTMLDossier(payload) {
+  var raw = payload.raw || {};
+  if (raw.raw) raw = Object.assign({}, raw, raw.raw);
+
   var detSede = "";
   if (payload.tipoSede === "Dentro de Agencia") {
     var subs = [];
-    if (payload.raw && payload.raw.sucMontejo) subs.push("Montejo");
-    if (payload.raw && payload.raw.sucItzaes) subs.push("Itzaes");
-    if (payload.raw && payload.raw.sucValladolid) subs.push("Valladolid");
-    if (payload.raw && payload.raw.sucCancun) subs.push("Cancún");
-    if (payload.raw && payload.raw.sucPlaya) subs.push("Playa del Carmen");
+    if (raw.sucMontejo) subs.push("Montejo");
+    if (raw.sucItzaes) subs.push("Itzaes");
+    if (raw.sucValladolid) subs.push("Valladolid");
+    if (raw.sucCancun) subs.push("Cancún");
+    if (raw.sucPlaya) subs.push("Playa del Carmen");
     detSede = subs.length > 0 ? "Sub-Agencias: " + subs.join(", ") : "Sedes matrices";
   } else {
-    var mun = (payload.raw ? payload.raw.selMunicipio : "") || "-";
-    var est = (payload.raw ? payload.raw.selEstado : "") || "-";
-    var ref = (payload.raw ? payload.raw.refUbicacion : "") || "Sin referencia";
+    var mun = raw.selMunicipio || "-";
+    var est = raw.selEstado || "-";
+    var ref = raw.refUbicacion || "Sin referencia";
     detSede = "Ubicación: " + mun + ", " + est + ". Ref: " + ref;
   }
 
   var uHtml = '<div style="font-style:italic; color:#64748b; padding:4px 0;">No se registraron unidades.</div>';
-  if (payload.raw && payload.raw.unidades && payload.raw.unidades.length > 0) {
+  var listaUnidades = raw.unidades || [];
+  if (listaUnidades.length > 0) {
     uHtml = '<table class="dossier-table"><thead><tr><th>Distribuidora</th><th>Marca</th><th>Modelo</th><th>Año</th><th style="width:50px; text-align:center;">Cant.</th></tr></thead><tbody>';
-    payload.raw.unidades.forEach(function(u) {
+    listaUnidades.forEach(function(u) {
       uHtml += '<tr><td>' + (u.dist || '-') + '</td><td>' + (u.marca || '-') + '</td><td>' + (u.modelo || '-') + '</td><td>' + (u.anio || '-') + '</td><td style="text-align:center;">' + (u.cant || '1') + '</td></tr>';
     });
     uHtml += '</tbody></table>';
   }
 
   var pHtml = '<tr><td colspan="5" class="text-center" style="color:#64748b;">No hay personal asignado.</td></tr>';
-  if (payload.raw && payload.raw.personal && payload.raw.personal.length > 0) {
+  var listaPersonal = raw.personal || [];
+  if (listaPersonal.length > 0) {
     pHtml = '';
-    payload.raw.personal.forEach(function(p) {
+    listaPersonal.forEach(function(p) {
       pHtml += '<tr><td>' + (p.dist || '-') + '</td><td>' + (p.nom || '-') + '</td><td>' + (p.rol || '-') + '</td><td>' + (p.asistencia || 'Todos') + '</td><td>' + (p.dia || 'N/A') + '</td></tr>';
     });
   }
 
   var iHtml = '<tr><td colspan="2" class="text-center" style="color:#64748b;">Sin conceptos de inversión.</td></tr>';
-  if (payload.raw && payload.raw.inversion && payload.raw.inversion.length > 0) {
+  var listaInv = raw.inversion || [];
+  if (Array.isArray(listaInv) && listaInv.length > 0) {
     iHtml = '';
-    payload.raw.inversion.forEach(function(inv) {
+    listaInv.forEach(function(inv) {
       var m = parseFloat(inv.monto) || 0;
       iHtml += '<tr><td>' + (inv.concepto || '-') + '</td><td style="text-align:right;">$' + m.toLocaleString("es-MX", {minimumFractionDigits: 2}) + '</td></tr>';
     });
   }
 
-  var obsH = (payload.raw && payload.raw.obsHorario) ? '<div style="margin-top:4px; color:#475569;">Obs: ' + payload.raw.obsHorario + '</div>' : '';
+  var obsH = raw.obsHorario ? '<div style="margin-top:4px; color:#475569;">Obs: ' + raw.obsHorario + '</div>' : '';
+  var invTotalStr = "$" + (parseFloat(payload.inversion) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2}) + " MXN";
 
   return '<div class="dossier-header">' +
     '<img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display=\'none\'">' +
@@ -1381,7 +1402,7 @@ function generarHTMLDossier(payload) {
     '<div class="dossier-block">' +
     '<div class="dossier-block-title">1. Proyecto y Justificación</div>' +
     '<div style="font-size: 15px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">' + (payload.nombreActivacion || 'Sin Título') + '</div>' +
-    '<div class="dossier-desc">' + (payload.descripcion || 'Sin descripción.') + '</div>' +
+    '<div class="dossier-desc">' + (raw.descripcion || payload.descripcion || 'Sin descripción.') + '</div>' +
     '</div>' +
     '<div class="dossier-grid-2">' +
     '<div class="dossier-pill-box">' +
@@ -1393,7 +1414,7 @@ function generarHTMLDossier(payload) {
     '<div class="dossier-pill-box">' +
     '<div class="dossier-block-title">3. Temporalidad y Horarios</div>' +
     '<div><strong>Vigencia:</strong> Del ' + (payload.fechaInicio || '-') + ' al ' + (payload.fechaFin || '-') + '</div>' +
-    '<div><strong>Horario:</strong> ' + (payload.horarios || '-') + '</div>' +
+    '<div><strong>Horario:</strong> ' + (raw.horarios || payload.horarios || '-') + '</div>' +
     obsH +
     '</div>' +
     '</div>' +
@@ -1411,7 +1432,7 @@ function generarHTMLDossier(payload) {
     '<div class="dossier-block-title">6. Presupuesto e Inversión</div>' +
     '<table class="dossier-table"><thead><tr><th>Concepto</th><th style="width: 140px; text-align: right;">Monto</th></tr></thead><tbody>' +
     iHtml +
-    '</tbody><tfoot><tr><th style="text-align: right; background: #e2e8f0;">TOTAL SOLICITADO:</th><th style="text-align: right; background: #e2e8f0; font-size: 13px;">' + (payload.totalInversion || '$0.00 MXN') + '</th></tr></tfoot></table>' +
+    '</tbody><tfoot><tr><th style="text-align: right; background: #e2e8f0;">TOTAL SOLICITADO:</th><th style="text-align: right; background: #e2e8f0; font-size: 13px;">' + invTotalStr + '</th></tr></tfoot></table>' +
     '</div>';
 }
 
@@ -1831,6 +1852,9 @@ function renderizarDashboard() {
   if (!tb) return;
   tb.innerHTML = "";
 
+  var hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
   if (catalogo.length === 0) {
     tb.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 20px; color: var(--text-muted); font-style: italic;">No hay proyectos registrados en el catálogo.</td></tr>';
   } else {
@@ -1838,7 +1862,16 @@ function renderizarDashboard() {
       var invNum = parseFloat(p.inversion) || 0;
       sumaTotalInversion += invNum;
 
-      if ((p.estatus || "").toLowerCase() === "concluido") concluidosCount++;
+      // Determinación dinámica de estatus por fecha
+      var esConcluido = false;
+      var fRaw = (p.raw && p.raw.fechaFinRaw) ? p.raw.fechaFinRaw : null;
+      if (fRaw) {
+        var fPartes = fRaw.split("-").map(Number);
+        var fFinDate = new Date(fPartes[0], fPartes[1] - 1, fPartes[2]);
+        if (hoy > fFinDate) esConcluido = true;
+      }
+
+      if (esConcluido) concluidosCount++;
       else activosCount++;
 
       var ventasP = todasVentas.filter(function(v) { return v.folio === p.folio; });
@@ -1873,7 +1906,7 @@ function renderizarDashboard() {
     });
   }
 
-  // TARJETAS KPIS
+  // Actualizar Tarjetas KPI
   document.getElementById("kpiTotalInversion").innerText = "$" + sumaTotalInversion.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
   document.getElementById("kpiProyectosTotales").innerText = catalogo.length;
   document.getElementById("kpiProyectosDesglose").innerHTML = "🟢 " + activosCount + " Activos &nbsp;|&nbsp; 🏁 " + concluidosCount + " Concluidos";
