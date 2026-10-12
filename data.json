@@ -1,7 +1,7 @@
 {
   "activaciones": [
     {
-      "distribuidoras": "<div class=\"ExternalClass2E9518F929FC47BFACF85F8AC092CAF8\"><p class=\"editor-paragraph\">Automaya, Millenium",
+      "distribuidoras": "<div class=\"ExternalClass2E9518F929FC47BFACF85F8AC092CAF8\"><p class=\"editor-paragraph\">Automaya, Millenium</p></div>",
       "estatus": "Aprobado",
       "fechaFin": "domingo, 27 de septiembre del 2026",
       "fechaInicio": "sábado, 26 de septiembre del 2026",
@@ -109,7 +109,7 @@
       "tipoSede": "Fuera de Agencia"
     },
     {
-      "distribuidoras": "<div class=\"ExternalClass9A0C807700A0425A90A47EDA82C3727C\"><p class=\"editor-paragraph\">Caribe",
+      "distribuidoras": "<div class=\"ExternalClass9A0C807700A0425A90A47EDA82C3727C\"><p class=\"editor-paragraph\">Caribe</p></div>",
       "estatus": "Aprobado",
       "fechaFin": "domingo, 27 de septiembre del 2026",
       "fechaInicio": "sábado, 26 de septiembre del 2026",
@@ -176,5 +176,26 @@
       "tipoSede": "Dentro de Agencia"
     }
   ],
-  "ventas": []
+  "ventas": [
+    {
+      "anio": "2026",
+      "distribuidora": "Caribe",
+      "factura": "1245",
+      "fecha": "2026-10-09",
+      "folio": "Act_SpecialDays_091026",
+      "marca": "DODGE",
+      "modelo": "attitude",
+      "utilidad": 41357.39
+    },
+    {
+      "anio": "2026",
+      "distribuidora": "Caribe",
+      "factura": "3456",
+      "fecha": "2026-10-09",
+      "folio": "Act_SpecialDays_091026",
+      "marca": "DODGE",
+      "modelo": "attitude sport",
+      "utilidad": 41357.39
+    }
+  ]
 }
