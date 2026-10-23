@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suite Comercial - Grupo CER</title>
+  <title>HUB Grupo CER - Módulo de Proyectos e Inversión</title>
+  <!-- Librería Oficial de Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Generador de Dossier PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     :root {
       --primary: #002060;
@@ -30,186 +34,61 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
     body { background-color: var(--bg-page); color: var(--text-main); display: flex; min-height: 100vh; }
 
-    /* CINTA LATERAL IZQUIERDA */
+    /* CINTA LATERAL */
     .app-sidebar {
-      width: var(--sidebar-w);
-      background: var(--surface);
-      border-right: 1px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      z-index: 100;
+      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border-subtle);
+      display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
     }
-    .sidebar-brand {
-      padding: 24px 20px;
-      border-bottom: 1px solid var(--border-subtle);
-      text-align: center;
-    }
-    .sidebar-brand img {
-      height: 42px;
-      width: auto;
-      object-fit: contain;
-      margin-bottom: 8px;
-    }
-    .sidebar-brand h2 {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .sidebar-nav {
-      padding: 16px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex: 1;
-    }
+    .sidebar-brand { padding: 24px 20px; border-bottom: 1px solid var(--border-subtle); text-align: center; }
+    .sidebar-brand img { height: 40px; margin-bottom: 8px; }
+    .sidebar-brand h2 { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .sidebar-nav { padding: 16px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
     .nav-btn {
-      height: 44px;
-      padding: 0 14px;
-      border-radius: var(--radius-sm);
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.2s ease;
-      width: 100%;
+      height: 44px; padding: 0 14px; border-radius: var(--radius-sm); border: none; background: transparent;
+      color: var(--text-muted); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 12px;
+      cursor: pointer; text-align: left; transition: all 0.2s ease; width: 100%;
     }
     .nav-btn:hover { background: var(--primary-soft); color: var(--primary); }
-    .nav-btn.active {
-      background: var(--primary);
-      color: #ffffff;
-      box-shadow: 0 4px 10px rgba(0, 32, 96, 0.15);
-    }
-    .sidebar-footer {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border-subtle);
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .nav-btn.active { background: var(--primary); color: #ffffff; box-shadow: 0 4px 10px rgba(0, 32, 96, 0.15); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
     .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
 
     /* CONTENEDOR DERECHO */
-    .app-main {
-      margin-left: var(--sidebar-w);
-      flex: 1;
-      padding: 30px;
-      max-width: calc(100vw - var(--sidebar-w));
-    }
-    .card-canvas {
-      max-width: 960px;
-      margin: 0 auto;
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 35px;
-      box-shadow: var(--shadow-card);
-      border: 1px solid var(--border-subtle);
-    }
+    .app-main { margin-left: var(--sidebar-w); flex: 1; padding: 30px; max-width: calc(100vw - var(--sidebar-w)); }
+    .card-canvas { max-width: 1040px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-lg); padding: 35px; box-shadow: var(--shadow-card); border: 1px solid var(--border-subtle); }
 
-    /* BARRA SUPERIOR NUEVA ACTIVACIÓN */
-    .top-toolbar {
-      max-width: 960px;
-      margin: 0 auto 18px auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 10px;
-    }
+    .top-toolbar { max-width: 1040px; margin: 0 auto 18px auto; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
     .btn-action-top {
-      height: 40px;
-      padding: 0 15px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-      border: 1px solid transparent;
+      height: 40px; padding: 0 15px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; border: 1px solid transparent;
     }
     .btn-reset-main { background: #ffffff; color: var(--text-muted); border-color: var(--border-subtle); }
     .btn-reset-main:hover { background: #f8fafc; color: var(--text-main); }
     .btn-secondary-main { background: #f8fafc; color: var(--primary); border-color: #cbd5e1; }
     .btn-secondary-main:hover { background: #e2e8f0; }
     .btn-preview-main { background: #0284c7; color: #ffffff; }
-    .btn-preview-main:hover { background: #0369a1; transform: translateY(-1px); }
+    .btn-preview-main:hover { background: #0369a1; }
     .btn-send-main { background: #15803d; color: #ffffff; }
-    .btn-send-main:hover { background: #166534; transform: translateY(-1px); }
+    .btn-send-main:hover { background: #166534; }
+    .btn-reject-main { background: #ef4444; color: #ffffff; }
 
-    .header-branding {
-      text-align: center;
-      margin-bottom: 25px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-    .header-branding h1 {
-      color: var(--primary);
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .meta-pills {
-      display: inline-flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      background: var(--primary-soft);
-      padding: 6px 16px;
-      border-radius: 999px;
-      gap: 15px;
-      font-size: 12px;
-      color: var(--primary);
-      font-weight: 600;
-      margin-top: 10px;
-    }
-    .meta-pills.locked-mode { background: #eff6ff; border: 1px solid #93c5fd; color: #1e40af; }
+    .header-branding { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle); }
+    .header-branding h1 { color: var(--primary); font-size: 20px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
+    .meta-pills { display: inline-flex; flex-wrap: wrap; justify-content: center; background: var(--primary-soft); padding: 6px 16px; border-radius: 999px; gap: 15px; font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 10px; }
 
     /* KPIS */
-    .kpi-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 25px;
-    }
-    .kpi-card {
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      padding: 18px;
-      border: 1px solid var(--border-subtle);
-      box-shadow: var(--shadow-card);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .kpi-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 25px; }
+    .kpi-card { background: var(--surface); border-radius: var(--radius-md); padding: 18px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 4px; }
+    .kpi-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     .kpi-value { font-size: 22px; font-weight: 800; color: var(--primary); }
     .kpi-subtext { font-size: 11px; color: var(--text-muted); }
 
-    /* FORMULARIOS Y TABLAS */
+    /* SECCIONES Y TABLAS */
     .section-card { padding-top: 22px; margin-top: 22px; border-top: 1px solid var(--border-subtle); }
     .section-card:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
     .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .section-num {
-      width: 24px; height: 24px; border-radius: 50%; background: var(--primary);
-      color: #ffffff; display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: bold;
-    }
-    .section-title { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.3px; }
+    .section-num { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+    .section-title { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
 
     .form-grid { display: flex; flex-wrap: wrap; gap: 14px; }
     .col-12 { flex: 0 0 100%; width: 100%; }
@@ -219,7 +98,7 @@
     .col-3  { flex: 0 0 calc(25% - 11px); width: calc(25% - 11px); }
 
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.2px; }
+    .form-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
 
     input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea {
       height: 40px; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);
@@ -239,20 +118,18 @@
 
     .subagency-card { background: #fafafa; border-radius: var(--radius-sm); border: 1px dashed var(--border-subtle); padding: 12px 16px; margin-top: 10px; }
     .subagency-title { font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; }
-    .subagency-empty { font-size: 12px; color: var(--text-muted); font-style: italic; }
 
-    .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow: hidden; margin-top: 10px; }
+    .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow-x: auto; margin-top: 10px; }
     .modern-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .modern-table th { background: var(--primary-soft); color: var(--primary); font-weight: 700; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
     .modern-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; background: #ffffff; }
-    .modern-table tr:last-child td { border-bottom: none; }
 
     .btn-row-delete {
       width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border-subtle); background: #ffffff;
       color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: bold; transition: all 0.2s;
+      font-size: 12px; font-weight: bold;
     }
-    .btn-row-delete:hover { background: #fee2e2; color: var(--btn-del-row); border-color: #fca5a5; }
+    .btn-row-delete:hover { background: #fee2e2; color: var(--btn-del-row); }
 
     .btn-tbl-add {
       height: 34px; padding: 0 14px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700;
@@ -264,31 +141,30 @@
       display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 12px 18px;
       background: var(--primary-soft); border-radius: var(--radius-sm); margin-top: 12px; font-weight: 700; color: var(--primary);
     }
-    .total-amount { font-size: 18px; color: var(--primary); }
+    .total-amount { font-size: 18px; }
 
     .roi-badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; text-align: center; }
     .roi-negative { background: #fee2e2; color: #b91c1c; }
     .roi-neutral  { background: #fef3c7; color: #b45309; }
     .roi-positive { background: #dcfce7; color: #15803d; }
 
-    .status-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; }
-    .status-synced { background: #dcfce7; color: #15803d; }
-    .status-pending { background: #fef3c7; color: #b45309; }
+    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .status-aprobado { background: #dcfce7; color: #15803d; }
+    .status-pendiente { background: #fef3c7; color: #b45309; }
+    .status-rechazado { background: #fee2e2; color: #b91c1c; }
 
     .hidden { display: none !important; }
     .text-center { text-align: center; }
     .text-right { text-align: right; }
 
     /* TOASTS */
-    #toastContainer { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+    #toastContainer { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
     .toast {
-      pointer-events: auto; min-width: 260px; max-width: 380px; padding: 12px 16px; border-radius: var(--radius-sm);
-      background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border-left: 4px solid var(--primary);
+      min-width: 260px; max-width: 380px; padding: 12px 16px; border-radius: var(--radius-sm); background: #ffffff;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border-left: 4px solid var(--primary);
       display: flex; align-items: flex-start; gap: 10px; transform: translateX(120%); transition: all 0.3s ease; opacity: 0;
     }
     .toast.show { transform: translateX(0); opacity: 1; }
-    .toast-title { font-size: 12px; font-weight: 700; color: var(--text-main); }
-    .toast-msg { font-size: 11px; color: var(--text-muted); }
     .toast.success { border-left-color: #10b981; }
     .toast.warning { border-left-color: #f59e0b; }
     .toast.info { border-left-color: #2563eb; }
@@ -300,18 +176,6 @@
       opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-box {
-      background: #ffffff; border-radius: var(--radius-md); max-width: 420px; width: 90%; padding: 22px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-    }
-    .modal-title { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
-    .modal-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.4; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
-    .btn-modal { height: 36px; padding: 0 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
-    .btn-modal-cancel { background: var(--btn-gray); color: var(--btn-gray-text); }
-    .btn-modal-confirm { background: #ef4444; color: #ffffff; }
-
-    /* MODAL DE PREVISUALIZACIÓN DEL DOSSIER */
     .modal-preview-box {
       background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 880px; max-height: 90vh;
       overflow-y: auto; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative;
@@ -320,59 +184,44 @@
       position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; border-radius: 50%;
       width: 32px; height: 32px; cursor: pointer; font-size: 16px; font-weight: bold; color: var(--text-muted);
     }
-    .modal-preview-close:hover { background: #e2e8f0; color: var(--text-main); }
-
-    /* ESTILOS INTERNOS DEL DOSSIER */
     .dossier-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 18px; }
     .dossier-header img { height: 42px; margin-bottom: 6px; }
     .dossier-header h2 { font-size: 17px; color: var(--primary); text-transform: uppercase; }
     .dossier-bar { display: flex; justify-content: space-between; background: var(--primary-soft); padding: 8px 12px; border-radius: 6px; font-weight: bold; color: var(--primary); font-size: 11px; margin-bottom: 16px; }
     .dossier-block { margin-bottom: 16px; }
     .dossier-block-title { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; margin-bottom: 6px; }
-    .dossier-desc { background: #f8fafc; border-left: 3px solid var(--primary); padding: 8px 12px; font-style: italic; color: #334155; margin-bottom: 8px; border-radius: 0 4px 4px 0; }
+    .dossier-desc { background: #f8fafc; border-left: 3px solid var(--primary); padding: 8px 12px; font-style: italic; color: #334155; margin-bottom: 8px; }
     .dossier-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px; }
-    .dossier-pill-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; }
+    .dossier-pill-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; font-size: 12px; }
     .dossier-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px; }
     .dossier-table th { background: #f1f5f9; color: var(--primary); padding: 6px; text-align: left; border: 1px solid #cbd5e1; }
     .dossier-table td { padding: 6px; border: 1px solid #cbd5e1; }
   </style>
 
   <script>
+    // Inicialización del cliente Supabase con tus credenciales
+    const SUPABASE_URL = "https://opxzkyivokspzaokffxn.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weHpreWl2b2tzcHphb2tmZnhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NTg1MDksImV4cCI6MjEwODMzNDUwOX0.Wvr7SBmvdLqVnfj6ZfC6a8vV9GlF72vE2B7OLtMZfEc";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
     function cambiarVista(vista) {
-      var vDash = document.getElementById("viewDashboard");
-      var vCap = document.getElementById("viewCaptura");
-      var vSeg = document.getElementById("viewSeguimiento");
+      document.getElementById("viewDashboard").classList.toggle("hidden", vista !== 'dashboard');
+      document.getElementById("viewCaptura").classList.toggle("hidden", vista !== 'captura');
+      document.getElementById("viewLeads").classList.toggle("hidden", vista !== 'leads');
 
-      if (vDash) vDash.classList.toggle("hidden", vista !== 'dashboard');
-      if (vCap) vCap.classList.toggle("hidden", vista !== 'captura');
-      if (vSeg) vSeg.classList.toggle("hidden", vista !== 'seguimiento');
-
-      var btns = document.querySelectorAll(".nav-btn");
-      btns.forEach(function(b) {
+      document.querySelectorAll(".nav-btn").forEach(b => {
         b.classList.remove("active");
         if (b.getAttribute("data-view") === vista) b.classList.add("active");
       });
 
-      if (vista === 'dashboard' && typeof renderizarDashboard === "function") renderizarDashboard();
-      if (vista === 'seguimiento' && typeof refrescarSelectorProyectosVentas === "function") refrescarSelectorProyectosVentas();
+      if (vista === 'dashboard') cargarDashboardDesdeBD();
+      if (vista === 'leads') refrescarSelectorProyectosLeads();
     }
   </script>
 </head>
 <body>
 
 <div id="toastContainer"></div>
-
-<!-- MODAL RESET -->
-<div class="modal-overlay" id="modalConfirmReset">
-  <div class="modal-box">
-    <div class="modal-title">¿Reiniciar Formulario?</div>
-    <div class="modal-desc">Se limpiarán todos los campos para comenzar la captura de un nuevo proyecto desde ceros.</div>
-    <div class="modal-actions">
-      <button type="button" class="btn-modal btn-modal-cancel" onclick="cerrarModalReset()">Cancelar</button>
-      <button type="button" class="btn-modal btn-modal-confirm" onclick="ejecutarReinicioTotal()">Sí, reiniciar</button>
-    </div>
-  </div>
-</div>
 
 <!-- MODAL PREVISUALIZACIÓN RESUMEN -->
 <div class="modal-overlay" id="modalPreview">
@@ -392,7 +241,7 @@
 <aside class="app-sidebar">
   <div class="sidebar-brand">
     <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display='none'">
-    <h2>Activaciones Comerciales</h2>
+    <h2>HUB Proyectos CER</h2>
   </div>
   <nav class="sidebar-nav">
     <button type="button" class="nav-btn active" data-view="dashboard" onclick="cambiarVista('dashboard')">
@@ -401,13 +250,13 @@
     <button type="button" class="nav-btn" data-view="captura" onclick="cambiarVista('captura')">
       <span>➕</span> Nueva Activación
     </button>
-    <button type="button" class="nav-btn" data-view="seguimiento" onclick="cambiarVista('seguimiento')">
-      <span>📈</span> Ventas & ROI
+    <button type="button" class="nav-btn" data-view="leads" onclick="cambiarVista('leads')">
+      <span>🎯</span> Embudo Leads & ROI
     </button>
   </nav>
   <div class="sidebar-footer">
     <div class="live-dot"></div>
-    <span>Conectado a Red CER</span>
+    <span>Supabase Postgres Conectado</span>
   </div>
 </aside>
 
@@ -415,45 +264,45 @@
 <main class="app-main">
 
   <!-- ========================================== -->
-  <!-- VISTA 1: DASHBOARD GENERAL (HOME)          -->
+  <!-- VISTA 1: DASHBOARD GENERAL (PORTFOLIO)     -->
   <!-- ========================================== -->
   <div id="viewDashboard" class="view-section">
     <div class="card-canvas">
       <div class="header-branding">
-        <h1>Tablero Ejecutivo de Activaciones</h1>
-        <p style="font-size: 13px; color: var(--text-muted);">Monitoreo integral de presupuesto, proyectos en curso y retorno comercial</p>
+        <h1>Tablero Ejecutivo de Inversiones</h1>
+        <p style="font-size: 13px; color: var(--text-muted);">Monitoreo directo desde base de datos de activaciones, leads y retorno comercial</p>
       </div>
 
-      <!-- KPIS -->
+      <!-- KPIS DINÁMICOS -->
       <div class="kpi-container">
         <div class="kpi-card">
           <span class="kpi-title">Inversión Comprometida</span>
           <span class="kpi-value" id="kpiTotalInversion">$0.00 MXN</span>
-          <span class="kpi-subtext">Total proyectos aprobados</span>
+          <span class="kpi-subtext">Proyectos aprobados</span>
         </div>
         <div class="kpi-card">
-          <span class="kpi-title">Proyectos Totales</span>
-          <span class="kpi-value" id="kpiProyectosTotales">0</span>
-          <span class="kpi-subtext" id="kpiProyectosDesglose">🟢 0 Activos &nbsp;|&nbsp; 🏁 0 Concluidos</span>
+          <span class="kpi-title">Leads Captados</span>
+          <span class="kpi-value" id="kpiTotalLeads">0</span>
+          <span class="kpi-subtext" id="kpiLeadsDesglose">0 Vivos | 0 Facturados</span>
         </div>
         <div class="kpi-card">
           <span class="kpi-title">Unidades Facturadas</span>
-          <span class="kpi-value" id="kpiUnidadesVendidas">0</span>
-          <span class="kpi-subtext">Cierres comerciales acumulados</span>
+          <span class="kpi-value" id="kpiUnidadesFacturadas">0</span>
+          <span class="kpi-subtext" id="kpiUtilidadAcum">Utilidad: $0.00 MXN</span>
         </div>
         <div class="kpi-card">
-          <span class="kpi-title">ROI Promedio</span>
+          <span class="kpi-title">ROI Promedio Realizado</span>
           <span class="kpi-value" id="kpiRoiPromedio">0.0%</span>
-          <span class="kpi-subtext">Retorno comercial global</span>
+          <span class="kpi-subtext">Solo sobre ventas cobradas</span>
         </div>
       </div>
 
-      <!-- TABLA DE ACTIVACIONES -->
+      <!-- TABLA DE ACTIVACIONES CON DICTAMEN DE DIRECCIÓN -->
       <div class="section-card">
         <div class="section-header" style="justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <div class="section-num">📋</div>
-            <div class="section-title">Portafolio de Activaciones</div>
+            <div class="section-title">Portafolio de Proyectos en Base de Datos</div>
           </div>
           <button type="button" class="btn-action-top btn-send-main" style="height: 34px;" onclick="cambiarVista('captura')">
             <span>+</span> Nueva Solicitud
@@ -465,18 +314,19 @@
             <thead>
               <tr>
                 <th>Folio</th>
-                <th>Activación</th>
+                <th>Proyecto</th>
                 <th>Distribuidoras</th>
-                <th style="width: 120px;">Inversión</th>
-                <th style="width: 70px; text-align: center;">Autos</th>
-                <th style="width: 90px; text-align: center;">ROI (%)</th>
-                <th style="width: 160px; text-align: center;">Acciones</th>
+                <th style="width: 110px;">Inversión</th>
+                <th style="width: 80px; text-align: center;">Estatus</th>
+                <th style="width: 60px; text-align: center;">Leads</th>
+                <th style="width: 80px; text-align: center;">ROI</th>
+                <th style="width: 170px; text-align: center;">Acciones</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="7" class="text-center" style="padding: 20px; color: var(--text-muted); font-style: italic;">
-                  No hay proyectos registrados en el catálogo.
+                <td colspan="8" class="text-center" style="padding: 20px; color: var(--text-muted); font-style: italic;">
+                  Consultando base de datos Supabase...
                 </td>
               </tr>
             </tbody>
@@ -491,34 +341,27 @@
   <!-- ========================================== -->
   <div id="viewCaptura" class="view-section hidden">
     <div class="top-toolbar">
-      <button type="button" class="btn-action-top btn-reset-main" onclick="solicitarReinicio()">
-        <span>⟲</span> Iniciar Nuevo Registro
-      </button>
-      <input type="file" id="fileImportar" accept=".txt,.json" style="display: none;" onchange="importarBorradorDesdeArchivo(this)">
-      <button type="button" class="btn-action-top btn-secondary-main" onclick="document.getElementById('fileImportar').click()">
-        <span>📂</span> Cargar Borrador (.txt)
-      </button>
-      <button type="button" class="btn-action-top btn-secondary-main" onclick="descargarRespaldoManual()">
-        <span>💾</span> Descargar Respaldo (.txt)
+      <button type="button" class="btn-action-top btn-reset-main" onclick="reiniciarFormulario()">
+        <span>⟲</span> Limpiar Formulario
       </button>
       <button type="button" class="btn-action-top btn-preview-main" onclick="abrirPrevisualizacionFormulario()">
-        <span>👁️</span> Previsualizar Resumen
+        <span>👁️</span> Previsualizar Dossier
       </button>
-      <button type="button" class="btn-action-top btn-send-main" onclick="enviarAutorizacion()">
-        <span>✉️</span> Mandar Proyecto a Autorización
+      <button type="button" class="btn-action-top btn-send-main" id="btnGuardarBD" onclick="guardarActivacionEnSupabase()">
+        <span>💾</span> Guardar en Base de Datos
       </button>
     </div>
 
-    <div class="card-canvas" id="areaCaptura">
+    <div class="card-canvas">
       <div class="header-branding">
-        <h1>Formato Activaciones Grupo CER</h1>
+        <h1>Formato de Proyecto / Activación</h1>
         <div class="meta-pills" id="contenedorPills">
-          <div>Fecha: <span id="lblFechaReg" style="font-weight: normal;">--/--/----</span></div>
+          <div>Fecha: <span id="lblFechaReg">--/--/----</span></div>
           <div>Folio: <span id="lblFolio">Act_SinNombre_000000</span></div>
         </div>
       </div>
 
-      <!-- SECCIÓN 1 -->
+      <!-- SECCIÓN 1: DATOS GENERALES -->
       <div class="section-card">
         <div class="section-header">
           <div class="section-num">1</div>
@@ -527,7 +370,7 @@
         <div class="form-grid">
           <div class="col-8 form-group">
             <label class="form-label">Nombre de la Activación *</label>
-            <input type="text" id="nombreAct" placeholder="Ej. Campaña Special Days" oninput="actualizarFolio(); marcarLleno(this)">
+            <input type="text" id="nombreAct" placeholder="Ej. Feria Maxcanú 2026" oninput="actualizarFolio(); marcarLleno(this)">
           </div>
           <div class="col-4 form-group">
             <label class="form-label">Tipo de Sede *</label>
@@ -538,10 +381,10 @@
           </div>
           <div class="col-12 form-group">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <label class="form-label">Descripción de la Activación *</label>
+              <label class="form-label">Descripción / Justificación Comercial *</label>
               <span id="contadorPalabras" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">0 / 80 palabras</span>
             </div>
-            <textarea id="descAct" placeholder="Redacta un breve resumen del evento, objetivos comerciales e intención..." oninput="controlarDescripcion(this); marcarLleno(this)"></textarea>
+            <textarea id="descAct" placeholder="Resumen de objetivos comerciales e intención..." oninput="controlarDescripcion(this); marcarLleno(this)"></textarea>
           </div>
           <div class="col-12 form-group">
             <label class="form-label">Distribuidoras Participantes *</label>
@@ -555,7 +398,7 @@
         </div>
       </div>
 
-      <!-- SECCIÓN 2A -->
+      <!-- SECCIÓN 2: SEDES DENTRO DE AGENCIA -->
       <div class="section-card" id="secSedesEnAgencia">
         <div class="section-header">
           <div class="section-num">2</div>
@@ -579,21 +422,20 @@
           </div>
           <div class="subagency-card hidden" id="subChetu">
             <div class="subagency-title">Chetumal</div>
-            <div class="subagency-empty">No contiene sub-agencias (Sede Matriz activa)</div>
+            <div style="font-size: 12px; color: var(--text-muted); font-style: italic;">Sede Matriz activa</div>
           </div>
           <div class="subagency-card hidden" id="subMillen">
             <div class="subagency-title">Millenium</div>
-            <div class="subagency-empty">No contiene sub-agencias (Sede Matriz activa)</div>
+            <div style="font-size: 12px; color: var(--text-muted); font-style: italic;">Sede Matriz activa</div>
           </div>
-          <div id="sinAgenciasMsg" class="subagency-empty" style="padding: 10px 0;">Selecciona distribuidoras en la Sección 1.</div>
         </div>
       </div>
 
-      <!-- SECCIÓN 2B -->
+      <!-- SECCIÓN 2B: UBICACIÓN FORÁNEA -->
       <div class="section-card hidden" id="secSedesForaneo">
         <div class="section-header">
           <div class="section-num">2</div>
-          <div class="section-title">Ubicación Foránea</div>
+          <div class="section-title">Ubicación Foránea (Península)</div>
         </div>
         <div class="form-grid">
           <div class="col-6 form-group">
@@ -609,13 +451,13 @@
             </select>
           </div>
           <div class="col-12 form-group">
-            <label class="form-label">Referencia de Ubicación *</label>
-            <input type="text" id="refUbicacion" placeholder="Centro comercial, explanada, dirección física..." oninput="marcarLleno(this)">
+            <label class="form-label">Referencia de Ubicación Física *</label>
+            <input type="text" id="refUbicacion" placeholder="Centro comercial, explanada municipal, etc..." oninput="marcarLleno(this)">
           </div>
         </div>
       </div>
 
-      <!-- SECCIÓN 3 -->
+      <!-- SECCIÓN 3: TEMPORALIDAD -->
       <div class="section-card">
         <div class="section-header">
           <div class="section-num">3</div>
@@ -640,12 +482,12 @@
           </div>
           <div class="col-12 form-group">
             <label class="form-label">Observaciones de Horario</label>
-            <input type="text" id="obsHorario" placeholder="Horarios especiales o guardias..." oninput="marcarLleno(this)">
+            <input type="text" id="obsHorario" placeholder="Guardias, horarios escalonados..." oninput="marcarLleno(this)">
           </div>
         </div>
       </div>
 
-      <!-- SECCIÓN 4 -->
+      <!-- SECCIÓN 4: UNIDADES -->
       <div class="section-card">
         <div class="section-header">
           <div class="section-num">4</div>
@@ -653,7 +495,7 @@
         </div>
         <div class="form-grid">
           <div class="col-4 form-group">
-            <label class="form-label">¿Se requieren unidades?</label>
+            <label class="form-label">¿Requiere exhibición física?</label>
             <select id="aplicaUnidades" onchange="gestionarAplicaUnidades(); marcarLleno(this)">
               <option value="NO">NO</option>
               <option value="SÍ">SÍ</option>
@@ -681,11 +523,11 @@
         </div>
       </div>
 
-      <!-- SECCIÓN 5 -->
+      <!-- SECCIÓN 5: PERSONAL -->
       <div class="section-card">
         <div class="section-header">
           <div class="section-num">5</div>
-          <div class="section-title">Responsables del Evento</div>
+          <div class="section-title">Personal Asignado</div>
         </div>
         <div class="table-container">
           <table class="modern-table" id="tblPersonal">
@@ -707,11 +549,11 @@
         <button type="button" class="btn-tbl-add" onclick="agregarFilaPersonal()">+ Agregar Personal</button>
       </div>
 
-      <!-- SECCIÓN 6 -->
+      <!-- SECCIÓN 6: PRESUPUESTO -->
       <div class="section-card">
         <div class="section-header">
           <div class="section-num">6</div>
-          <div class="section-title">Inversión y Presupuesto</div>
+          <div class="section-title">Desglose Presupuestal (Inversión Total)</div>
         </div>
         <div class="table-container">
           <table class="modern-table" id="tblInversion">
@@ -728,7 +570,7 @@
         </div>
         <button type="button" class="btn-tbl-add" onclick="agregarFilaInversion()">+ Agregar Concepto</button>
         <div class="total-banner">
-          <span>Total de Inversión:</span>
+          <span>Inversión Total Solicitada:</span>
           <span class="total-amount" id="txtTotalInversion">$0.00 MXN</span>
         </div>
       </div>
@@ -736,131 +578,138 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- VISTA 3: SEGUIMIENTO DE VENTAS & ROI       -->
+  <!-- VISTA 3: EMBUDO DE LEADS Y CIERRE DE ROI   -->
   <!-- ========================================== -->
-  <div id="viewSeguimiento" class="view-section hidden">
+  <div id="viewLeads" class="view-section hidden">
     <div class="card-canvas">
       <div class="header-branding">
-        <h1>Registro Comercial y Medición de ROI</h1>
-        <p style="font-size: 13px; color: var(--text-muted);">Asigna ventas facturadas a cada activación para actualizar el retorno real de la inversión</p>
+        <h1>Embudo Comercial y Retorno Real (ROI)</h1>
+        <p style="font-size: 13px; color: var(--text-muted);">Administra los prospectos captados en piso y registra facturaciones para medir el retorno neto</p>
       </div>
 
-      <!-- SELECTOR -->
+      <!-- SELECTOR DE ACTIVACIÓN -->
       <div class="section-card" style="padding-top: 0; margin-top: 0; border-top: none;">
         <div class="form-grid">
           <div class="col-8 form-group">
-            <label class="form-label">Seleccionar Activación *</label>
-            <select id="selProyectoVentas" onchange="seleccionarProyectoParaVenta(this.value); marcarLleno(this)">
-              <option value="">Cargando lista de proyectos...</option>
+            <label class="form-label">Seleccionar Proyecto / Activación *</label>
+            <select id="selProyectoLeads" onchange="seleccionarProyectoParaLeads(this.value); marcarLleno(this)">
+              <option value="">Cargando activaciones desde base de datos...</option>
             </select>
-          </div>
-          <div class="col-4 form-group">
-            <label class="form-label">O Buscar por Folio</label>
-            <input type="text" id="inpBuscarFolio" placeholder="Ej. Act_FeriaMaxcan_081026" oninput="buscarFolioDirecto(this.value)">
           </div>
         </div>
       </div>
 
-      <!-- BLOQUE ROI -->
-      <div id="boxDetalleROI" class="hidden" style="margin-top: 20px;">
+      <div id="boxDetalleLeadsROI" class="hidden" style="margin-top: 20px;">
+        <!-- TARJETAS DE MÉTRICAS DEL PROYECTO -->
         <div class="kpi-container">
           <div class="kpi-card">
-            <span class="kpi-title">Inversión Autorizada</span>
-            <span class="kpi-value" id="roiInversion">$0.00 MXN</span>
-            <span class="kpi-subtext" id="roiProyectoNombre">--</span>
+            <span class="kpi-title">Inversión Aprobada</span>
+            <span class="kpi-value" id="leadRoiInversion">$0.00 MXN</span>
+            <span class="kpi-subtext" id="leadRoiNombre">--</span>
           </div>
           <div class="kpi-card">
-            <span class="kpi-title">Utilidad Bruta Acumulada</span>
-            <span class="kpi-value" id="roiUtilidadAcum">$0.00 MXN</span>
-            <span class="kpi-subtext" id="roiUnidadesConteo">0 unidades facturadas</span>
+            <span class="kpi-title">Utilidad Bruta (Facturada)</span>
+            <span class="kpi-value" id="leadRoiUtilidad">$0.00 MXN</span>
+            <span class="kpi-subtext" id="leadRoiUnidadesFact">0 unidades cerradas</span>
           </div>
           <div class="kpi-card">
-            <span class="kpi-title">Retorno (ROI Actual)</span>
-            <span class="kpi-value" id="roiPorcentaje">0.0%</span>
-            <span class="kpi-subtext" id="roiDiagnostico">Pendiente de ventas</span>
+            <span class="kpi-title">Retorno Comercial (ROI)</span>
+            <span class="kpi-value" id="leadRoiPorcentaje">0.0%</span>
+            <span class="kpi-subtext" id="leadRoiDiag">Sin ventas aún</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Apartados en Custodia</span>
+            <span class="kpi-value" id="leadTotalAnticipos">$0.00 MXN</span>
+            <span class="kpi-subtext">Pasivo sujeto a devolución</span>
           </div>
         </div>
 
-        <!-- FORMULARIO DE VENTA -->
+        <!-- FORMULARIO DE CAPTURA DE LEADS -->
         <div class="section-card">
           <div class="section-header">
             <div class="section-num">+</div>
-            <div class="section-title">Agregar Unidad a la Bitácora</div>
+            <div class="section-title">Capturar Prospecto / Lead a la Activación</div>
           </div>
           <div class="form-grid">
-            <div class="col-3 form-group">
-              <label class="form-label">Fecha Facturación *</label>
-              <input type="date" id="vtaFecha" onchange="marcarLleno(this)">
+            <div class="col-4 form-group">
+              <label class="form-label">Nombre del Prospecto *</label>
+              <input type="text" id="leadNom" placeholder="Nombre completo o razón social">
             </div>
+            <div class="col-4 form-group">
+              <label class="form-label">Teléfono *</label>
+              <input type="text" id="leadTel" placeholder="WhatsApp / Teléfono">
+            </div>
+            <div class="col-4 form-group">
+              <label class="form-label">Correo Electrónico</label>
+              <input type="text" id="leadCorreo" placeholder="contacto@ejemplo.com">
+            </div>
+
             <div class="col-3 form-group">
               <label class="form-label">Distribuidora *</label>
-              <select id="vtaDistribuidora" onchange="marcarLleno(this)">
-                <option value="">Seleccione...</option>
+              <select id="leadDist"></select>
+            </div>
+            <div class="col-3 form-group">
+              <label class="form-label">Marca Interés *</label>
+              <select id="leadMarca"></select>
+            </div>
+            <div class="col-3 form-group">
+              <label class="form-label">Modelo Interés *</label>
+              <input type="text" id="leadModelo" placeholder="Ej. Pulse / Ram 700">
+            </div>
+            <div class="col-3 form-group">
+              <label class="form-label">Etapa Inicial del Lead *</label>
+              <select id="leadEstatus" onchange="evaluarCamposCondicionalesLead(this.value)">
+                <option value="Registrado">1. Registrado (En Piso)</option>
+                <option value="Sin Seguimiento">2. Sin Seguimiento (No responde)</option>
+                <option value="Vivo">3. Vivo / Activo (En cotización)</option>
+                <option value="Con Anticipo">4. Con Anticipo (Apartado)</option>
+                <option value="Anticipo Reembolsado">5. Anticipo Reembolsado</option>
+                <option value="Facturado">6. Facturado / Venta Cerrada</option>
               </select>
             </div>
-            <div class="col-3 form-group">
-              <label class="form-label">Marca *</label>
-              <select id="vtaMarca" onchange="marcarLleno(this)">
-                <option value="">Seleccione Marca...</option>
-              </select>
+
+            <!-- CAMPOS CONDICIONALES DE FINANZAS -->
+            <div class="col-3 form-group hidden" id="boxLeadAnticipo">
+              <label class="form-label" style="color: #b45309;">Monto Anticipo (MXN) *</label>
+              <input type="number" id="leadMontoAnticipo" placeholder="0.00" min="0" step="0.01">
             </div>
-            <div class="col-3 form-group">
-              <label class="form-label">Modelo *</label>
-              <input type="text" id="vtaModelo" placeholder="Ej. Ram 700" oninput="marcarLleno(this)">
+            <div class="col-3 form-group hidden" id="boxLeadFactura">
+              <label class="form-label" style="color: #15803d;">Núm. Factura / Pedido *</label>
+              <input type="text" id="leadNumFactura" placeholder="Ej. F-98214">
             </div>
-            <div class="col-3 form-group">
-              <label class="form-label">Año *</label>
-              <input type="number" id="vtaAnio" placeholder="Ej. 2026" min="1990" max="2035" oninput="marcarLleno(this)">
-            </div>
-            <div class="col-3 form-group">
-              <label class="form-label">Núm. Factura / Pedido *</label>
-              <input type="text" id="vtaFactura" placeholder="Ej. F-94821" oninput="marcarLleno(this)">
-            </div>
-            <div class="col-3 form-group">
-              <label class="form-label">Utilidad Bruta (MXN) *</label>
-              <input type="number" id="vtaUtilidad" placeholder="Ej. 18500.00" min="0.01" step="0.01" oninput="marcarLleno(this)">
+            <div class="col-3 form-group hidden" id="boxLeadUtilidad">
+              <label class="form-label" style="color: #15803d;">Utilidad Bruta (MXN) *</label>
+              <input type="number" id="leadUtilidadBruta" placeholder="Ej. 18500.00" min="0" step="0.01">
             </div>
             <div class="col-3 form-group" style="justify-content: flex-end;">
-              <button type="button" class="btn-action-top btn-secondary-main" style="width: 100%; justify-content: center;" onclick="guardarCierreUnidad()">
-                <span>➕</span> Agregar a la Lista
+              <button type="button" class="btn-action-top btn-send-main" style="width: 100%; justify-content: center;" onclick="guardarLeadEnSupabase()">
+                <span>💾</span> Guardar Lead
               </button>
             </div>
           </div>
         </div>
 
-        <!-- BITÁCORA Y ENVÍO POR LOTE -->
+        <!-- BITÁCORA DEL EMBUDO -->
         <div class="section-card">
-          <div class="section-header" style="justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="section-num">📜</div>
-              <div class="section-title">Bitácora de Unidades Facturadas</div>
-            </div>
-            <button type="button" class="btn-action-top btn-send-main" id="btnEnviarLote" onclick="enviarLoteVentas()">
-              <span>✉️</span> Sincronizar Lote de Ventas
-            </button>
+          <div class="section-header">
+            <div class="section-num">🎯</div>
+            <div class="section-title">Embudo de Prospectos Registrados</div>
           </div>
           <div class="table-container">
-            <table class="modern-table" id="tblVentasProyecto">
+            <table class="modern-table" id="tblLeadsProyecto">
               <thead>
                 <tr>
                   <th style="width: 35px;" class="text-center">#</th>
-                  <th>Fecha</th>
-                  <th>Distribuidora</th>
-                  <th>Marca y Modelo</th>
-                  <th>Año</th>
-                  <th>Factura</th>
+                  <th>Prospecto</th>
+                  <th>Contacto</th>
+                  <th>Distribuidora / Unidad</th>
+                  <th style="width: 140px;">Etapa (Estatus)</th>
+                  <th style="text-align: right;">Anticipo</th>
                   <th style="text-align: right;">Utilidad Bruta</th>
-                  <th style="width: 80px; text-align: center;">Estatus</th>
                   <th style="width: 40px;" class="text-center"></th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td colspan="9" class="text-center" style="padding: 16px; color: var(--text-muted); font-style: italic;">
-                    No hay ventas registradas aún para este folio.
-                  </td>
-                </tr>
-              </tbody>
+              <tbody></tbody>
             </table>
           </div>
         </div>
@@ -871,99 +720,41 @@
 </main>
 
 <script>
-var BASE_ESTADOS_MUNICIPIOS = {
+// ==========================================
+// CATÁLOGOS BASE
+// ==========================================
+const BASE_ESTADOS_MUNICIPIOS = {
   "Campeche": ["Calakmul", "Calkiní", "Campeche", "Candelaria", "Carmen", "Champotón", "Dzitbalché", "Escárcega", "Hecelchakán", "Hopelchén", "Palizada", "Seybaplaya", "Tenabo"],
   "Quintana Roo": ["Bacalar", "Benito Juárez (Cancún)", "Cozumel", "Felipe Carrillo Puerto", "Isla Mujeres", "José María Morelos", "Lázaro Cárdenas", "Othón P. Blanco (Chetumal)", "Puerto Morelos", "Solidaridad (Playa del Carmen)", "Tulum"],
   "Yucatán": ["Abalá", "Acanceh", "Akil", "Baca", "Bokobá", "Buctzotz", "Cacalchén", "Calotmul", "Cansahcab", "Cantamayec", "Celestún", "Cenotillo", "Conkal", "Chacsinkín", "Chankom", "Chapab", "Chemax", "Chicxulub Pueblo", "Chichimilá", "Chikindzonot", "Chocholá", "Chumayel", "Dzan", "Dzemul", "Dzidzantún", "Dzilam de Bravo", "Dzilam González", "Dzitás", "Dzoncauich", "Espita", "Halachó", "Hocabá", "Hoctún", "Homún", "Huhí", "Hunucmá", "Ixil", "Izamal", "Kanasín", "Kantunil", "Kaua", "Kinchil", "Kopomá", "Mama", "Maní", "Maxcanú", "Mayapán", "Mérida", "Mocochá", "Motul", "Muna", "Muxupip", "Opichén", "Oxkutzcab", "Panabá", "Peto", "Progreso", "Quintana Roo", "Río Lagartos", "Sacalum", "Samahil", "Sanahcat", "San Felipe", "Santa Elena", "Seyé", "Sinanché", "Sotuta", "Sucilá", "Sudzal", "Suma", "Tahdziú", "Tahmek", "Teabo", "Tecoh", "Tekal de Venegas", "Tekantó", "Tekax", "Tekit", "Tekom", "Telchac Pueblo", "Telchac Puerto", "Temax", "Temozón", "Tepakán", "Tetiz", "Teya", "Ticul", "Timucuy", "Tinum", "Tixcacalcupul", "Tixkokob", "Tixmehuac", "Tixpéhual", "Tizimín", "Tunkás", "Tzucacab", "Uayma", "Ucú", "Umán", "Valladolid", "Xocchel", "Yaxcabá", "Yaxkukul", "Yobaín"]
 };
 
-var MARCAS_GRUPO_CER = ["ALFA ROMEO", "CHRYSLER", "DODGE", "FIAT", "JEEP", "MITSUBISHI", "PEUGEOT", "RAM"];
-var LIMITE_PALABRAS = 80;
+const MARCAS_GRUPO_CER = ["ALFA ROMEO", "CHRYSLER", "DODGE", "FIAT", "JEEP", "MITSUBISHI", "PEUGEOT", "RAM"];
+const LIMITE_PALABRAS = 80;
 
-var memoriaGlobal = {
-  activaciones: [],
-  ventas: []
-};
+let activacionesEnMemoria = [];
+let activacionSeleccionadaLeads = null;
 
 window.onload = function() {
   poblarEstados();
-  inicializarFormularioBase();
-  poblarMarcasVentas();
-  cargarDatosCentrales();
+  poblarMarcasLeads();
+  reiniciarFormulario();
+  cargarDashboardDesdeBD();
 };
 
-function cargarDatosCentrales() {
-  fetch('./data.json?v=' + Date.now())
-    .then(function(res) {
-      if (!res.ok) throw new Error("Archivo data.json no accesible");
-      return res.json();
-    })
-    .then(function(data) {
-      memoriaGlobal.activaciones = (data.activaciones || []).map(function(a) {
-        var rawInv = (a.inversion !== undefined) ? a.inversion : (a.totalInversion || 0);
-        var invNum = typeof rawInv === 'number' ? rawInv : parseFloat(String(rawInv).replace(/[^0-9.-]+/g, "")) || 0;
-        var distLimpia = String(a.distribuidoras || "-").replace(/<[^>]*>?/gm, '').trim();
-
-        var rawData = a.raw || {};
-        if (rawData.raw) {
-          rawData = Object.assign({}, rawData, rawData.raw);
-        }
-
-        return {
-          folio: a.folio || a.Title || a.Folio || "SinFolio",
-          nombreActivacion: a.nombreActivacion || a.NombreActivacion || "Sin Título",
-          distribuidoras: distLimpia,
-          tipoSede: a.tipoSede || a.TipoSede || "-",
-          fechaInicio: a.fechaInicio || a.FechaInicio || "-",
-          fechaFin: a.fechaFin || a.FechaFin || "-",
-          inversion: invNum,
-          estatus: a.estatus || a.Estatus || "Activo",
-          raw: rawData
-        };
-      });
-
-      memoriaGlobal.ventas = (data.ventas || []).map(function(v) {
-        var rawUtil = (v.utilidad !== undefined) ? v.utilidad : (v.UtilidadBruta || 0);
-        var utilNum = typeof rawUtil === 'number' ? rawUtil : parseFloat(String(rawUtil).replace(/[^0-9.-]+/g, "")) || 0;
-        return {
-          id: v.id || v.ID || Date.now(),
-          folio: v.folio || v.Title || v.Folio || "",
-          fecha: v.fecha || v.FechaFacturacion || "",
-          distribuidora: v.distribuidora || v.Distribuidora || "-",
-          marca: v.marca || v.Marca || "-",
-          modelo: v.modelo || v.Modelo || "-",
-          anio: v.anio || v.Anio || "-",
-          factura: v.factura || v.NumFactura || "-",
-          utilidad: utilNum,
-          pendienteEnvio: false
-        };
-      });
-
-      renderizarDashboard();
-      refrescarSelectorProyectosVentas();
-    })
-    .catch(function(err) {
-      console.warn("Aviso:", err);
-      renderizarDashboard();
-      refrescarSelectorProyectosVentas();
-    });
-}
-
-function mostrarToast(titulo, mensaje, tipo) {
-  tipo = tipo || "info";
-  var cont = document.getElementById("toastContainer");
-  var t = document.createElement("div");
-  t.className = "toast " + tipo;
-  var icon = "ℹ️";
+function mostrarToast(titulo, mensaje, tipo = "info") {
+  const cont = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast ${tipo}`;
+  let icon = "ℹ️";
   if (tipo === "success") icon = "✅";
   if (tipo === "warning") icon = "⚠️";
-
-  t.innerHTML = '<div style="font-size:16px;">' + icon + '</div><div><div class="toast-title">' + titulo + '</div><div class="toast-msg">' + mensaje + '</div></div>';
+  t.innerHTML = `<div style="font-size:16px;">${icon}</div><div><div style="font-weight:700; font-size:12px;">${titulo}</div><div style="font-size:11px; color:#64748b;">${mensaje}</div></div>`;
   cont.appendChild(t);
-  setTimeout(function() { t.classList.add("show"); }, 10);
-  setTimeout(function() {
+  setTimeout(() => t.classList.add("show"), 10);
+  setTimeout(() => {
     t.classList.remove("show");
-    setTimeout(function() { t.remove(); }, 300);
+    setTimeout(() => t.remove(), 300);
   }, 4000);
 }
 
@@ -975,84 +766,60 @@ function marcarLleno(el) {
 function controlarDescripcion(el) {
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
-  var palabras = el.value.trim().split(/\s+/).filter(function(p) { return p.length > 0; });
+  let palabras = el.value.trim().split(/\s+/).filter(p => p.length > 0);
   if (palabras.length > LIMITE_PALABRAS) {
     el.value = palabras.slice(0, LIMITE_PALABRAS).join(" ");
-    palabras = el.value.trim().split(/\s+/).filter(function(p) { return p.length > 0; });
+    palabras = el.value.trim().split(/\s+/).filter(p => p.length > 0);
   }
-  document.getElementById("contadorPalabras").innerText = palabras.length + " / " + LIMITE_PALABRAS + " palabras";
-}
-
-function formatearFechaLarga(fechaStr) {
-  if (!fechaStr) return "--";
-  var parts = fechaStr.split("-").map(Number);
-  var fecha = new Date(parts[0], parts[1] - 1, parts[2]);
-  var txt = fecha.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  return txt.replace(/de (\d{4})$/, 'del $1');
-}
-
-function formatearHoraCompleta(horaStr) {
-  if (!horaStr) return "--:--";
-  var parts = horaStr.split(":").map(Number);
-  var h = parts[0];
-  var m = parts[1];
-  var ampm = h >= 12 ? 'pm' : 'am';
-  var h12 = h % 12 || 12;
-  var h12Str = String(h12).padStart(2, '0');
-  var h24Str = String(h).padStart(2, '0');
-  var minStr = String(m).padStart(2, '0');
-  return h24Str + ":" + minStr + " h (" + h12Str + ":" + minStr + " " + ampm + ")";
+  document.getElementById("contadorPalabras").innerText = `${palabras.length} / ${LIMITE_PALABRAS} palabras`;
 }
 
 function poblarEstados() {
-  var sel = document.getElementById("selEstado");
-  sel.innerHTML = '<option value="">Seleccione Estado...</option>';
-  Object.keys(BASE_ESTADOS_MUNICIPIOS).sort().forEach(function(est) {
-    sel.innerHTML += '<option value="' + est + '">' + est + '</option>';
-  });
+  const sel = document.getElementById("selEstado");
+  sel.innerHTML = '<option value="">Seleccione Estado...</option>' + 
+    Object.keys(BASE_ESTADOS_MUNICIPIOS).sort().map(e => `<option value="${e}">${e}</option>`).join("");
 }
 
 function filtrarMunicipios() {
-  var est = document.getElementById("selEstado").value;
-  var selMun = document.getElementById("selMunicipio");
+  const est = document.getElementById("selEstado").value;
+  const selMun = document.getElementById("selMunicipio");
   selMun.innerHTML = '<option value="">Seleccione Municipio...</option>';
   if (BASE_ESTADOS_MUNICIPIOS[est]) {
-    BASE_ESTADOS_MUNICIPIOS[est].forEach(function(m) {
-      selMun.innerHTML += '<option value="' + m + '">' + m + '</option>';
-    });
+    selMun.innerHTML += BASE_ESTADOS_MUNICIPIOS[est].map(m => `<option value="${m}">${m}</option>`).join("");
   }
 }
 
+function poblarMarcasLeads() {
+  const sel = document.getElementById("leadMarca");
+  sel.innerHTML = '<option value="">Seleccione...</option>' + MARCAS_GRUPO_CER.map(m => `<option value="${m}">${m}</option>`).join("");
+}
+
 function actualizarFolio() {
-  var folioCongelado = document.getElementById("lblFolio").getAttribute("data-locked");
-  if (folioCongelado) return;
-  var nombre = document.getElementById("nombreAct").value.trim() || "SinNombre";
-  var hoy = new Date();
-  var d = String(hoy.getDate()).padStart(2, '0');
-  var m = String(hoy.getMonth() + 1).padStart(2, '0');
-  var y = String(hoy.getFullYear()).slice(-2);
-  var folioLimpio = "Act_" + nombre.replace(/[^a-zA-Z0-9]/g, '') + "_" + d + m + y;
-  document.getElementById("lblFolio").innerText = folioLimpio;
+  const nombre = document.getElementById("nombreAct").value.trim() || "SinNombre";
+  const hoy = new Date();
+  const d = String(hoy.getDate()).padStart(2, '0');
+  const m = String(hoy.getMonth() + 1).padStart(2, '0');
+  const y = String(hoy.getFullYear()).slice(-2);
+  document.getElementById("lblFolio").innerText = `Act_${nombre.replace(/[^a-zA-Z0-9]/g, '')}_${d}${m}${y}`;
 }
 
 function gestionarTipoSede() {
-  var esEnAgencia = (document.getElementById("tipoSede").value === "Dentro de Agencia");
+  const esEnAgencia = (document.getElementById("tipoSede").value === "Dentro de Agencia");
   document.getElementById("secSedesEnAgencia").classList.toggle("hidden", !esEnAgencia);
   document.getElementById("secSedesForaneo").classList.toggle("hidden", esEnAgencia);
 }
 
 function sincronizarAgencias() {
-  var auto = document.getElementById("chkAuto").checked;
-  var caribe = document.getElementById("chkCaribe").checked;
-  var chetu = document.getElementById("chkChetu").checked;
-  var millen = document.getElementById("chkMillen").checked;
+  const auto = document.getElementById("chkAuto").checked;
+  const caribe = document.getElementById("chkCaribe").checked;
+  const chetu = document.getElementById("chkChetu").checked;
+  const millen = document.getElementById("chkMillen").checked;
 
   document.getElementById("subAuto").classList.toggle("hidden", !auto);
   document.getElementById("subCaribe").classList.toggle("hidden", !caribe);
   document.getElementById("subChetu").classList.toggle("hidden", !chetu);
   document.getElementById("subMillen").classList.toggle("hidden", !millen);
 
-  document.getElementById("sinAgenciasMsg").classList.toggle("hidden", auto || caribe || chetu || millen);
   document.getElementById("cardAuto").classList.toggle("checked", auto);
   document.getElementById("cardCaribe").classList.toggle("checked", caribe);
   document.getElementById("cardChetu").classList.toggle("checked", chetu);
@@ -1061,8 +828,8 @@ function sincronizarAgencias() {
   refrescarDesplegablesDistribuidoras();
 }
 
-function obtenerDistribuidorasActivas(incluirCoorp) {
-  var lista = [];
+function obtenerDistribuidorasActivas(incluirCoorp = false) {
+  const lista = [];
   if (incluirCoorp) lista.push("Coorp");
   if (document.getElementById("chkAuto").checked) lista.push("Automaya");
   if (document.getElementById("chkCaribe").checked) lista.push("Caribe");
@@ -1072,172 +839,122 @@ function obtenerDistribuidorasActivas(incluirCoorp) {
 }
 
 function refrescarDesplegablesDistribuidoras() {
-  var distUnid = obtenerDistribuidorasActivas(false);
-  document.querySelectorAll("#tblUnidades select.sel-dist-unid").forEach(function(sel) {
-    var valPrev = sel.value;
-    sel.innerHTML = '<option value="">Seleccione...</option>' + distUnid.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join("");
-    if (distUnid.includes(valPrev)) sel.value = valPrev;
+  const distUnid = obtenerDistribuidorasActivas(false);
+  document.querySelectorAll("#tblUnidades select.sel-dist-unid").forEach(sel => {
+    const val = sel.value;
+    sel.innerHTML = '<option value="">Seleccione...</option>' + distUnid.map(d => `<option value="${d}">${d}</option>`).join("");
+    if (distUnid.includes(val)) sel.value = val;
   });
 
-  var distPers = obtenerDistribuidorasActivas(true);
-  document.querySelectorAll("#tblPersonal select.sel-dist-pers").forEach(function(sel) {
-    var valPrev = sel.value;
-    sel.innerHTML = '<option value="">Seleccione...</option>' + distPers.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join("");
-    if (distPers.includes(valPrev)) sel.value = valPrev;
-  });
-}
-
-function obtenerDiasEntreFechas() {
-  var fIniVal = document.getElementById("fechaInicio").value;
-  var fFinVal = document.getElementById("fechaFin").value;
-  if (!fIniVal || !fFinVal) return [];
-
-  var fIni = new Date(fIniVal + "T00:00:00");
-  var fFin = new Date(fFinVal + "T00:00:00");
-  if (fFin < fIni) return [];
-
-  var dias = [];
-  var cur = new Date(fIni);
-  while (cur <= fFin) {
-    dias.push(cur.toLocaleDateString("es-MX", { day: '2-digit', month: '2-digit', year: 'numeric' }));
-    cur.setDate(cur.getDate() + 1);
-  }
-  return dias;
-}
-
-function actualizarDiasDisponibles() {
-  document.querySelectorAll("#tblPersonal tr").forEach(function(tr) {
-    var selTipo = tr.querySelector(".sel-tipo-asistencia");
-    if (selTipo) gestionarAsistenciaFila(selTipo);
+  const distPers = obtenerDistribuidorasActivas(true);
+  document.querySelectorAll("#tblPersonal select.sel-dist-pers").forEach(sel => {
+    const val = sel.value;
+    sel.innerHTML = '<option value="">Seleccione...</option>' + distPers.map(d => `<option value="${d}">${d}</option>`).join("");
+    if (distPers.includes(val)) sel.value = val;
   });
 }
 
 function gestionarAplicaUnidades() {
-  var req = (document.getElementById("aplicaUnidades").value === "SÍ");
+  const req = (document.getElementById("aplicaUnidades").value === "SÍ");
   document.getElementById("contenedorUnidades").classList.toggle("hidden", !req);
   if (req && document.querySelector("#tblUnidades tbody").rows.length === 0) agregarFilaUnidad();
 }
 
 function agregarFilaUnidad() {
-  var tb = document.querySelector("#tblUnidades tbody");
-  var num = tb.rows.length + 1;
-  var dists = obtenerDistribuidorasActivas(false);
-  var tr = document.createElement("tr");
+  const tb = document.querySelector("#tblUnidades tbody");
+  const num = tb.rows.length + 1;
+  const dists = obtenerDistribuidorasActivas(false);
+  const tr = document.createElement("tr");
 
-  tr.innerHTML = '<td class="text-center fw-bold row-num">' + num + '</td>' +
-    '<td><select class="sel-dist-unid" onchange="marcarLleno(this)"><option value="">Seleccione...</option>' +
-    dists.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join("") + '</select></td>' +
-    '<td><select class="sel-marca-unid" onchange="marcarLleno(this)"><option value="">Seleccione Marca...</option>' +
-    MARCAS_GRUPO_CER.map(function(m) { return '<option value="' + m + '">' + m + '</option>'; }).join("") + '</select></td>' +
-    '<td><input type="text" class="inp-modelo-unid" placeholder="Modelo..." oninput="marcarLleno(this)"></td>' +
-    '<td><input type="number" class="inp-anio-unid" placeholder="Año" min="1990" max="2035" oninput="marcarLleno(this)"></td>' +
-    '<td><input type="number" class="inp-cant-unid text-center filled" value="1" min="1"></td>' +
-    '<td class="text-center"><button type="button" class="btn-row-delete" onclick="eliminarFilaIndividual(this, \'tblUnidades\')">✕</button></td>';
+  tr.innerHTML = `<td class="text-center fw-bold row-num">${num}</td>
+    <td><select class="sel-dist-unid"><option value="">Seleccione...</option>${dists.map(d => `<option value="${d}">${d}</option>`).join("")}</select></td>
+    <td><select class="sel-marca-unid"><option value="">Marca...</option>${MARCAS_GRUPO_CER.map(m => `<option value="${m}">${m}</option>`).join("")}</select></td>
+    <td><input type="text" class="inp-modelo-unid" placeholder="Modelo..."></td>
+    <td><input type="number" class="inp-anio-unid" placeholder="Año" min="1990" max="2035"></td>
+    <td><input type="number" class="inp-cant-unid text-center filled" value="1" min="1"></td>
+    <td class="text-center"><button type="button" class="btn-row-delete" onclick="eliminarFila(this, 'tblUnidades')">✕</button></td>`;
   tb.appendChild(tr);
 }
 
 function agregarFilaPersonal() {
-  var tb = document.querySelector("#tblPersonal tbody");
-  var num = tb.rows.length + 1;
-  var dists = obtenerDistribuidorasActivas(true);
-  var tr = document.createElement("tr");
+  const tb = document.querySelector("#tblPersonal tbody");
+  const num = tb.rows.length + 1;
+  const dists = obtenerDistribuidorasActivas(true);
+  const tr = document.createElement("tr");
 
-  tr.innerHTML = '<td class="text-center fw-bold row-num">' + num + '</td>' +
-    '<td><select class="sel-dist-pers" onchange="marcarLleno(this)"><option value="">Seleccione...</option>' +
-    dists.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join("") + '</select></td>' +
-    '<td><input type="text" class="inp-nom-pers" placeholder="Nombre completo" oninput="marcarLleno(this)"></td>' +
-    '<td><input type="text" class="inp-rol-pers" placeholder="Coordinador, Asesor..." oninput="marcarLleno(this)"></td>' +
-    '<td><select class="sel-tipo-asistencia filled" onchange="gestionarAsistenciaFila(this); marcarLleno(this)"><option value="Todos los días">Todos los días</option><option value="1 día en específico">1 día en específico</option></select></td>' +
-    '<td><select class="sel-dia-especifico filled" disabled><option value="">N/A</option></select></td>' +
-    '<td><input type="text" class="inp-com-pers" placeholder="Comentarios adicionales..."></td>' +
-    '<td class="text-center"><button type="button" class="btn-row-delete" onclick="eliminarFilaIndividual(this, \'tblPersonal\')">✕</button></td>';
+  tr.innerHTML = `<td class="text-center fw-bold row-num">${num}</td>
+    <td><select class="sel-dist-pers"><option value="">Seleccione...</option>${dists.map(d => `<option value="${d}">${d}</option>`).join("")}</select></td>
+    <td><input type="text" class="inp-nom-pers" placeholder="Nombre completo"></td>
+    <td><input type="text" class="inp-rol-pers" placeholder="Asesor, Coordinador..."></td>
+    <td><select class="sel-tipo-asistencia" onchange="gestionarAsistenciaFila(this)"><option value="Todos los días">Todos los días</option><option value="1 día en específico">1 día en específico</option></select></td>
+    <td><select class="sel-dia-especifico" disabled><option value="">N/A</option></select></td>
+    <td><input type="text" class="inp-com-pers" placeholder="Comentarios"></td>
+    <td class="text-center"><button type="button" class="btn-row-delete" onclick="eliminarFila(this, 'tblPersonal')">✕</button></td>`;
   tb.appendChild(tr);
 }
 
 function gestionarAsistenciaFila(selTipo) {
-  var tr = selTipo.closest("tr");
-  var selDia = tr.querySelector(".sel-dia-especifico");
-  var dias = obtenerDiasEntreFechas();
+  const tr = selTipo.closest("tr");
+  const selDia = tr.querySelector(".sel-dia-especifico");
+  const fIni = document.getElementById("fechaInicio").value;
+  const fFin = document.getElementById("fechaFin").value;
 
-  if (selTipo.value === "1 día en específico") {
+  if (selTipo.value === "1 día en específico" && fIni && fFin) {
     selDia.disabled = false;
-    selDia.classList.remove("filled");
-    selDia.innerHTML = (dias.length === 0) ? '<option value="">Primero elija fechas</option>' : '<option value="">Seleccione día...</option>' + dias.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join("");
+    let cur = new Date(fIni + "T00:00:00");
+    const end = new Date(fFin + "T00:00:00");
+    let opts = '<option value="">Seleccione día...</option>';
+    while (cur <= end) {
+      opts += `<option value="${cur.toISOString().split('T')[0]}">${cur.toLocaleDateString('es-MX')}</option>`;
+      cur.setDate(cur.getDate() + 1);
+    }
+    selDia.innerHTML = opts;
   } else {
     selDia.disabled = true;
-    selDia.classList.add("filled");
     selDia.innerHTML = '<option value="">N/A</option>';
   }
 }
 
-function agregarFilaInversion() {
-  var tb = document.querySelector("#tblInversion tbody");
-  var num = tb.rows.length + 1;
-  var tr = document.createElement("tr");
+function actualizarDiasDisponibles() {
+  document.querySelectorAll("#tblPersonal .sel-tipo-asistencia").forEach(sel => gestionarAsistenciaFila(sel));
+}
 
-  tr.innerHTML = '<td class="text-center fw-bold row-num">' + num + '</td>' +
-    '<td><input type="text" class="inp-con-inv" placeholder="Concepto de inversión..." oninput="marcarLleno(this)"></td>' +
-    '<td><input type="number" class="monto-val text-right" value="0.00" min="0" step="0.01" oninput="validarMontoPositivo(this); calcularTotalInversion(); marcarLleno(this)"></td>' +
-    '<td class="text-center"><button type="button" class="btn-row-delete" onclick="eliminarFilaIndividual(this, \'tblInversion\')">✕</button></td>';
+function agregarFilaInversion() {
+  const tb = document.querySelector("#tblInversion tbody");
+  const num = tb.rows.length + 1;
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `<td class="text-center fw-bold row-num">${num}</td>
+    <td><input type="text" class="inp-con-inv" placeholder="Concepto (Carpas, audio, volantes...)"></td>
+    <td><input type="number" class="monto-val text-right" value="0.00" min="0" step="0.01" oninput="calcularTotalInversion()"></td>
+    <td class="text-center"><button type="button" class="btn-row-delete" onclick="eliminarFila(this, 'tblInversion')">✕</button></td>`;
   tb.appendChild(tr);
   calcularTotalInversion();
 }
 
-function validarMontoPositivo(input) {
-  if (parseFloat(input.value) < 0 || isNaN(parseFloat(input.value))) input.value = "0.00";
-}
-
 function calcularTotalInversion() {
-  var total = 0;
-  document.querySelectorAll("#tblInversion .monto-val").forEach(function(inp) {
-    var val = parseFloat(inp.value) || 0;
-    if (val > 0) total += val;
+  let total = 0;
+  document.querySelectorAll("#tblInversion .monto-val").forEach(inp => {
+    total += parseFloat(inp.value) || 0;
   });
-  document.getElementById("txtTotalInversion").innerText = "$" + total.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " MXN";
+  document.getElementById("txtTotalInversion").innerText = `$${total.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
 }
 
-function eliminarFilaIndividual(btn, tblId) {
-  var tb = document.querySelector("#" + tblId + " tbody");
-  var tr = btn.closest("tr");
-  if (tb.rows.length === 1) {
-    Array.from(tr.querySelectorAll("input, select")).forEach(function(el) {
-      el.value = (el.type === "number" ? (el.classList.contains("monto-val") ? "0.00" : "1") : "");
-      marcarLleno(el);
-    });
-  } else {
-    tr.remove();
-    Array.from(tb.rows).forEach(function(row, idx) { row.querySelector(".row-num").innerText = idx + 1; });
+function eliminarFila(btn, tblId) {
+  const tb = document.querySelector(`#${tblId} tbody`);
+  if (tb.rows.length > 1) {
+    btn.closest("tr").remove();
+    Array.from(tb.rows).forEach((row, idx) => row.querySelector(".row-num").innerText = idx + 1);
   }
   if (tblId === "tblInversion") calcularTotalInversion();
 }
 
-function solicitarReinicio() {
-  document.getElementById("modalConfirmReset").classList.add("open");
-}
-
-function cerrarModalReset() {
-  document.getElementById("modalConfirmReset").classList.remove("open");
-}
-
-function ejecutarReinicioTotal() {
-  cerrarModalReset();
-  document.getElementById("lblFolio").removeAttribute("data-locked");
-  document.getElementById("contenedorPills").classList.remove("locked-mode");
-  inicializarFormularioBase();
-  mostrarToast("Formulario Reiniciado", "Campos limpios y folio liberado.", "info");
-}
-
-function inicializarFormularioBase() {
-  var hoy = new Date();
-  document.getElementById("lblFechaReg").innerText = hoy.toLocaleDateString("es-MX");
-
+function reiniciarFormulario() {
+  document.getElementById("lblFechaReg").innerText = new Date().toLocaleDateString("es-MX");
   document.getElementById("nombreAct").value = "";
   document.getElementById("descAct").value = "";
-  document.getElementById("descAct").style.height = "auto";
   document.getElementById("contadorPalabras").innerText = "0 / 80 palabras";
-
   document.getElementById("tipoSede").value = "Dentro de Agencia";
-  marcarLleno(document.getElementById("tipoSede"));
   document.getElementById("chkAuto").checked = false;
   document.getElementById("chkCaribe").checked = false;
   document.getElementById("chkChetu").checked = false;
@@ -1246,10 +963,6 @@ function inicializarFormularioBase() {
   sincronizarAgencias();
   actualizarFolio();
 
-  document.getElementById("selEstado").value = "";
-  document.getElementById("selMunicipio").innerHTML = '<option value="">Seleccione Municipio...</option>';
-  document.getElementById("refUbicacion").value = "";
-
   document.getElementById("fechaInicio").value = "";
   document.getElementById("fechaFin").value = "";
   document.getElementById("horaEntrada").value = "";
@@ -1257,7 +970,6 @@ function inicializarFormularioBase() {
   document.getElementById("obsHorario").value = "";
 
   document.getElementById("aplicaUnidades").value = "NO";
-  marcarLleno(document.getElementById("aplicaUnidades"));
   document.querySelector("#tblUnidades tbody").innerHTML = "";
   gestionarAplicaUnidades();
 
@@ -1266,197 +978,418 @@ function inicializarFormularioBase() {
 
   document.querySelector("#tblInversion tbody").innerHTML = "";
   agregarFilaInversion();
-
-  document.querySelectorAll("input, select, textarea").forEach(function(el) { marcarLleno(el); });
 }
 
-function construirPayloadCompleto() {
-  var unidadesArr = [];
-  if (document.getElementById("aplicaUnidades").value === "SÍ") {
-    document.querySelectorAll("#tblUnidades tbody tr").forEach(function(r) {
-      unidadesArr.push({
-        dist: r.querySelector(".sel-dist-unid") ? r.querySelector(".sel-dist-unid").value : "",
-        marca: r.querySelector(".sel-marca-unid") ? r.querySelector(".sel-marca-unid").value : "",
-        modelo: r.querySelector(".inp-modelo-unid") ? r.querySelector(".inp-modelo-unid").value : "",
-        anio: r.querySelector(".inp-anio-unid") ? r.querySelector(".inp-anio-unid").value : "",
-        cant: r.querySelector(".inp-cant-unid") ? r.querySelector(".inp-cant-unid").value : "1"
-      });
-    });
-  }
+// ==========================================
+// CONEXIÓN SUPABASE: GUARDAR ACTIVACIÓN
+// ==========================================
+async function guardarActivacionEnSupabase() {
+  const nombre = document.getElementById("nombreAct").value.trim();
+  const fIni = document.getElementById("fechaInicio").value;
+  const fFin = document.getElementById("fechaFin").value;
+  const folio = document.getElementById("lblFolio").innerText;
 
-  var personalArr = [];
-  document.querySelectorAll("#tblPersonal tbody tr").forEach(function(r) {
-    personalArr.push({
-      dist: r.querySelector(".sel-dist-pers") ? r.querySelector(".sel-dist-pers").value : "",
-      nom: r.querySelector(".inp-nom-pers") ? r.querySelector(".inp-nom-pers").value : "",
-      rol: r.querySelector(".inp-rol-pers") ? r.querySelector(".inp-rol-pers").value : "",
-      asistencia: r.querySelector(".sel-tipo-asistencia") ? r.querySelector(".sel-tipo-asistencia").value : "Todos los días",
-      dia: r.querySelector(".sel-dia-especifico") ? r.querySelector(".sel-dia-especifico").value : "",
-      com: r.querySelector(".inp-com-pers") ? r.querySelector(".inp-com-pers").value : ""
-    });
-  });
-
-  var inversionArr = [];
-  var sumaInv = 0;
-  document.querySelectorAll("#tblInversion tbody tr").forEach(function(r) {
-    var con = r.querySelector(".inp-con-inv") ? r.querySelector(".inp-con-inv").value : "";
-    var mon = parseFloat(r.querySelector(".monto-val") ? r.querySelector(".monto-val").value : 0) || 0;
-    sumaInv += mon;
-    inversionArr.push({ concepto: con, monto: mon.toFixed(2) });
-  });
-
-  return {
-    folio: document.getElementById("lblFolio").innerText,
-    nombreActivacion: document.getElementById("nombreAct").value.trim(),
-    descripcion: document.getElementById("descAct").value.trim(),
-    tipoSede: document.getElementById("tipoSede").value,
-    distribuidoras: obtenerDistribuidorasActivas(false).join(", "),
-    fechaInicio: formatearFechaLarga(document.getElementById("fechaInicio").value),
-    fechaFin: formatearFechaLarga(document.getElementById("fechaFin").value),
-    horarios: "De " + formatearHoraCompleta(document.getElementById("horaEntrada").value) + " a " + formatearHoraCompleta(document.getElementById("horaSalida").value),
-    totalInversion: document.getElementById("txtTotalInversion").innerText,
-    inversion: sumaInv,
-    raw: {
-      chkAuto: document.getElementById("chkAuto").checked,
-      chkCaribe: document.getElementById("chkCaribe").checked,
-      chkChetu: document.getElementById("chkChetu").checked,
-      chkMillen: document.getElementById("chkMillen").checked,
-      sucMontejo: document.getElementById("sucMontejo") ? document.getElementById("sucMontejo").checked : false,
-      sucItzaes: document.getElementById("sucItzaes") ? document.getElementById("sucItzaes").checked : false,
-      sucValladolid: document.getElementById("sucValladolid") ? document.getElementById("sucValladolid").checked : false,
-      sucCancun: document.getElementById("sucCancun") ? document.getElementById("sucCancun").checked : false,
-      sucPlaya: document.getElementById("sucPlaya") ? document.getElementById("sucPlaya").checked : false,
-      selEstado: document.getElementById("selEstado").value,
-      selMunicipio: document.getElementById("selMunicipio").value,
-      refUbicacion: document.getElementById("refUbicacion").value,
-      fechaInicioRaw: document.getElementById("fechaInicio").value,
-      fechaFinRaw: document.getElementById("fechaFin").value,
-      horaEntradaRaw: document.getElementById("horaEntrada").value,
-      horaSalidaRaw: document.getElementById("horaSalida").value,
-      obsHorario: document.getElementById("obsHorario").value,
-      aplicaUnidades: document.getElementById("aplicaUnidades").value,
-      unidades: unidadesArr,
-      personal: personalArr,
-      inversion: inversionArr
-    }
-  };
-}
-
-function generarHTMLDossier(payload) {
-  var raw = payload.raw || {};
-  if (raw.raw) raw = Object.assign({}, raw, raw.raw);
-
-  var detSede = "";
-  if (payload.tipoSede === "Dentro de Agencia") {
-    var subs = [];
-    if (raw.sucMontejo) subs.push("Montejo");
-    if (raw.sucItzaes) subs.push("Itzaes");
-    if (raw.sucValladolid) subs.push("Valladolid");
-    if (raw.sucCancun) subs.push("Cancún");
-    if (raw.sucPlaya) subs.push("Playa del Carmen");
-    detSede = subs.length > 0 ? "Sub-Agencias: " + subs.join(", ") : "Sedes matrices";
-  } else {
-    var mun = raw.selMunicipio || "-";
-    var est = raw.selEstado || "-";
-    var ref = raw.refUbicacion || "Sin referencia";
-    detSede = "Ubicación: " + mun + ", " + est + ". Ref: " + ref;
-  }
-
-  var uHtml = '<div style="font-style:italic; color:#64748b; padding:4px 0;">No se registraron unidades.</div>';
-  var listaUnidades = raw.unidades || [];
-  if (listaUnidades.length > 0) {
-    uHtml = '<table class="dossier-table"><thead><tr><th>Distribuidora</th><th>Marca</th><th>Modelo</th><th>Año</th><th style="width:50px; text-align:center;">Cant.</th></tr></thead><tbody>';
-    listaUnidades.forEach(function(u) {
-      uHtml += '<tr><td>' + (u.dist || '-') + '</td><td>' + (u.marca || '-') + '</td><td>' + (u.modelo || '-') + '</td><td>' + (u.anio || '-') + '</td><td style="text-align:center;">' + (u.cant || '1') + '</td></tr>';
-    });
-    uHtml += '</tbody></table>';
-  }
-
-  var pHtml = '<tr><td colspan="5" class="text-center" style="color:#64748b;">No hay personal asignado.</td></tr>';
-  var listaPersonal = raw.personal || [];
-  if (listaPersonal.length > 0) {
-    pHtml = '';
-    listaPersonal.forEach(function(p) {
-      pHtml += '<tr><td>' + (p.dist || '-') + '</td><td>' + (p.nom || '-') + '</td><td>' + (p.rol || '-') + '</td><td>' + (p.asistencia || 'Todos') + '</td><td>' + (p.dia || 'N/A') + '</td></tr>';
-    });
-  }
-
-  var iHtml = '<tr><td colspan="2" class="text-center" style="color:#64748b;">Sin conceptos de inversión.</td></tr>';
-  var listaInv = raw.inversion || [];
-  if (Array.isArray(listaInv) && listaInv.length > 0) {
-    iHtml = '';
-    listaInv.forEach(function(inv) {
-      var m = parseFloat(inv.monto) || 0;
-      iHtml += '<tr><td>' + (inv.concepto || '-') + '</td><td style="text-align:right;">$' + m.toLocaleString("es-MX", {minimumFractionDigits: 2}) + '</td></tr>';
-    });
-  }
-
-  var obsH = raw.obsHorario ? '<div style="margin-top:4px; color:#475569;">Obs: ' + raw.obsHorario + '</div>' : '';
-  var invTotalStr = "$" + (parseFloat(payload.inversion) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2}) + " MXN";
-
-  return '<div class="dossier-header">' +
-    '<img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display=\'none\'">' +
-    '<h2>Resumen Ejecutivo de Activación Comercial</h2>' +
-    '</div>' +
-    '<div class="dossier-bar">' +
-    '<div>FOLIO: ' + payload.folio + '</div>' +
-    '<div>FECHA: ' + new Date().toLocaleDateString("es-MX") + '</div>' +
-    '</div>' +
-    '<div class="dossier-block">' +
-    '<div class="dossier-block-title">1. Proyecto y Justificación</div>' +
-    '<div style="font-size: 15px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">' + (payload.nombreActivacion || 'Sin Título') + '</div>' +
-    '<div class="dossier-desc">' + (raw.descripcion || payload.descripcion || 'Sin descripción.') + '</div>' +
-    '</div>' +
-    '<div class="dossier-grid-2">' +
-    '<div class="dossier-pill-box">' +
-    '<div class="dossier-block-title">2. Sede y Participantes</div>' +
-    '<div><strong>Sede:</strong> ' + payload.tipoSede + '</div>' +
-    '<div><strong>Marcas:</strong> ' + (payload.distribuidoras || '-') + '</div>' +
-    '<div style="margin-top:4px; color:#475569;">' + detSede + '</div>' +
-    '</div>' +
-    '<div class="dossier-pill-box">' +
-    '<div class="dossier-block-title">3. Temporalidad y Horarios</div>' +
-    '<div><strong>Vigencia:</strong> Del ' + (payload.fechaInicio || '-') + ' al ' + (payload.fechaFin || '-') + '</div>' +
-    '<div><strong>Horario:</strong> ' + (raw.horarios || payload.horarios || '-') + '</div>' +
-    obsH +
-    '</div>' +
-    '</div>' +
-    '<div class="dossier-block">' +
-    '<div class="dossier-block-title">4. Unidades en Exhibición</div>' +
-    uHtml +
-    '</div>' +
-    '<div class="dossier-block">' +
-    '<div class="dossier-block-title">5. Responsables Asignados</div>' +
-    '<table class="dossier-table"><thead><tr><th>Distribuidora</th><th>Nombre</th><th>Puesto</th><th>Asistencia</th><th>Día Asignado</th></tr></thead><tbody>' +
-    pHtml +
-    '</tbody></table>' +
-    '</div>' +
-    '<div class="dossier-block">' +
-    '<div class="dossier-block-title">6. Presupuesto e Inversión</div>' +
-    '<table class="dossier-table"><thead><tr><th>Concepto</th><th style="width: 140px; text-align: right;">Monto</th></tr></thead><tbody>' +
-    iHtml +
-    '</tbody><tfoot><tr><th style="text-align: right; background: #e2e8f0;">TOTAL SOLICITADO:</th><th style="text-align: right; background: #e2e8f0; font-size: 13px;">' + invTotalStr + '</th></tr></tfoot></table>' +
-    '</div>';
-}
-
-var payloadEnModal = null;
-
-function abrirPrevisualizacionFormulario() {
-  var payload = construirPayloadCompleto();
-  if (!payload.nombreActivacion) {
-    mostrarToast("Nombre Requerido", "Ingresa el nombre antes de previsualizar.", "warning");
+  if (!nombre || !fIni || !fFin) {
+    mostrarToast("Datos Incompletos", "Nombre y vigencia son obligatorios.", "warning");
     return;
   }
-  payloadEnModal = payload;
-  document.getElementById("contenedorModalDossier").innerHTML = generarHTMLDossier(payload);
-  document.getElementById("modalPreview").classList.add("open");
+
+  const btn = document.getElementById("btnGuardarBD");
+  btn.disabled = true;
+  btn.innerText = "Guardando...";
+
+  try {
+    // 1. Calcular total de inversión
+    let totalInv = 0;
+    const listaPresupuesto = [];
+    document.querySelectorAll("#tblInversion tbody tr").forEach(r => {
+      const con = r.querySelector(".inp-con-inv").value.trim();
+      const mon = parseFloat(r.querySelector(".monto-val").value) || 0;
+      if (con) {
+        totalInv += mon;
+        listaPresupuesto.push({ concepto: con, monto: mon });
+      }
+    });
+
+    // 2. Extraer sedes dentro de agencia
+    const sedesAgencia = {
+      sucMontejo: document.getElementById("sucMontejo")?.checked || false,
+      sucItzaes: document.getElementById("sucItzaes")?.checked || false,
+      sucValladolid: document.getElementById("sucValladolid")?.checked || false,
+      sucCancun: document.getElementById("sucCancun")?.checked || false,
+      sucPlaya: document.getElementById("sucPlaya")?.checked || false
+    };
+
+    // 3. Insertar registro padre en tabla activaciones
+    const { data: actData, error: actError } = await sb
+      .from('activaciones')
+      .insert([{
+        folio: folio,
+        nombre_activacion: nombre,
+        descripcion: document.getElementById("descAct").value.trim(),
+        tipo_sede: document.getElementById("tipoSede").value,
+        distribuidoras_texto: obtenerDistribuidorasActivas(false).join(", "),
+        sedes_en_agencia: sedesAgencia,
+        estado_foraneo: document.getElementById("selEstado").value || null,
+        municipio_foraneo: document.getElementById("selMunicipio").value || null,
+        ref_ubicacion: document.getElementById("refUbicacion").value || null,
+        fecha_inicio: fIni,
+        fecha_fin: fFin,
+        hora_entrada: document.getElementById("horaEntrada").value || null,
+        hora_salida: document.getElementById("horaSalida").value || null,
+        obs_horario: document.getElementById("obsHorario").value || null,
+        inversion_total: totalInv,
+        estatus: 'Pendiente_Aprobacion'
+      }])
+      .select()
+      .single();
+
+    if (actError) throw actError;
+    const actId = actData.id;
+
+    // 4. Insertar Presupuesto en cascada
+    if (listaPresupuesto.length > 0) {
+      const items = listaPresupuesto.map(p => ({ activacion_id: actId, concepto: p.concepto, monto: p.monto }));
+      await sb.from('activacion_presupuesto').insert(items);
+    }
+
+    // 5. Insertar Unidades en Exhibición
+    if (document.getElementById("aplicaUnidades").value === "SÍ") {
+      const listaUnidades = [];
+      document.querySelectorAll("#tblUnidades tbody tr").forEach(r => {
+        const d = r.querySelector(".sel-dist-unid").value;
+        const m = r.querySelector(".sel-marca-unid").value;
+        const mod = r.querySelector(".inp-modelo-unid").value.trim();
+        const a = parseInt(r.querySelector(".inp-anio-unid").value) || null;
+        const c = parseInt(r.querySelector(".inp-cant-unid").value) || 1;
+        if (d && m && mod) {
+          listaUnidades.push({ activacion_id: actId, distribuidora: d, marca: m, modelo: mod, anio: a, cantidad: c });
+        }
+      });
+      if (listaUnidades.length > 0) await sb.from('activacion_unidades_exhibicion').insert(listaUnidades);
+    }
+
+    // 6. Insertar Personal Asignado
+    const listaPersonal = [];
+    document.querySelectorAll("#tblPersonal tbody tr").forEach(r => {
+      const d = r.querySelector(".sel-dist-pers").value;
+      const nom = r.querySelector(".inp-nom-pers").value.trim();
+      const rol = r.querySelector(".inp-rol-pers").value.trim();
+      const asis = r.querySelector(".sel-tipo-asistencia").value;
+      const dia = r.querySelector(".sel-dia-especifico").value || null;
+      const com = r.querySelector(".inp-com-pers").value.trim();
+      if (d && nom) {
+        listaPersonal.push({ activacion_id: actId, distribuidora: d, nombre_completo: nom, puesto_rol: rol, asistencia: asis, dia_especifico: dia, comentarios: com });
+      }
+    });
+    if (listaPersonal.length > 0) await sb.from('activacion_personal').insert(listaPersonal);
+
+    mostrarToast("Proyecto Guardado", `Folio ${folio} registrado exitosamente.`, "success");
+    reiniciarFormulario();
+    cambiarVista('dashboard');
+  } catch (err) {
+    console.error(err);
+    mostrarToast("Error de Inserción", err.message || "No se pudo guardar.", "warning");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "💾 Guardar en Base de Datos";
+  }
 }
 
-function previsualizarProyectoDesdeDashboard(folio) {
-  var p = memoriaGlobal.activaciones.find(function(item) { return item.folio === folio; });
-  if (!p) return;
-  payloadEnModal = p;
-  document.getElementById("contenedorModalDossier").innerHTML = generarHTMLDossier(p);
+// ==========================================
+// CONEXIÓN SUPABASE: CARGAR DASHBOARD
+// ==========================================
+async function cargarDashboardDesdeBD() {
+  const tb = document.querySelector("#tblProyectosDashboard tbody");
+  tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 20px; color:#64748b; font-style:italic;">Consultando datos en tiempo real...</td></tr>';
+
+  try {
+    const { data, error } = await sb
+      .from('vista_kpis_activaciones')
+      .select('*')
+      .order('fecha_inicio', { ascending: false });
+
+    if (error) throw error;
+    activacionesEnMemoria = data || [];
+
+    let totalInv = 0;
+    let totalLeads = 0;
+    let totalVivos = 0;
+    let totalFact = 0;
+    let totalUtilidad = 0;
+
+    if (activacionesEnMemoria.length === 0) {
+      tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:20px; color:#64748b; font-style:italic;">No hay activaciones registradas aún.</td></tr>';
+    } else {
+      tb.innerHTML = "";
+      activacionesEnMemoria.forEach(act => {
+        totalInv += parseFloat(act.inversion_total) || 0;
+        totalLeads += parseInt(act.total_leads) || 0;
+        totalVivos += parseInt(act.leads_vivos) || 0;
+        totalFact += parseInt(act.leads_facturados) || 0;
+        totalUtilidad += parseFloat(act.utilidad_acumulada) || 0;
+
+        let statusClass = "status-pendiente";
+        if (act.estatus === 'Aprobado') statusClass = "status-aprobado";
+        if (act.estatus === 'Rechazado') statusClass = "status-rechazado";
+
+        let roiClass = "roi-neutral";
+        const roiVal = parseFloat(act.roi_porcentaje) || 0;
+        if (parseInt(act.leads_facturados) > 0) {
+          roiClass = roiVal >= 0 ? "roi-positive" : "roi-negative";
+        }
+
+        tb.innerHTML += `<tr>
+          <td><strong style="font-family:monospace; color:var(--primary);">${act.folio}</strong></td>
+          <td><strong>${act.nombre_activacion}</strong></td>
+          <td><span style="font-size:11px; color:#64748b;">${act.distribuidoras_texto || 'Grupo CER'}</span></td>
+          <td>$${(parseFloat(act.inversion_total) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+          <td class="text-center"><span class="status-badge ${statusClass}">${act.estatus}</span></td>
+          <td class="text-center"><strong>${act.total_leads}</strong></td>
+          <td class="text-center"><span class="roi-badge ${roiClass}">${roiVal >= 0 ? '+' : ''}${roiVal.toFixed(1)}%</span></td>
+          <td class="text-center" style="display:flex; justify-content:center; gap:6px;">
+            <button type="button" class="btn-action-top btn-secondary-main" title="Gestionar Leads / Ventas" style="height:28px; padding:0 8px; font-size:11px;" onclick="irALeadsDesdeDashboard('${act.activacion_id}')">
+              🎯 Leads
+            </button>
+            <button type="button" class="btn-action-top btn-send-main" title="Aprobar Proyecto" style="height:28px; padding:0 8px; font-size:11px;" onclick="dictaminarProyecto('${act.activacion_id}', 'Aprobado')">
+              ✓
+            </button>
+            <button type="button" class="btn-action-top btn-reject-main" title="Rechazar Proyecto" style="height:28px; padding:0 8px; font-size:11px;" onclick="dictaminarProyecto('${act.activacion_id}', 'Rechazado')">
+              ✕
+            </button>
+          </td>
+        </tr>`;
+      });
+    }
+
+    // Actualizar Tarjetas KPI de cabecera
+    document.getElementById("kpiTotalInversion").innerText = `$${totalInv.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+    document.getElementById("kpiTotalLeads").innerText = totalLeads;
+    document.getElementById("kpiLeadsDesglose").innerText = `🟢 ${totalVivos} Vivos | 🏁 ${totalFact} Facturados`;
+    document.getElementById("kpiUnidadesFacturadas").innerText = totalFact;
+    document.getElementById("kpiUtilidadAcum").innerText = `Utilidad: $${totalUtilidad.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+
+    let roiGlobal = 0;
+    if (totalInv > 0) roiGlobal = ((totalUtilidad - totalInv) / totalInv) * 100;
+    const roiEl = document.getElementById("kpiRoiPromedio");
+    roiEl.innerText = `${roiGlobal >= 0 ? '+' : ''}${roiGlobal.toFixed(1)}%`;
+    roiEl.style.color = (totalFact === 0 ? "var(--primary)" : (roiGlobal >= 0 ? "#15803d" : "#b91c1c"));
+  } catch (err) {
+    console.error(err);
+    mostrarToast("Error al Cargar", "No se pudo consultar la vista de Supabase.", "warning");
+  }
+}
+
+async function dictaminarProyecto(id, nuevoEstatus) {
+  try {
+    const { error } = await sb.from('activaciones').update({ estatus: nuevoEstatus }).eq('id', id);
+    if (error) throw error;
+    mostrarToast("Dictamen Aplicado", `Proyecto marcado como ${nuevoEstatus}.`, "success");
+    cargarDashboardDesdeBD();
+  } catch (err) {
+    mostrarToast("Error", err.message, "warning");
+  }
+}
+
+// ==========================================
+// SECCIÓN EMBUDO DE LEADS Y CIERRE DE ROI
+// ==========================================
+function refrescarSelectorProyectosLeads() {
+  const sel = document.getElementById("selProyectoLeads");
+  sel.innerHTML = '<option value="">Seleccione una activación registrada...</option>' +
+    activacionesEnMemoria.map(a => `<option value="${a.activacion_id}">${a.nombre_activacion} (${a.folio})</option>`).join("");
+}
+
+function irALeadsDesdeDashboard(actId) {
+  cambiarVista('leads');
+  document.getElementById("selProyectoLeads").value = actId;
+  seleccionarProyectoParaLeads(actId);
+}
+
+async function seleccionarProyectoParaLeads(actId) {
+  if (!actId) {
+    document.getElementById("boxDetalleLeadsROI").classList.add("hidden");
+    activacionSeleccionadaLeads = null;
+    return;
+  }
+
+  activacionSeleccionadaLeads = activacionesEnMemoria.find(a => a.activacion_id === actId);
+  document.getElementById("boxDetalleLeadsROI").classList.remove("hidden");
+
+  // Poblar select de distribuidoras
+  const selDist = document.getElementById("leadDist");
+  const distArr = (activacionSeleccionadaLeads.distribuidoras_texto || "Automaya, Caribe, Chetumal, Millenium").split(",").map(d => d.trim());
+  selDist.innerHTML = distArr.map(d => `<option value="${d}">${d}</option>`).join("");
+
+  // Cabecera ROI
+  const inv = parseFloat(activacionSeleccionadaLeads.inversion_total) || 0;
+  document.getElementById("leadRoiInversion").innerText = `$${inv.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+  document.getElementById("leadRoiNombre").innerText = activacionSeleccionadaLeads.nombre_activacion;
+
+  cargarBitacoraLeads(actId, inv);
+}
+
+function evaluarCamposCondicionalesLead(estatus) {
+  document.getElementById("boxLeadAnticipo").classList.toggle("hidden", estatus !== 'Con Anticipo');
+  document.getElementById("boxLeadFactura").classList.toggle("hidden", estatus !== 'Facturado');
+  document.getElementById("boxLeadUtilidad").classList.toggle("hidden", estatus !== 'Facturado');
+}
+
+async function guardarLeadEnSupabase() {
+  if (!activacionSeleccionadaLeads) return;
+
+  const nom = document.getElementById("leadNom").value.trim();
+  const tel = document.getElementById("leadTel").value.trim();
+  const estatus = document.getElementById("leadEstatus").value;
+
+  if (!nom || !tel) {
+    mostrarToast("Campos Faltantes", "Nombre y teléfono son obligatorios.", "warning");
+    return;
+  }
+
+  let anticipo = 0;
+  let factura = null;
+  let utilidad = 0;
+
+  if (estatus === 'Con Anticipo') {
+    anticipo = parseFloat(document.getElementById("leadMontoAnticipo").value) || 0;
+  }
+  if (estatus === 'Facturado') {
+    factura = document.getElementById("leadNumFactura").value.trim();
+    utilidad = parseFloat(document.getElementById("leadUtilidadBruta").value) || 0;
+    if (!factura || utilidad <= 0) {
+      mostrarToast("Datos de Venta Requeridos", "Para facturar ingresa el número de factura y utilidad > 0.", "warning");
+      return;
+    }
+  }
+
+  try {
+    const { error } = await sb.from('activacion_leads').insert([{
+      activacion_id: activacionSeleccionadaLeads.activacion_id,
+      nombre_prospecto: nom,
+      telefono: tel,
+      correo: document.getElementById("leadCorreo").value.trim() || null,
+      distribuidora: document.getElementById("leadDist").value,
+      marca_interes: document.getElementById("leadMarca").value || null,
+      modelo_interes: document.getElementById("leadModelo").value.trim() || null,
+      estatus_lead: estatus,
+      monto_anticipo: anticipo,
+      num_factura: factura,
+      utilidad_bruta: utilidad
+    }]);
+
+    if (error) throw error;
+    mostrarToast("Lead Registrado", `${nom} agregado a la activación.`, "success");
+
+    // Limpiar campos
+    document.getElementById("leadNom").value = "";
+    document.getElementById("leadTel").value = "";
+    document.getElementById("leadCorreo").value = "";
+    document.getElementById("leadModelo").value = "";
+    document.getElementById("leadMontoAnticipo").value = "";
+    document.getElementById("leadNumFactura").value = "";
+    document.getElementById("leadUtilidadBruta").value = "";
+
+    // Recargar datos y recalcular
+    const { data: actActualizada } = await sb.from('vista_kpis_activaciones').select('*').eq('activacion_id', activacionSeleccionadaLeads.activacion_id).single();
+    if (actActualizada) activacionSeleccionadaLeads = actActualizada;
+
+    cargarBitacoraLeads(activacionSeleccionadaLeads.activacion_id, parseFloat(activacionSeleccionadaLeads.inversion_total) || 0);
+  } catch (err) {
+    mostrarToast("Error", err.message, "warning");
+  }
+}
+
+async function cargarBitacoraLeads(actId, inversion) {
+  const tb = document.querySelector("#tblLeadsProyecto tbody");
+  tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:15px; color:#64748b;">Cargando prospectos...</td></tr>';
+
+  try {
+    const { data: leads, error } = await sb
+      .from('activacion_leads')
+      .select('*')
+      .eq('activacion_id', actId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    let sumaUtilidad = 0;
+    let sumaAnticipos = 0;
+    let unidadesFacturadas = 0;
+
+    if (!leads || leads.length === 0) {
+      tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:15px; color:#64748b; font-style:italic;">No hay prospectos captados en esta activación.</td></tr>';
+    } else {
+      tb.innerHTML = "";
+      leads.forEach((l, idx) => {
+        if (l.estatus_lead === 'Facturado') {
+          sumaUtilidad += parseFloat(l.utilidad_bruta) || 0;
+          unidadesFacturadas++;
+        }
+        if (l.estatus_lead === 'Con Anticipo') {
+          sumaAnticipos += parseFloat(l.monto_anticipo) || 0;
+        }
+
+        tb.innerHTML += `<tr>
+          <td class="text-center fw-bold">${idx + 1}</td>
+          <td><strong>${l.nombre_prospecto}</strong></td>
+          <td>${l.telefono}</td>
+          <td>${l.distribuidora} - ${l.marca_interes || ''} ${l.modelo_interes || ''}</td>
+          <td><span class="status-badge" style="background:#f1f5f9; color:#1e293b;">${l.estatus_lead}</span></td>
+          <td class="text-right" style="color:#b45309;">$${(parseFloat(l.monto_anticipo) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+          <td class="text-right" style="color:#15803d; font-weight:700;">+$${(parseFloat(l.utilidad_bruta) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+          <td class="text-center"><button type="button" class="btn-row-delete" onclick="eliminarLead('${l.id}')">✕</button></td>
+        </tr>`;
+      });
+    }
+
+    // Actualizar KPIs de la Activación en pantalla
+    document.getElementById("leadRoiUtilidad").innerText = `$${sumaUtilidad.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+    document.getElementById("leadRoiUnidadesFact").innerText = `${unidadesFacturadas} unidad(es) facturada(s)`;
+    document.getElementById("leadTotalAnticipos").innerText = `$${sumaAnticipos.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+
+    let roi = 0;
+    let diag = "Sin ventas cerradas";
+    let colorClass = "roi-neutral";
+
+    if (inversion > 0) {
+      roi = ((sumaUtilidad - inversion) / inversion) * 100;
+      if (unidadesFacturadas === 0) diag = "Pendiente de facturación";
+      else if (roi < 0) { diag = "Retorno negativo (Inversión no amortizada)"; colorClass = "roi-negative"; }
+      else { diag = "Inversión recuperada con utilidad neta"; colorClass = "roi-positive"; }
+    }
+
+    const roiEl = document.getElementById("leadRoiPorcentaje");
+    roiEl.innerText = `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%`;
+    roiEl.className = `kpi-value ${colorClass}`;
+    document.getElementById("leadRoiDiag").innerText = diag;
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function eliminarLead(leadId) {
+  try {
+    const { error } = await sb.from('activacion_leads').delete().eq('id', leadId);
+    if (error) throw error;
+    mostrarToast("Lead Eliminado", "Se removió de la bitácora.", "info");
+    cargarBitacoraLeads(activacionSeleccionadaLeads.activacion_id, parseFloat(activacionSeleccionadaLeads.inversion_total) || 0);
+  } catch (err) {
+    mostrarToast("Error", err.message, "warning");
+  }
+}
+
+// ==========================================
+// PREVISUALIZACIÓN Y DESCARGA DE DOSSIER
+// ==========================================
+function abrirPrevisualizacionFormulario() {
+  const nombre = document.getElementById("nombreAct").value.trim();
+  if (!nombre) {
+    mostrarToast("Nombre Requerido", "Ingresa el nombre de la activación para ver el resumen.", "warning");
+    return;
+  }
+  document.getElementById("contenedorModalDossier").innerHTML = generarHTMLDossierDesdeForm();
   document.getElementById("modalPreview").classList.add("open");
 }
 
@@ -1464,505 +1397,95 @@ function cerrarModalPreview() {
   document.getElementById("modalPreview").classList.remove("open");
 }
 
+function generarHTMLDossierDesdeForm() {
+  const folio = document.getElementById("lblFolio").innerText;
+  const nombre = document.getElementById("nombreAct").value.trim();
+  const desc = document.getElementById("descAct").value.trim() || "Sin descripción.";
+  const tipoSede = document.getElementById("tipoSede").value;
+  const dists = obtenerDistribuidorasActivas(false).join(", ");
+  const fIni = document.getElementById("fechaInicio").value;
+  const fFin = document.getElementById("fechaFin").value;
+  const hEnt = document.getElementById("horaEntrada").value;
+  const hSal = document.getElementById("horaSalida").value;
+  const obsH = document.getElementById("obsHorario").value;
+  const totalInv = document.getElementById("txtTotalInversion").innerText;
+
+  let uRows = '';
+  document.querySelectorAll("#tblUnidades tbody tr").forEach(r => {
+    uRows += `<tr><td>${r.querySelector(".sel-dist-unid")?.value || '-'}</td><td>${r.querySelector(".sel-marca-unid")?.value || '-'}</td><td>${r.querySelector(".inp-modelo-unid")?.value || '-'}</td><td>${r.querySelector(".inp-anio-unid")?.value || '-'}</td><td class="text-center">${r.querySelector(".inp-cant-unid")?.value || '1'}</td></tr>`;
+  });
+
+  let pRows = '';
+  document.querySelectorAll("#tblPersonal tbody tr").forEach(r => {
+    pRows += `<tr><td>${r.querySelector(".sel-dist-pers")?.value || '-'}</td><td>${r.querySelector(".inp-nom-pers")?.value || '-'}</td><td>${r.querySelector(".inp-rol-pers")?.value || '-'}</td><td>${r.querySelector(".sel-tipo-asistencia")?.value || 'Todos'}</td></tr>`;
+  });
+
+  let iRows = '';
+  document.querySelectorAll("#tblInversion tbody tr").forEach(r => {
+    const c = r.querySelector(".inp-con-inv")?.value;
+    const m = parseFloat(r.querySelector(".monto-val")?.value) || 0;
+    if (c) iRows += `<tr><td>${c}</td><td class="text-right">$${m.toLocaleString("es-MX", {minimumFractionDigits: 2})}</td></tr>`;
+  });
+
+  return `<div class="dossier-header">
+    <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display='none'">
+    <h2>Resumen Ejecutivo de Activación Comercial</h2>
+  </div>
+  <div class="dossier-bar">
+    <div>FOLIO: ${folio}</div>
+    <div>FECHA: ${new Date().toLocaleDateString("es-MX")}</div>
+  </div>
+  <div class="dossier-block">
+    <div class="dossier-block-title">1. Proyecto y Justificación</div>
+    <div style="font-size:15px; font-weight:bold; color:var(--primary); margin-bottom:4px;">${nombre}</div>
+    <div class="dossier-desc">${desc}</div>
+  </div>
+  <div class="dossier-grid-2">
+    <div class="dossier-pill-box">
+      <div class="dossier-block-title">2. Sede y Participantes</div>
+      <div><strong>Sede:</strong> ${tipoSede}</div>
+      <div><strong>Distribuidoras:</strong> ${dists || '-'}</div>
+    </div>
+    <div class="dossier-pill-box">
+      <div class="dossier-block-title">3. Temporalidad y Horarios</div>
+      <div><strong>Vigencia:</strong> Del ${fIni || '-'} al ${fFin || '-'}</div>
+      <div><strong>Horario:</strong> ${hEnt || '--'} a ${hSal || '--'} h</div>
+      ${obsH ? `<div style="margin-top:4px; color:#475569;">Obs: ${obsH}</div>` : ''}
+    </div>
+  </div>
+  <div class="dossier-block">
+    <div class="dossier-block-title">4. Unidades en Exhibición</div>
+    <table class="dossier-table"><thead><tr><th>Distribuidora</th><th>Marca</th><th>Modelo</th><th>Año</th><th class="text-center">Cant.</th></tr></thead><tbody>${uRows || '<tr><td colspan="5" class="text-center">Sin unidades</td></tr>'}</tbody></table>
+  </div>
+  <div class="dossier-block">
+    <div class="dossier-block-title">5. Personal Asignado</div>
+    <table class="dossier-table"><thead><tr><th>Distribuidora</th><th>Nombre</th><th>Puesto</th><th>Asistencia</th></tr></thead><tbody>${pRows || '<tr><td colspan="4" class="text-center">Sin personal</td></tr>'}</tbody></table>
+  </div>
+  <div class="dossier-block">
+    <div class="dossier-block-title">6. Presupuesto Solicitado</div>
+    <table class="dossier-table"><thead><tr><th>Concepto</th><th class="text-right">Monto</th></tr></thead><tbody>${iRows || '<tr><td colspan="2" class="text-center">Sin conceptos</td></tr>'}</tbody><tfoot><tr><th class="text-right" style="background:#e2e8f0;">TOTAL:</th><th class="text-right" style="background:#e2e8f0;">${totalInv}</th></tr></tfoot></table>
+  </div>`;
+}
+
 function descargarPDFDesdeModal() {
-  if (!payloadEnModal) return;
-  var wrap = document.createElement("div");
-  wrap.innerHTML = generarHTMLDossier(payloadEnModal);
+  const folio = document.getElementById("lblFolio").innerText;
+  const wrap = document.createElement("div");
+  wrap.innerHTML = document.getElementById("contenedorModalDossier").innerHTML;
   wrap.style.padding = "20px";
   wrap.style.background = "#ffffff";
   wrap.style.color = "#0f172a";
 
-  var opt = {
+  const opt = {
     margin: [10, 10, 10, 10],
-    filename: payloadEnModal.folio + ".pdf",
+    filename: `${folio}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2, useCORS: true },
     jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
   };
 
-  html2pdf().set(opt).from(wrap).save().then(function() {
-    mostrarToast("PDF Descargado", "Archivo " + payloadEnModal.folio + ".pdf generado.", "success");
+  html2pdf().set(opt).from(wrap).save().then(() => {
+    mostrarToast("PDF Descargado", `Archivo ${folio}.pdf generado.`, "success");
   });
-}
-
-function descargarRespaldoManual() {
-  var payload = construirPayloadCompleto();
-  if (!payload.nombreActivacion) {
-    mostrarToast("Campo Requerido", "Ingresa el nombre de la activación para crear el respaldo.", "warning");
-    return;
-  }
-  var dataBlob = new Blob([JSON.stringify(payload, null, 2)], { type: "text/plain;charset=utf-8" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(dataBlob);
-  a.download = "Metadata_" + payload.folio + ".txt";
-  a.click();
-  mostrarToast("Respaldo Descargado", "Archivo Metadata generado.", "success");
-}
-
-function enviarAutorizacion() {
-  var nombre = document.getElementById("nombreAct").value.trim();
-  if (!nombre) {
-    mostrarToast("Nombre Requerido", "Ingresa el nombre antes de enviar.", "warning");
-    return;
-  }
-
-  var payload = construirPayloadCompleto();
-
-  document.getElementById("lblFolio").setAttribute("data-locked", payload.folio);
-  document.getElementById("contenedorPills").classList.add("locked-mode");
-
-  var dataBlob = new Blob([JSON.stringify(payload, null, 2)], { type: "text/plain;charset=utf-8" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(dataBlob);
-  a.download = "Metadata_" + payload.folio + ".txt";
-  a.click();
-
-  payloadEnModal = payload;
-  descargarPDFDesdeModal();
-
-  var destinatarios = "jumartinez@grupocer.com.mx; gcervera@avasa.com.mx; mtellez@avasa.com.mx";
-  var asunto = encodeURIComponent("Activación | " + payload.nombreActivacion);
-  var cuerpo = encodeURIComponent(
-    "Buen día,\n\n" +
-    "Anexo propuesta para " + payload.nombreActivacion + ".\n\n" +
-    "Descripción:\n" + payload.descripcion + "\n\n" +
-    "Detalles de la Activación:\n" +
-    "• Organizado por: " + payload.distribuidoras + "\n" +
-    "• Sede: " + payload.tipoSede + "\n" +
-    "• Vigencia: Del " + payload.fechaInicio + " al " + payload.fechaFin + "\n" +
-    "• Horario: " + payload.horarios + "\n" +
-    "• Inversión Total Solicitada: " + payload.totalInversion + "\n\n" +
-    "Para más detalles se adjunta el PDF formal y el archivo de datos estructurados.\n\n" +
-    "Quedo pendiente de su confirmación y visto bueno."
-  );
-
-  mostrarToast("Ventana de correo abierta", "Adjunta el PDF y Metadata generados.", "info");
-  window.location.href = "mailto:" + destinatarios + "?subject=" + asunto + "&body=" + cuerpo;
-}
-
-function restaurarFormularioDesdeData(data) {
-  if (data.folio) {
-    document.getElementById("lblFolio").innerText = data.folio;
-    document.getElementById("lblFolio").setAttribute("data-locked", data.folio);
-    document.getElementById("contenedorPills").classList.add("locked-mode");
-  }
-
-  var raw = data.raw || data;
-
-  document.getElementById("nombreAct").value = data.nombreActivacion || raw.nombreAct || "";
-  document.getElementById("descAct").value = data.descripcion || raw.descAct || "";
-  controlarDescripcion(document.getElementById("descAct"));
-
-  document.getElementById("tipoSede").value = raw.tipoSede || "Dentro de Agencia";
-  document.getElementById("chkAuto").checked = !!raw.chkAuto;
-  document.getElementById("chkCaribe").checked = !!raw.chkCaribe;
-  document.getElementById("chkChetu").checked = !!raw.chkChetu;
-  document.getElementById("chkMillen").checked = !!raw.chkMillen;
-
-  gestionarTipoSede();
-  sincronizarAgencias();
-
-  if (document.getElementById("sucMontejo")) document.getElementById("sucMontejo").checked = !!raw.sucMontejo;
-  if (document.getElementById("sucItzaes")) document.getElementById("sucItzaes").checked = !!raw.sucItzaes;
-  if (document.getElementById("sucValladolid")) document.getElementById("sucValladolid").checked = !!raw.sucValladolid;
-  if (document.getElementById("sucCancun")) document.getElementById("sucCancun").checked = !!raw.sucCancun;
-  if (document.getElementById("sucPlaya")) document.getElementById("sucPlaya").checked = !!raw.sucPlaya;
-
-  if (raw.selEstado) {
-    document.getElementById("selEstado").value = raw.selEstado;
-    filtrarMunicipios();
-    document.getElementById("selMunicipio").value = raw.selMunicipio || "";
-  }
-  document.getElementById("refUbicacion").value = raw.refUbicacion || "";
-
-  document.getElementById("fechaInicio").value = raw.fechaInicioRaw || raw.fechaInicio || "";
-  document.getElementById("fechaFin").value = raw.fechaFinRaw || raw.fechaFin || "";
-  document.getElementById("horaEntrada").value = raw.horaEntradaRaw || raw.horaEntrada || "";
-  document.getElementById("horaSalida").value = raw.horaSalidaRaw || raw.horaSalida || "";
-  document.getElementById("obsHorario").value = raw.obsHorario || "";
-
-  var aplicaU = raw.aplicaUnidades || (raw.unidades && raw.unidades.length > 0 ? "SÍ" : "NO");
-  document.getElementById("aplicaUnidades").value = aplicaU;
-  gestionarAplicaUnidades();
-  var tbU = document.querySelector("#tblUnidades tbody");
-  tbU.innerHTML = "";
-  if (aplicaU === "SÍ" && raw.unidades && raw.unidades.length > 0) {
-    raw.unidades.forEach(function(u) {
-      agregarFilaUnidad();
-      var r = tbU.lastElementChild;
-      if (r.querySelector(".sel-dist-unid")) r.querySelector(".sel-dist-unid").value = u.dist || "";
-      if (r.querySelector(".sel-marca-unid")) r.querySelector(".sel-marca-unid").value = u.marca || "";
-      if (r.querySelector(".inp-modelo-unid")) r.querySelector(".inp-modelo-unid").value = u.modelo || "";
-      if (r.querySelector(".inp-anio-unid")) r.querySelector(".inp-anio-unid").value = u.anio || "";
-      if (r.querySelector(".inp-cant-unid")) r.querySelector(".inp-cant-unid").value = u.cant || "1";
-    });
-  }
-
-  var tbP = document.querySelector("#tblPersonal tbody");
-  tbP.innerHTML = "";
-  if (raw.personal && raw.personal.length > 0) {
-    raw.personal.forEach(function(p) {
-      agregarFilaPersonal();
-      var r = tbP.lastElementChild;
-      if (r.querySelector(".sel-dist-pers")) r.querySelector(".sel-dist-pers").value = p.dist || "";
-      if (r.querySelector(".inp-nom-pers")) r.querySelector(".inp-nom-pers").value = p.nom || "";
-      if (r.querySelector(".inp-rol-pers")) r.querySelector(".inp-rol-pers").value = p.rol || "";
-      var selAs = r.querySelector(".sel-tipo-asistencia");
-      if (selAs) {
-        selAs.value = p.asistencia || "Todos los días";
-        gestionarAsistenciaFila(selAs);
-      }
-      if (r.querySelector(".sel-dia-especifico")) r.querySelector(".sel-dia-especifico").value = p.dia || "";
-      if (r.querySelector(".inp-com-pers")) r.querySelector(".inp-com-pers").value = p.com || "";
-    });
-  } else {
-    agregarFilaPersonal();
-  }
-
-  var tbI = document.querySelector("#tblInversion tbody");
-  tbI.innerHTML = "";
-  if (raw.inversion && raw.inversion.length > 0) {
-    raw.inversion.forEach(function(inv) {
-      agregarFilaInversion();
-      var r = tbI.lastElementChild;
-      if (r.querySelector(".inp-con-inv")) r.querySelector(".inp-con-inv").value = inv.concepto || "";
-      if (r.querySelector(".monto-val")) r.querySelector(".monto-val").value = inv.monto || "0.00";
-    });
-  } else {
-    agregarFilaInversion();
-  }
-
-  calcularTotalInversion();
-  document.querySelectorAll("input, select, textarea").forEach(function(el) { marcarLleno(el); });
-}
-
-function importarBorradorDesdeArchivo(input) {
-  var file = input.files[0];
-  if (!file) return;
-
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      var data = JSON.parse(e.target.result);
-      if (!data.folio && !data.nombreActivacion && !data.raw) throw new Error();
-      restaurarFormularioDesdeData(data);
-      mostrarToast("Borrador Importado", "Folio cargado: " + document.getElementById("lblFolio").innerText, "success");
-    } catch (err) {
-      mostrarToast("Archivo Incompatible", "El archivo no contiene metadatos de Grupo CER.", "warning");
-    }
-    input.value = "";
-  };
-  reader.readAsText(file);
-}
-
-// ==========================================
-// LÓGICA DE DASHBOARD Y SEGUIMIENTO DE ROI
-// ==========================================
-
-function poblarMarcasVentas() {
-  var sel = document.getElementById("vtaMarca");
-  sel.innerHTML = '<option value="">Seleccione Marca...</option>' + 
-    MARCAS_GRUPO_CER.map(function(m) { return '<option value="' + m + '">' + m + '</option>'; }).join("");
-}
-
-function refrescarSelectorProyectosVentas() {
-  var sel = document.getElementById("selProyectoVentas");
-  var valPrev = sel.value;
-
-  sel.innerHTML = '<option value="">Selecciona un proyecto registrado...</option>' + 
-    memoriaGlobal.activaciones.map(function(p) {
-      return '<option value="' + p.folio + '">' + p.nombreActivacion + ' (' + p.folio + ')</option>';
-    }).join("");
-
-  if (valPrev && memoriaGlobal.activaciones.some(function(p) { return p.folio === valPrev; })) {
-    sel.value = valPrev;
-  }
-}
-
-function buscarFolioDirecto(query) {
-  var q = query.trim().toLowerCase();
-  var match = memoriaGlobal.activaciones.find(function(p) { return p.folio.toLowerCase() === q; });
-  if (match) {
-    document.getElementById("selProyectoVentas").value = match.folio;
-    seleccionarProyectoParaVenta(match.folio);
-  }
-}
-
-var proyectoActivoEnVentas = null;
-
-function seleccionarProyectoParaVenta(folio) {
-  if (!folio) {
-    document.getElementById("boxDetalleROI").classList.add("hidden");
-    proyectoActivoEnVentas = null;
-    return;
-  }
-
-  var p = memoriaGlobal.activaciones.find(function(item) { return item.folio === folio; });
-  if (!p) return;
-
-  proyectoActivoEnVentas = p;
-  document.getElementById("boxDetalleROI").classList.remove("hidden");
-
-  var distArr = (p.distribuidoras || "").split(",").map(function(d) { return d.trim(); }).filter(function(d) { return d; });
-  var selDist = document.getElementById("vtaDistribuidora");
-  selDist.innerHTML = '<option value="">Seleccione...</option>' + 
-    distArr.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join("");
-
-  document.getElementById("roiProyectoNombre").innerText = p.nombreActivacion;
-  var inv = parseFloat(p.inversion) || 0;
-  document.getElementById("roiInversion").innerText = "$" + inv.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
-
-  document.getElementById("vtaFecha").value = new Date().toISOString().split("T")[0];
-  marcarLleno(document.getElementById("vtaFecha"));
-
-  renderizarBitacoraVentasProyecto();
-}
-
-function guardarCierreUnidad() {
-  if (!proyectoActivoEnVentas) return;
-
-  var fecha = document.getElementById("vtaFecha").value;
-  var dist = document.getElementById("vtaDistribuidora").value;
-  var marca = document.getElementById("vtaMarca").value;
-  var modelo = document.getElementById("vtaModelo").value.trim();
-  var anio = document.getElementById("vtaAnio").value.trim();
-  var factura = document.getElementById("vtaFactura").value.trim();
-  var utilidad = parseFloat(document.getElementById("vtaUtilidad").value) || 0;
-
-  if (!fecha || !dist || !marca || !modelo || !factura || utilidad <= 0) {
-    mostrarToast("Campos Incompletos", "Completa los datos y verifica que la Utilidad sea > 0.", "warning");
-    return;
-  }
-
-  var nuevaVenta = {
-    id: Date.now(),
-    folio: proyectoActivoEnVentas.folio,
-    fecha: fecha,
-    distribuidora: dist,
-    marca: marca,
-    modelo: modelo,
-    anio: anio || "-",
-    factura: factura,
-    utilidad: utilidad,
-    pendienteEnvio: true // Marca para lote
-  };
-
-  memoriaGlobal.ventas.push(nuevaVenta);
-
-  document.getElementById("vtaModelo").value = "";
-  document.getElementById("vtaAnio").value = "";
-  document.getElementById("vtaFactura").value = "";
-  document.getElementById("vtaUtilidad").value = "";
-  marcarLleno(document.getElementById("vtaModelo"));
-  marcarLleno(document.getElementById("vtaFactura"));
-  marcarLleno(document.getElementById("vtaUtilidad"));
-
-  mostrarToast("Unidad Agregada a la Lista", "Lista para sincronizar por lote.", "success");
-
-  renderizarBitacoraVentasProyecto();
-  renderizarDashboard();
-}
-
-function enviarLoteVentas() {
-  if (!proyectoActivoEnVentas) return;
-
-  var pendientes = memoriaGlobal.ventas.filter(function(v) {
-    return v.folio === proyectoActivoEnVentas.folio && v.pendienteEnvio === true;
-  });
-
-  if (pendientes.length === 0) {
-    mostrarToast("Sin Unidades Pendientes", "No hay unidades nuevas por sincronizar.", "warning");
-    return;
-  }
-
-  // Prepara el arreglo limpio para el correo
-  var loteParaEnviar = pendientes.map(function(v) {
-    return {
-      id: v.id,
-      folio: v.folio,
-      fecha: v.fecha,
-      distribuidora: v.distribuidora,
-      marca: v.marca,
-      modelo: v.modelo,
-      anio: v.anio,
-      factura: v.factura,
-      utilidad: v.utilidad
-    };
-  });
-
-  var destinatario = "mtellez@avasa.com.mx";
-  var asunto = encodeURIComponent("Ventas Activación | " + proyectoActivoEnVentas.folio);
-  var cuerpo = encodeURIComponent(JSON.stringify(loteParaEnviar, null, 2));
-
-  // Marca como enviadas en la interfaz local
-  pendientes.forEach(function(v) { v.pendienteEnvio = false; });
-  renderizarBitacoraVentasProyecto();
-
-  mostrarToast("Ventana de Correo Abierta", "Envía el correo para registrar el lote en el sistema.", "info");
-  window.location.href = "mailto:" + destinatario + "?subject=" + asunto + "&body=" + cuerpo;
-}
-
-function eliminarVentaBitacora(idVenta) {
-  memoriaGlobal.ventas = memoriaGlobal.ventas.filter(function(v) { return v.id !== idVenta; });
-  mostrarToast("Venta Eliminada", "Se quitó la unidad de la bitácora y se recalculó el ROI.", "info");
-  renderizarBitacoraVentasProyecto();
-  renderizarDashboard();
-}
-
-function renderizarBitacoraVentasProyecto() {
-  if (!proyectoActivoEnVentas) return;
-
-  var ventas = memoriaGlobal.ventas.filter(function(v) { return v.folio === proyectoActivoEnVentas.folio; });
-  var tb = document.querySelector("#tblVentasProyecto tbody");
-  tb.innerHTML = "";
-
-  var sumaUtilidad = 0;
-  var hayPendientes = false;
-
-  if (ventas.length === 0) {
-    tb.innerHTML = '<tr><td colspan="9" class="text-center" style="padding: 16px; color: var(--text-muted); font-style: italic;">No hay ventas registradas aún para este folio.</td></tr>';
-  } else {
-    ventas.forEach(function(v, idx) {
-      sumaUtilidad += parseFloat(v.utilidad) || 0;
-      if (v.pendienteEnvio) hayPendientes = true;
-
-      var badgeEstatus = v.pendienteEnvio 
-        ? '<span class="status-badge status-pending">Pendiente</span>'
-        : '<span class="status-badge status-synced">Sincronizado</span>';
-
-      tb.innerHTML += '<tr>' +
-        '<td class="text-center fw-bold">' + (idx + 1) + '</td>' +
-        '<td>' + v.fecha + '</td>' +
-        '<td>' + (v.distribuidora || v.dist || '-') + '</td>' +
-        '<td><strong>' + v.marca + '</strong> ' + v.modelo + '</td>' +
-        '<td>' + v.anio + '</td>' +
-        '<td>' + v.factura + '</td>' +
-        '<td style="text-align: right; font-weight: 700; color: #15803d;">+$' + (parseFloat(v.utilidad) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2}) + '</td>' +
-        '<td class="text-center">' + badgeEstatus + '</td>' +
-        '<td class="text-center">' +
-          '<button type="button" class="btn-row-delete" title="Eliminar registro" onclick="eliminarVentaBitacora(' + v.id + ')">✕</button>' +
-        '</td>' +
-        '</tr>';
-    });
-  }
-
-  var btnLote = document.getElementById("btnEnviarLote");
-  if (btnLote) {
-    btnLote.style.opacity = hayPendientes ? "1" : "0.6";
-  }
-
-  var inv = parseFloat(proyectoActivoEnVentas.inversion) || 0;
-  document.getElementById("roiUtilidadAcum").innerText = "$" + sumaUtilidad.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
-  document.getElementById("roiUnidadesConteo").innerText = ventas.length + " unidad(es) facturada(s)";
-
-  var roiCalc = 0;
-  var diag = "Sin ventas registradas";
-  var colorClass = "roi-neutral";
-
-  if (inv > 0) {
-    roiCalc = ((sumaUtilidad - inv) / inv) * 100;
-    if (ventas.length === 0) {
-      diag = "Pendiente de ventas";
-      colorClass = "roi-neutral";
-    } else if (roiCalc < 0) {
-      diag = "Retorno negativo (Inversión aún no amortizada)";
-      colorClass = "roi-negative";
-    } else {
-      diag = "Proyecto rentable (Inversión superada)";
-      colorClass = "roi-positive";
-    }
-  }
-
-  var roiEl = document.getElementById("roiPorcentaje");
-  roiEl.innerText = (roiCalc >= 0 ? "+" : "") + roiCalc.toFixed(1) + "%";
-  roiEl.className = "kpi-value " + colorClass;
-  document.getElementById("roiDiagnostico").innerText = diag;
-}
-
-function abrirSeguimientoDesdeDashboard(folio) {
-  cambiarVista('seguimiento');
-  document.getElementById("selProyectoVentas").value = folio;
-  seleccionarProyectoParaVenta(folio);
-}
-
-function renderizarDashboard() {
-  var catalogo = memoriaGlobal.activaciones;
-  var todasVentas = memoriaGlobal.ventas;
-
-  var sumaTotalInversion = 0;
-  var sumaTotalUtilidad = 0;
-  var activosCount = 0;
-  var concluidosCount = 0;
-
-  var tb = document.querySelector("#tblProyectosDashboard tbody");
-  if (!tb) return;
-  tb.innerHTML = "";
-
-  var hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-
-  if (catalogo.length === 0) {
-    tb.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 20px; color: var(--text-muted); font-style: italic;">No hay proyectos registrados en el catálogo.</td></tr>';
-  } else {
-    catalogo.forEach(function(p) {
-      var invNum = parseFloat(p.inversion) || 0;
-      sumaTotalInversion += invNum;
-
-      var esConcluido = false;
-      var fRaw = (p.raw && p.raw.fechaFinRaw) ? p.raw.fechaFinRaw : null;
-      if (fRaw) {
-        var fPartes = fRaw.split("-").map(Number);
-        var fFinDate = new Date(fPartes[0], fPartes[1] - 1, fPartes[2]);
-        if (hoy > fFinDate) esConcluido = true;
-      }
-
-      if (esConcluido) concluidosCount++;
-      else activosCount++;
-
-      var ventasP = todasVentas.filter(function(v) { return v.folio === p.folio; });
-      var utilidadP = ventasP.reduce(function(acc, cur) { return acc + (parseFloat(cur.utilidad) || 0); }, 0);
-      sumaTotalUtilidad += utilidadP;
-
-      var roi = 0;
-      var badgeClass = "roi-neutral";
-      if (invNum > 0) {
-        roi = ((utilidadP - invNum) / invNum) * 100;
-        if (ventasP.length === 0) badgeClass = "roi-neutral";
-        else if (roi < 0) badgeClass = "roi-negative";
-        else badgeClass = "roi-positive";
-      }
-
-      tb.innerHTML += '<tr>' +
-        '<td><span style="font-family: monospace; font-weight: 700; color: var(--primary);">' + p.folio + '</span></td>' +
-        '<td><strong>' + p.nombreActivacion + '</strong></td>' +
-        '<td><span style="font-size: 11px; color: var(--text-muted);">' + (p.distribuidoras || '-') + '</span></td>' +
-        '<td>$' + invNum.toLocaleString("es-MX", {minimumFractionDigits: 2}) + '</td>' +
-        '<td class="text-center"><strong>' + ventasP.length + '</strong></td>' +
-        '<td class="text-center"><span class="roi-badge ' + badgeClass + '">' + (roi >= 0 ? "+" : "") + roi.toFixed(1) + '%</span></td>' +
-        '<td class="text-center" style="display:flex; justify-content:center; gap:6px;">' +
-          '<button type="button" class="btn-action-top btn-secondary-main" title="Ver Resumen Ejecutivo" style="height: 28px; padding: 0 8px; font-size: 12px;" onclick="previsualizarProyectoDesdeDashboard(\'' + p.folio + '\')">' +
-            '👁️' +
-          '</button>' +
-          '<button type="button" class="btn-action-top btn-secondary-main" title="Cargar Ventas / ROI" style="height: 28px; padding: 0 8px; font-size: 11px;" onclick="abrirSeguimientoDesdeDashboard(\'' + p.folio + '\')">' +
-            '📈 Venta' +
-          '</button>' +
-        '</td>' +
-        '</tr>';
-    });
-  }
-
-  document.getElementById("kpiTotalInversion").innerText = "$" + sumaTotalInversion.toLocaleString("es-MX", { minimumFractionDigits: 2 }) + " MXN";
-  document.getElementById("kpiProyectosTotales").innerText = catalogo.length;
-  document.getElementById("kpiProyectosDesglose").innerHTML = "🟢 " + activosCount + " Activos &nbsp;|&nbsp; 🏁 " + concluidosCount + " Concluidos";
-  document.getElementById("kpiUnidadesVendidas").innerText = todasVentas.length;
-
-  var roiGlobal = 0;
-  if (sumaTotalInversion > 0) {
-    roiGlobal = ((sumaTotalUtilidad - sumaTotalInversion) / sumaTotalInversion) * 100;
-  }
-  var roiPromEl = document.getElementById("kpiRoiPromedio");
-  roiPromEl.innerText = (roiGlobal >= 0 ? "+" : "") + roiGlobal.toFixed(1) + "%";
-  roiPromEl.style.color = (todasVentas.length === 0 ? "var(--primary)" : (roiGlobal >= 0 ? "#15803d" : "#b91c1c"));
 }
 </script>
 </body>
