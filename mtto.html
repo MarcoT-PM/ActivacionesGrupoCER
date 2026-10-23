@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantenimiento - HUB Grupo CER</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #002060;
+      --primary-hover: #001540;
+      --primary-soft: #f0f4fa;
+      --accent: #2563eb;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --bg-page: #f1f5f9;
+      --surface: #ffffff;
+      --border-subtle: #e2e8f0;
+      --sidebar-w: 260px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-card: 0 4px 12px -2px rgba(0, 32, 96, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+
+      /* Semáforo Flujo Clientes */
+      --flujo-alto: #ef4444;
+      --flujo-medio: #f97316;
+      --flujo-bajo: #eab308;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: var(--bg-page); color: var(--text-main); display: flex; min-height: 100vh; }
+
+    /* BARRA LATERAL (ESCRITORIO) */
+    .app-sidebar {
+      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border-subtle);
+      display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
+    }
+    .sidebar-brand { padding: 24px 20px; border-bottom: 1px solid var(--border-subtle); text-align: center; }
+    .sidebar-brand img { height: 38px; margin-bottom: 8px; }
+    .sidebar-brand h2 { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .sidebar-nav { padding: 16px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .nav-btn {
+      height: 44px; padding: 0 14px; border-radius: var(--radius-sm); border: none; background: transparent;
+      color: var(--text-muted); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 12px;
+      cursor: pointer; text-align: left; transition: all 0.2s ease; width: 100%;
+    }
+    .nav-btn:hover { background: var(--primary-soft); color: var(--primary); }
+    .nav-btn.active { background: var(--primary); color: #ffffff; box-shadow: 0 4px 10px rgba(0, 32, 96, 0.15); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
+
+    /* CONTENEDOR PRINCIPAL */
+    .app-main { margin-left: var(--sidebar-w); flex: 1; padding: 30px; max-width: calc(100vw - var(--sidebar-w)); }
+    .card-canvas { max-width: 1040px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-lg); padding: 35px; box-shadow: var(--shadow-card); border: 1px solid var(--border-subtle); }
+
+    /* MODO MÓVIL PÚBLICO (CAPTURA POR QR) */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .app-sidebar {
+        position: fixed; bottom: 0; top: auto; left: 0; right: 0; width: 100%; height: 60px;
+        flex-direction: row; border-right: none; border-top: 1px solid var(--border-subtle);
+        background: #ffffff; z-index: 1000;
+      }
+      .sidebar-brand, .sidebar-footer { display: none; }
+      .sidebar-nav { flex-direction: row; padding: 6px; justify-content: space-around; width: 100%; }
+      .nav-btn { height: 100%; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; gap: 4px; padding: 4px; }
+      .app-main { margin-left: 0; padding: 15px 12px 80px 12px; max-width: 100vw; }
+      .card-canvas { padding: 20px 15px; border-radius: var(--radius-md); }
+    }
+
+    .header-branding { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle); }
+    .header-branding h1 { color: var(--primary); font-size: 20px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
+
+    /* KPIS */
+    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 25px; }
+    .kpi-card { background: var(--surface); border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 4px; }
+    .kpi-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .kpi-value { font-size: 22px; font-weight: 800; color: var(--primary); }
+    .kpi-subtext { font-size: 11px; color: var(--text-muted); }
+
+    /* FORMULARIOS */
+    .section-card { padding-top: 20px; margin-top: 20px; border-top: 1px solid var(--border-subtle); }
+    .section-card:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .section-num { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+    .section-title { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+
+    .form-grid { display: flex; flex-wrap: wrap; gap: 14px; }
+    .col-12 { flex: 0 0 100%; width: 100%; }
+    .col-6  { flex: 0 0 calc(50% - 7px); width: calc(50% - 7px); }
+    .col-4  { flex: 0 0 calc(33.333% - 10px); width: calc(33.333% - 10px); }
+    @media (max-width: 600px) { .col-6, .col-4 { flex: 0 0 100%; width: 100%; } }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+
+    input[type="text"], input[type="date"], input[type="number"], select, textarea {
+      height: 42px; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);
+      font-size: 13px; color: var(--text-main); background-color: #fffbeb; outline: none; transition: all 0.2s; width: 100%;
+    }
+    textarea { height: auto; min-height: 80px; resize: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); background-color: #ffffff !important; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    .filled { background-color: #ffffff !important; }
+
+    /* UPLOAD FOTOS */
+    .photo-upload-box {
+      border: 2px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 12px; text-align: center;
+      background: #f8fafc; cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .photo-upload-box:hover { border-color: var(--primary); background: var(--primary-soft); }
+    .photo-preview { width: 100%; height: 90px; object-fit: cover; border-radius: 4px; margin-top: 6px; display: none; }
+
+    .btn-submit {
+      height: 46px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+      background: var(--primary); color: #ffffff; border: none; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 20px; transition: all 0.2s;
+    }
+    .btn-submit:hover { background: var(--primary-hover); }
+
+    /* CONSOLA DE TARJETAS TIPO DECK */
+    .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; margin-top: 15px; }
+    .deck-card {
+      background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card); padding: 16px; display: flex; flex-direction: column; gap: 10px;
+      position: relative; border-left: 5px solid #94a3b8;
+    }
+    .deck-card.flujo-Alto { border-left-color: var(--flujo-alto); }
+    .deck-card.flujo-Medio { border-left-color: var(--flujo-medio); }
+    .deck-card.flujo-Bajo { border-left-color: var(--flujo-bajo); }
+
+    .deck-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .deck-dist { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+    .deck-folio { font-size: 10px; font-family: monospace; color: var(--text-muted); }
+    .deck-title { font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px; }
+    .deck-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .deck-photos { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0; }
+    .deck-photos img { width: 55px; height: 55px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; cursor: pointer; }
+
+    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .status-sin-empezar { background: #fee2e2; color: #b91c1c; }
+    .status-en-proceso  { background: #fef3c7; color: #b45309; }
+    .status-resuelto    { background: #dcfce7; color: #15803d; }
+
+    .atraso-pill { font-size: 10px; font-weight: 700; color: #ef4444; background: #fee2e2; padding: 2px 6px; border-radius: 999px; }
+
+    /* TABLA DASHBOARD */
+    .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow-x: auto; margin-top: 15px; }
+    .modern-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .modern-table th { background: var(--primary-soft); color: var(--primary); font-weight: 700; padding: 10px; text-align: left; }
+    .modern-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; background: #ffffff; }
+
+    /* MODAL DE EDICIÓN / CIERRE */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 10000;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-box { background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+
+    /* TOASTS */
+    #toastContainer { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      min-width: 250px; padding: 12px 14px; border-radius: var(--radius-sm); background: #ffffff;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 4px solid var(--primary);
+      font-size: 12px; display: flex; align-items: center; gap: 8px;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+
+  <script>
+    const SUPABASE_URL = "https://opxzkyivokspzaokffxn.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weHpreWl2b2tzcHphb2tmZnhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NTg1MDksImV4cCI6MjEwODMzNDUwOX0.Wvr7SBmvdLqVnfj6ZfC6a8vV9GlF72vE2B7OLtMZfEc";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    function cambiarVista(vista) {
+      document.getElementById("viewDashboard").classList.toggle("hidden", vista !== 'dashboard');
+      document.getElementById("viewCaptura").classList.toggle("hidden", vista !== 'captura');
+      document.getElementById("viewConsola").classList.toggle("hidden", vista !== 'consola');
+
+      document.querySelectorAll(".nav-btn").forEach(b => {
+        b.classList.remove("active");
+        if (b.getAttribute("data-view") === vista) b.classList.add("active");
+      });
+
+      if (vista === 'dashboard') cargarDashboardMtto();
+      if (vista === 'consola') cargarConsolaMtto();
+    }
+  </script>
+</head>
+<body>
+
+<div id="toastContainer"></div>
+
+<!-- MODAL EDICIÓN Y RESOLUCIÓN PARA MANTENIMIENTO -->
+<div class="modal-overlay" id="modalEdicion">
+  <div class="modal-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h3 style="font-size: 15px; color: var(--primary); text-transform: uppercase;" id="modalTicketTitulo">Atención de Incidencia</h3>
+      <button type="button" style="border:none; background:none; font-size:18px; cursor:pointer;" onclick="cerrarModalEdicion()">✕</button>
+    </div>
+
+    <input type="hidden" id="editTicketId">
+    <div class="form-grid">
+      <div class="col-12 form-group">
+        <label class="form-label">Técnico / Encargado de Mtto Asignado</label>
+        <input type="text" id="editResponsable" placeholder="Ej. Juan Pérez / Cuadrilla Cancún">
+      </div>
+      <div class="col-6 form-group">
+        <label class="form-label">Fecha Compromiso de Entrega</label>
+        <input type="date" id="editFechaCompromiso">
+      </div>
+      <div class="col-6 form-group">
+        <label class="form-label">Costo Total Reparación (MXN)</label>
+        <input type="number" id="editCosto" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="col-12 form-group">
+        <label class="form-label">Notas y Comentarios Operativos</label>
+        <textarea id="editComentarios" placeholder="Materiales utilizados, refacciones o detalles..."></textarea>
+      </div>
+
+      <!-- SECCIÓN DE RESOLUCIÓN CON FOTOS (OBLIGATORIA PARA CERRAR) -->
+      <div class="col-12" style="border-top: 1px solid var(--border-subtle); padding-top: 14px; margin-top: 8px;">
+        <label class="form-label" style="color: #15803d; font-weight: 800;">Evidencia de Cierre (Foto del "Después" para Concluir) *</label>
+        <div class="form-grid" style="margin-top: 6px;">
+          <div class="col-4 photo-upload-box" onclick="document.getElementById('fileRes1').click()">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">Foto Cierre 1 *</span>
+            <input type="file" id="fileRes1" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevRes1')">
+            <img id="prevRes1" class="photo-preview">
+          </div>
+          <div class="col-4 photo-upload-box" onclick="document.getElementById('fileRes2').click()">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">Foto Cierre 2</span>
+            <input type="file" id="fileRes2" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevRes2')">
+            <img id="prevRes2" class="photo-preview">
+          </div>
+          <div class="col-4 photo-upload-box" onclick="document.getElementById('fileRes3').click()">
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">Foto Cierre 3</span>
+            <input type="file" id="fileRes3" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevRes3')">
+            <img id="prevRes3" class="photo-preview">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
+        <button type="button" class="btn-submit" style="background: #64748b; height: 38px; width: auto; padding: 0 16px;" onclick="cerrarModalEdicion()">Cancelar</button>
+        <button type="button" class="btn-submit" id="btnGuardarEdicion" style="height: 38px; width: auto; padding: 0 20px;" onclick="guardarActualizacionTicket()">
+          <span>💾</span> Guardar Avance / Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR IZQUIERDA -->
+<aside class="app-sidebar">
+  <div class="sidebar-brand">
+    <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display='none'">
+    <h2>Control de Incidencias</h2>
+  </div>
+  <nav class="sidebar-nav">
+    <button type="button" class="nav-btn active" data-view="dashboard" onclick="cambiarVista('dashboard')">
+      <span>📊</span> 1. Dashboard
+    </button>
+    <button type="button" class="nav-btn" data-view="captura" onclick="cambiarVista('captura')">
+      <span>📷</span> 2. Levantar Reporte
+    </button>
+    <button type="button" class="nav-btn" data-view="consola" onclick="cambiarVista('consola')">
+      <span>🔧</span> 3. Consola Mtto
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="live-dot"></div>
+    <span>Supabase Storage Activo</span>
+  </div>
+</aside>
+
+<!-- CONTENEDOR DERECHO -->
+<main class="app-main">
+
+  <!-- ========================================== -->
+  <!-- VISTA 1: DASHBOARD MACRO                   -->
+  <!-- ========================================== -->
+  <div id="viewDashboard" class="view-section">
+    <div class="card-canvas">
+      <div class="header-branding">
+        <h1>Tablero General de Mantenimiento</h1>
+        <p style="font-size: 13px; color: var(--text-muted);">Monitoreo de tiempos de atención, atrasos y gasto consolidado por agencia</p>
+      </div>
+
+      <div class="kpi-container">
+        <div class="kpi-card">
+          <span class="kpi-title">Incidencias Totales</span>
+          <span class="kpi-value" id="kpiTotalTickets">0</span>
+          <span class="kpi-subtext" id="kpiDesgloseTickets">0 Sin empezar | 0 En proceso</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Resueltas con Éxito</span>
+          <span class="kpi-value" id="kpiResueltas" style="color: #15803d;">0</span>
+          <span class="kpi-subtext" id="kpiPorcentajeCierre">0.0% tasa de efectividad</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Tickets con Atraso</span>
+          <span class="kpi-value" id="kpiTicketsAtrasados" style="color: #ef4444;">0</span>
+          <span class="kpi-subtext">Compromiso vencido</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Inversión en Reparaciones</span>
+          <span class="kpi-value" id="kpiGastoTotal">$0.00 MXN</span>
+          <span class="kpi-subtext">Gasto acumulado</span>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-num">📋</div>
+          <div class="section-title">Resumen de Incidencias Registradas</div>
+        </div>
+        <div class="table-container">
+          <table class="modern-table" id="tblDashboardMtto">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Distribuidora</th>
+                <th>Área / Falla</th>
+                <th>Flujo Clientes</th>
+                <th>Estatus</th>
+                <th>Compromiso</th>
+                <th>Atraso</th>
+                <th style="text-align: right;">Costo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="8" class="text-center" style="padding:15px; color:#64748b;">Cargando incidencias...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- VISTA 2: LEVANTAR REPORTE (PÚBLICO / QR)   -->
+  <!-- ========================================== -->
+  <div id="viewCaptura" class="view-section hidden">
+    <div class="card-canvas">
+      <div class="header-branding">
+        <h1>Levantamiento de Incidencia</h1>
+        <p style="font-size: 13px; color: var(--text-muted);">Reporte ágil sin contraseñas. Documenta la falla con fotografías para atención inmediata.</p>
+      </div>
+
+      <form id="formReporte" onsubmit="event.preventDefault(); guardarNuevoReporte();">
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-num">1</div>
+            <div class="section-title">Ubicación y Departamento</div>
+          </div>
+          <div class="form-grid">
+            <div class="col-6 form-group">
+              <label class="form-label">Distribuidora / Agencia *</label>
+              <select id="repDistribuidora" required onchange="marcarLleno(this)">
+                <option value="">Seleccione Agencia...</option>
+                <option value="Montejo">Automaya - Montejo</option>
+                <option value="Itzáes">Automaya - Itzáes</option>
+                <option value="Valladolid">Automaya - Valladolid</option>
+                <option value="Chetumal">Chetumal Automotores</option>
+                <option value="Mitsubishi">Millenium (Mitsubishi)</option>
+                <option value="Caribe Cancún">Automotriz Caribe - Cancún</option>
+                <option value="Caribe Playa">Automotriz Caribe - Playa del Carmen</option>
+              </select>
+            </div>
+            <div class="col-6 form-group">
+              <label class="form-label">Departamento Solicitante *</label>
+              <select id="repDpto" required onchange="marcarLleno(this)">
+                <option value="">Seleccione Departamento...</option>
+                <option value="Ventas / Showroom">Ventas / Showroom</option>
+                <option value="Servicio / Taller">Servicio / Taller</option>
+                <option value="Refacciones">Refacciones</option>
+                <option value="Hojalatería y Pintura (HyP)">Hojalatería y Pintura (HyP)</option>
+                <option value="Administración / Finanzas">Administración / Finanzas</option>
+                <option value="BDC">BDC</option>
+                <option value="Calidad / Procesos">Calidad / Procesos</option>
+                <option value="Sistemas / TI">Sistemas / TI</option>
+                <option value="Dirección General">Dirección General</option>
+              </select>
+            </div>
+            <div class="col-6 form-group">
+              <label class="form-label">Área Específica (Ubicación puntual) *</label>
+              <input type="text" id="repArea" required placeholder="Ej. Baños Clientes, Bahía 4, Recepción..." oninput="marcarLleno(this)">
+            </div>
+            <div class="col-6 form-group">
+              <label class="form-label">Tipo de Daño / Clasificación *</label>
+              <select id="repTipo" required onchange="marcarLleno(this)">
+                <option value="">Seleccione Tipo...</option>
+                <option value="Eléctrico / Iluminación">Eléctrico / Iluminación</option>
+                <option value="Pintura y Acabados">Pintura y Acabados</option>
+                <option value="Pisos y Plafones">Pisos y Plafones</option>
+                <option value="Cerrajería y Cancelería">Cerrajería y Cancelería</option>
+                <option value="Plomería y Sanitarios">Plomería y Sanitarios</option>
+                <option value="Imagen / Señalética">Imagen / Señalética</option>
+                <option value="Mobiliario / Otro">Mobiliario / Otro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-num">2</div>
+            <div class="section-title">Detalle del Problema e Impacto</div>
+          </div>
+          <div class="form-grid">
+            <div class="col-6 form-group">
+              <label class="form-label">Flujo de Clientes (Impacto Comercial) *</label>
+              <select id="repFlujo" required onchange="marcarLleno(this)">
+                <option value="Alto">Alto (Afecta directamente atención al cliente o showroom)</option>
+                <option value="Medio" selected>Medio (Operación interna de soporte)</option>
+                <option value="Bajo">Bajo (Detalle estético sin freno operativo)</option>
+              </select>
+            </div>
+            <div class="col-12 form-group">
+              <label class="form-label">Descripción Técnica de la Falla *</label>
+              <textarea id="repDescripcion" required placeholder="Describe puntualmente el problema observado..." oninput="marcarLleno(this)"></textarea>
+            </div>
+            <div class="col-12 form-group">
+              <label class="form-label">Comentarios Adicionales (Opcional)</label>
+              <input type="text" id="repComentarios" placeholder="Notas adicionales o referencias..." oninput="marcarLleno(this)">
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-num">3</div>
+            <div class="section-title">Evidencia Fotográfica Inicial</div>
+          </div>
+          <div class="form-grid">
+            <div class="col-4 photo-upload-box" onclick="document.getElementById('fileInc1').click()">
+              <span style="font-size: 11px; font-weight: 700; color: var(--primary);">Foto Inicial 1 (Obligatoria) *</span>
+              <input type="file" id="fileInc1" accept="image/*" capture="environment" style="display:none;" required onchange="previewFoto(this, 'prevInc1')">
+              <img id="prevInc1" class="photo-preview">
+            </div>
+            <div class="col-4 photo-upload-box" onclick="document.getElementById('fileInc2').click()">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Foto Inicial 2 (Opcional)</span>
+              <input type="file" id="fileInc2" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevInc2')">
+              <img id="prevInc2" class="photo-preview">
+            </div>
+            <div class="col-4 photo-upload-box" onclick="document.getElementById('fileInc3').click()">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Foto Inicial 3 (Opcional)</span>
+              <input type="file" id="fileInc3" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevInc3')">
+              <img id="prevInc3" class="photo-preview">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnEnviarReporte">
+          <span>📤</span> Enviar Reporte de Incidencia
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- VISTA 3: CONSOLA OPERATIVA DE MTTO (DECK)  -->
+  <!-- ========================================== -->
+  <div id="viewConsola" class="view-section hidden">
+    <div class="card-canvas">
+      <div class="header-branding" style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+        <div>
+          <h1>Consola Operativa de Trabajo</h1>
+          <p style="font-size: 13px; color: var(--text-muted);">Asigna técnicos, define fechas compromiso y documenta la resolución con fotos</p>
+        </div>
+        <button type="button" class="btn-submit" style="width: auto; height: 36px; padding: 0 14px; font-size: 12px; margin-top: 0;" onclick="cargarConsolaMtto()">
+          🔄 Actualizar
+        </button>
+      </div>
+
+      <!-- FILTRO RÁPIDO POR AGENCIA -->
+      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+        <select id="filtroAgencia" style="max-width: 260px; height: 38px;" onchange="filtrarDeckPorAgencia(this.value)">
+          <option value="TODAS">Todas las Distribuidoras</option>
+          <option value="Montejo">Montejo</option>
+          <option value="Itzáes">Itzáes</option>
+          <option value="Valladolid">Valladolid</option>
+          <option value="Chetumal">Chetumal</option>
+          <option value="Mitsubishi">Mitsubishi</option>
+          <option value="Caribe Cancún">Caribe Cancún</option>
+          <option value="Caribe Playa">Caribe Playa</option>
+        </select>
+        <select id="filtroEstatus" style="max-width: 220px; height: 38px;" onchange="filtrarDeckPorAgencia()">
+          <option value="TODOS">Todos los Estatus</option>
+          <option value="Sin empezar">Sin empezar</option>
+          <option value="En proceso">En proceso</option>
+          <option value="Resuelto">Resuelto</option>
+        </select>
+      </div>
+
+      <div class="deck-grid" id="contenedorDeckMtto">
+        <!-- Renderizado dinámico de tarjetas -->
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let ticketsEnMemoria = [];
+
+window.onload = function() {
+  cargarDashboardMtto();
+};
+
+function mostrarToast(titulo, mensaje, tipo = "info") {
+  const cont = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast`;
+  t.innerHTML = `<div><div style="font-weight:700;">${titulo}</div><div style="font-size:11px; color:#64748b;">${mensaje}</div></div>`;
+  cont.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function marcarLleno(el) {
+  if (el.value && el.value.trim() !== "") el.classList.add("filled");
+  else el.classList.remove("filled");
+}
+
+function previewFoto(input, idImg) {
+  const img = document.getElementById(idImg);
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      img.src = e.target.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// ==========================================
+// FUNCIÓN AUXILIAR: SUBIR IMAGEN A STORAGE
+// ==========================================
+async function subirImagenASupabase(file, carpeta = "reportes") {
+  if (!file) return null;
+  const ext = file.name.split('.').pop();
+  const nombreArchivo = `${carpeta}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+
+  const { data, error } = await sb.storage
+    .from('mtto-evidencias')
+    .upload(nombreArchivo, file, { cacheControl: '3600', upsert: false });
+
+  if (error) {
+    console.error("Error al subir imagen:", error);
+    throw error;
+  }
+
+  const { data: pubData } = sb.storage.from('mtto-evidencias').getPublicUrl(nombreArchivo);
+  return pubData.publicUrl;
+}
+
+// ==========================================
+// VISTA 2: GUARDAR REPORTE (PÚBLICO)
+// ==========================================
+async function guardarNuevoReporte() {
+  const btn = document.getElementById("btnEnviarReporte");
+  const file1 = document.getElementById("fileInc1").files[0];
+
+  if (!file1) {
+    mostrarToast("Evidencia Requerida", "Debes tomar al menos 1 fotografía de la falla.", "warning");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = "Subiendo fotos y registrando...";
+
+  try {
+    // 1. Subir fotos al Bucket
+    const urlFoto1 = await subirImagenASupabase(file1, "incidencias");
+    const file2 = document.getElementById("fileInc2").files[0];
+    const urlFoto2 = file2 ? await subirImagenASupabase(file2, "incidencias") : null;
+    const file3 = document.getElementById("fileInc3").files[0];
+    const urlFoto3 = file3 ? await subirImagenASupabase(file3, "incidencias") : null;
+
+    // 2. Insertar ticket en base de datos
+    const { error } = await sb.from('incidencias_mtto').insert([{
+      distribuidora: document.getElementById("repDistribuidora").value,
+      dpto_reporte: document.getElementById("repDpto").value,
+      area: document.getElementById("repArea").value.trim(),
+      tipo: document.getElementById("repTipo").value,
+      flujo_clientes: document.getElementById("repFlujo").value,
+      descripcion: document.getElementById("repDescripcion").value.trim(),
+      comentarios: document.getElementById("repComentarios").value.trim() || null,
+      foto_incidencia_1: urlFoto1,
+      foto_incidencia_2: urlFoto2,
+      foto_incidencia_3: urlFoto3
+    }]);
+
+    if (error) throw error;
+
+    mostrarToast("Reporte Registrado", "La falla ha sido enviada al equipo de mantenimiento.", "success");
+
+    // Limpiar formulario
+    document.getElementById("formReporte").reset();
+    document.querySelectorAll(".photo-preview").forEach(img => { img.src = ""; img.style.display = "none"; });
+    document.querySelectorAll("input, select, textarea").forEach(el => el.classList.remove("filled"));
+
+    cambiarVista('dashboard');
+  } catch (err) {
+    mostrarToast("Error", err.message || "No se pudo registrar el reporte.", "warning");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "📤 Enviar Reporte de Incidencia";
+  }
+}
+
+// ==========================================
+// VISTA 1: CARGAR DASHBOARD MACRO
+// ==========================================
+async function cargarDashboardMtto() {
+  const tb = document.querySelector("#tblDashboardMtto tbody");
+  tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:15px; color:#64748b;">Consultando base de datos...</td></tr>';
+
+  try {
+    const { data, error } = await sb
+      .from('vista_incidencias_mtto')
+      .select('*')
+      .order('fecha_reporte', { ascending: false });
+
+    if (error) throw error;
+    ticketsEnMemoria = data || [];
+
+    let total = ticketsEnMemoria.length;
+    let resueltos = 0;
+    let sinEmpezar = 0;
+    let enProceso = 0;
+    let atrasados = 0;
+    let gastoTotal = 0;
+
+    if (total === 0) {
+      tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:15px; color:#64748b; font-style:italic;">No hay reportes de mantenimiento registrados.</td></tr>';
+    } else {
+      tb.innerHTML = "";
+      ticketsEnMemoria.forEach(t => {
+        if (t.estatus === 'Resuelto') resueltos++;
+        else if (t.estatus === 'En proceso') enProceso++;
+        else sinEmpezar++;
+
+        const diasAtraso = parseInt(t.atraso_dias) || 0;
+        if (diasAtraso > 0 && t.estatus !== 'Resuelto') atrasados++;
+
+        gastoTotal += parseFloat(t.costo_total_reparacion) || 0;
+
+        let statusClass = "status-sin-empezar";
+        if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
+        if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+
+        const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
+        const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : '--';
+
+        tb.innerHTML += `<tr>
+          <td>${fReg}</td>
+          <td><strong>${t.distribuidora}</strong></td>
+          <td>${t.area} <span style="color:#64748b; font-size:11px;">(${t.tipo})</span></td>
+          <td><span style="font-weight:700; color:var(--flujo-${t.flujo_clientes});">${t.flujo_clientes}</span></td>
+          <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
+          <td>${fComp}</td>
+          <td>${diasAtraso > 0 ? `<span class="atraso-pill">+${diasAtraso} d</span>` : '0 d'}</td>
+          <td style="text-align:right;">$${(parseFloat(t.costo_total_reparacion) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+        </tr>`;
+      });
+    }
+
+    // Actualizar KPIs de cabecera
+    document.getElementById("kpiTotalTickets").innerText = total;
+    document.getElementById("kpiDesgloseTickets").innerText = `${sinEmpezar} Sin empezar | ${enProceso} En proceso`;
+    document.getElementById("kpiResueltas").innerText = resueltos;
+    const tasa = total > 0 ? ((resueltos / total) * 100).toFixed(1) : "0.0";
+    document.getElementById("kpiPorcentajeCierre").innerText = `${tasa}% tasa de efectividad`;
+    document.getElementById("kpiTicketsAtrasados").innerText = atrasados;
+    document.getElementById("kpiGastoTotal").innerText = `$${gastoTotal.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+
+  } catch (err) {
+    console.error(err);
+    mostrarToast("Error", "No se pudo actualizar el dashboard.", "warning");
+  }
+}
+
+// ==========================================
+// VISTA 3: CONSOLA DE TRABAJO (TARJETAS DECK)
+// ==========================================
+async function cargarConsolaMtto() {
+  await cargarDashboardMtto();
+  filtrarDeckPorAgencia();
+}
+
+function filtrarDeckPorAgencia() {
+  const ag = document.getElementById("filtroAgencia").value;
+  const est = document.getElementById("filtroEstatus").value;
+  const cont = document.getElementById("contenedorDeckMtto");
+  cont.innerHTML = "";
+
+  let filtrados = ticketsEnMemoria;
+  if (ag !== "TODAS") filtrados = filtrados.filter(t => t.distribuidora === ag);
+  if (est !== "TODOS") filtrados = filtrados.filter(t => t.estatus === est);
+
+  if (filtrados.length === 0) {
+    cont.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:#64748b; font-style:italic;">No hay reportes con este criterio.</div>';
+    return;
+  }
+
+  filtrados.forEach(t => {
+    let statusClass = "status-sin-empezar";
+    if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
+    if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+
+    const atraso = parseInt(t.atraso_dias) || 0;
+    const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
+    const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'Sin fecha';
+
+    let fotosHtml = '';
+    if (t.foto_incidencia_1) fotosHtml += `<img src="${t.foto_incidencia_1}" onclick="window.open('${t.foto_incidencia_1}')" title="Foto Inicial 1">`;
+    if (t.foto_incidencia_2) fotosHtml += `<img src="${t.foto_incidencia_2}" onclick="window.open('${t.foto_incidencia_2}')" title="Foto Inicial 2">`;
+    if (t.foto_resolucion_1) fotosHtml += `<img src="${t.foto_resolucion_1}" onclick="window.open('${t.foto_resolucion_1}')" title="Evidencia de Solución" style="border-color:#15803d; border-width:2px;">`;
+
+    cont.innerHTML += `
+      <div class="deck-card flujo-${t.flujo_clientes}">
+        <div class="deck-header">
+          <div>
+            <div class="deck-dist">${t.distribuidora} &bull; ${t.dpto_reporte}</div>
+            <div class="deck-title">${t.area}</div>
+          </div>
+          <span class="status-badge ${statusClass}">${t.estatus}</span>
+        </div>
+
+        <div style="font-size:12px; color:#334155; line-height:1.4;">${t.descripcion}</div>
+
+        <div class="deck-meta">
+          <span>📅 ${fReg}</span> &bull; 
+          <span>🎯 Entrega: <strong>${fComp}</strong></span>
+          ${atraso > 0 ? `<span class="atraso-pill">+${atraso} d atraso</span>` : ''}
+        </div>
+
+        <div class="deck-photos">${fotosHtml}</div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f5f9; padding-top:8px; margin-top:4px;">
+          <div style="font-size:11px; color:#64748b;">
+            👤 ${t.responsable_mtto || 'Sin asignar'}
+          </div>
+          <button type="button" class="btn-submit" style="width:auto; height:30px; font-size:11px; padding:0 12px; margin-top:0;" onclick="abrirModalEdicion('${t.id}')">
+            🛠️ Atender
+          </button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+// ==========================================
+// MODAL EDICIÓN Y CIERRE DE TICKET
+// ==========================================
+function abrirModalEdicion(id) {
+  const t = ticketsEnMemoria.find(item => item.id === id);
+  if (!t) return;
+
+  document.getElementById("editTicketId").value = t.id;
+  document.getElementById("modalTicketTitulo").innerText = `${t.distribuidora} - ${t.area}`;
+  document.getElementById("editResponsable").value = t.responsable_mtto || "";
+  document.getElementById("editFechaCompromiso").value = t.fecha_compromiso || "";
+  document.getElementById("editCosto").value = t.costo_total_reparacion || "0.00";
+  document.getElementById("editComentarios").value = t.comentarios || "";
+
+  // Reset previews de resolución
+  document.getElementById("fileRes1").value = "";
+  document.getElementById("fileRes2").value = "";
+  document.getElementById("fileRes3").value = "";
+  document.getElementById("prevRes1").style.display = t.foto_resolucion_1 ? "block" : "none";
+  if (t.foto_resolucion_1) document.getElementById("prevRes1").src = t.foto_resolucion_1;
+
+  document.getElementById("modalEdicion").classList.add("open");
+}
+
+function cerrarModalEdicion() {
+  document.getElementById("modalEdicion").classList.remove("open");
+}
+
+async function guardarActualizacionTicket() {
+  const id = document.getElementById("editTicketId").value;
+  const btn = document.getElementById("btnGuardarEdicion");
+  btn.disabled = true;
+  btn.innerText = "Guardando...";
+
+  try {
+    let updatePayload = {
+      responsable_mtto: document.getElementById("editResponsable").value.trim() || null,
+      fecha_compromiso: document.getElementById("editFechaCompromiso").value || null,
+      costo_total_reparacion: parseFloat(document.getElementById("editCosto").value) || 0.00,
+      comentarios: document.getElementById("editComentarios").value.trim() || null
+    };
+
+    // Si se subió foto de resolución 1, subirla y estampar fecha de resolución
+    const fileR1 = document.getElementById("fileRes1").files[0];
+    if (fileR1) {
+      updatePayload.foto_resolucion_1 = await subirImagenASupabase(fileR1, "resoluciones");
+      updatePayload.fecha_resolucion = new Date().toISOString().split('T')[0];
+    }
+    const fileR2 = document.getElementById("fileRes2").files[0];
+    if (fileR2) {
+      updatePayload.foto_resolucion_2 = await subirImagenASupabase(fileR2, "resoluciones");
+    }
+    const fileR3 = document.getElementById("fileRes3").files[0];
+    if (fileR3) {
+      updatePayload.foto_resolucion_3 = await subirImagenASupabase(fileR3, "resoluciones");
+    }
+
+    const { error } = await sb.from('incidencias_mtto').update(updatePayload).eq('id', id);
+    if (error) throw error;
+
+    mostrarToast("Ticket Actualizado", "Los cambios y evidencias han sido guardados.", "success");
+    cerrarModalEdicion();
+    cargarConsolaMtto();
+  } catch (err) {
+    mostrarToast("Error", err.message || "No se pudo actualizar.", "warning");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "💾 Guardar Avance / Cerrar";
+  }
+}
+</script>
+</body>
+</html>
