@@ -50,10 +50,9 @@
     .nav-btn.active { background: var(--primary); color: #ffffff; box-shadow: 0 4px 10px rgba(0, 32, 96, 0.15); }
     
     .sidebar-footer { padding: 14px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
-    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
 
     .app-main { margin-left: var(--sidebar-w); flex: 1; padding: 25px; max-width: calc(100vw - var(--sidebar-w)); }
-    .card-canvas { max-width: 1040px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow-card); border: 1px solid var(--border-subtle); }
+    .card-canvas { max-width: 1060px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow-card); border: 1px solid var(--border-subtle); }
 
     @media (max-width: 768px) {
       body { flex-direction: column; }
@@ -71,12 +70,14 @@
     .header-branding { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-subtle); }
     .header-branding h1 { color: var(--primary); font-size: 18px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
 
-    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    /* KPIS */
+    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .kpi-card { background: var(--surface); border-radius: var(--radius-md); padding: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 3px; }
     .kpi-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     .kpi-value { font-size: 20px; font-weight: 800; color: var(--primary); }
     .kpi-subtext { font-size: 10px; color: var(--text-muted); }
 
+    /* FORMULARIOS */
     .section-card { padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border-subtle); }
     .section-card:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
     .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -115,11 +116,20 @@
     }
     .btn-submit:hover { background: var(--primary-hover); }
 
-    .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-top: 14px; }
+    /* SIMBOLOGÍA */
+    .legend-bar {
+      display: flex; gap: 14px; background: #f8fafc; padding: 8px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle); font-size: 11px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #334155; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+    /* TARJETAS CONSOLA */
+    .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-top: 14px; }
     .deck-card {
       background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
       box-shadow: var(--shadow-card); padding: 14px; display: flex; flex-direction: column; gap: 8px;
-      position: relative; border-left: 5px solid #94a3b8;
+      position: relative; border-left: 6px solid #94a3b8;
     }
     .deck-card.flujo-Alto { border-left-color: var(--flujo-Alto); }
     .deck-card.flujo-Medio { border-left-color: var(--flujo-Medio); }
@@ -149,7 +159,13 @@
       opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-box { background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+    .modal-box { background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+
+    .btn-delete-row {
+      background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 13px;
+      transition: color 0.2s; padding: 4px;
+    }
+    .btn-delete-row:hover { color: #ef4444; }
 
     #toastContainer { position: fixed; top: 15px; right: 15px; z-index: 99999; display: flex; flex-direction: column; gap: 6px; }
     .toast { min-width: 240px; padding: 10px 12px; border-radius: var(--radius-sm); background: #ffffff; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 4px solid var(--primary); font-size: 11px; }
@@ -161,8 +177,8 @@
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weHpreWl2b2tzcHphb2tmZnhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NTg1MDksImV4cCI6MjEwODMzNDUwOX0.Wvr7SBmvdLqVnfj6ZfC6a8vV9GlF72vE2B7OLtMZfEc";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    // PIN fijo para Mantenimiento y Dirección
     const PIN_MTTO = "CER2026";
+    const CLAVE_ADMIN_BORRADO = "TEOM021128";
     let sesionMttoAutorizada = false;
 
     function cambiarVista(vista) {
@@ -190,7 +206,7 @@
       const pin = prompt("🔒 Acceso Restringido (Mantenimiento y Dirección)\nIngresa el PIN de autorización:");
       if (pin === PIN_MTTO) {
         sesionMttoAutorizada = true;
-        document.getElementById("badgeCandado").innerText = "🔓 Mantenimiento Autorizado";
+        document.getElementById("badgeCandado").innerText = "🔓 Modo Mantenimiento";
         document.getElementById("badgeCandado").style.color = "#15803d";
         cambiarVista(destinoVista);
       } else if (pin !== null) {
@@ -203,44 +219,64 @@
 
 <div id="toastContainer"></div>
 
-<!-- MODAL EDICIÓN Y RESOLUCIÓN -->
-<div class="modal-overlay" id="modalEdicion">
+<!-- MODAL 1: ASIGNAR Y COMPROMISO (PRELIMINAR) -->
+<div class="modal-overlay" id="modalAsignar">
   <div class="modal-box">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <h3 style="font-size: 14px; color: var(--primary); text-transform: uppercase;" id="modalTicketTitulo">Atención de Incidencia</h3>
-      <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModalEdicion()">✕</button>
+      <h3 style="font-size: 13px; color: var(--primary); text-transform: uppercase;" id="modalAsignarTitulo">Asignación y Compromiso</h3>
+      <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModal('modalAsignar')">✕</button>
     </div>
 
-    <input type="hidden" id="editTicketId">
+    <input type="hidden" id="asigTicketId">
     <div class="form-grid">
       <div class="col-12 form-group">
-        <label class="form-label">Técnico / Cuadrilla Asignada</label>
-        <input type="text" id="editResponsable" placeholder="Ej. Juan Pérez / Proveedor Climas">
+        <label class="form-label">Técnico o Cuadrilla Responsable *</label>
+        <input type="text" id="asigResponsable" placeholder="Ej. Juan Pérez / Proveedor Climas">
       </div>
-
-      <!-- FASE 1: COMPROMISO Y ESTIMACIÓN (SE CONGELAN UNA VEZ CAPTURADOS) -->
       <div class="col-6 form-group">
         <label class="form-label">Fecha Compromiso Tentativa *</label>
-        <input type="date" id="editFechaCompromiso">
+        <input type="date" id="asigFechaCompromiso">
       </div>
       <div class="col-6 form-group">
         <label class="form-label">Costo Estimado / Cotización (MXN) *</label>
-        <input type="number" id="editCostoEstimado" placeholder="0.00" min="0" step="0.01">
+        <input type="number" id="asigCostoEstimado" placeholder="0.00" min="0" step="0.01">
       </div>
-
       <div class="col-12 form-group">
         <label class="form-label">Notas y Comentarios Operativos</label>
-        <textarea id="editComentarios" placeholder="Detalles de materiales o refacciones..."></textarea>
+        <textarea id="asigComentarios" placeholder="Detalles preliminares, refacciones solicitadas..."></textarea>
       </div>
 
-      <!-- FASE 2: RESOLUCIÓN FINAL CON COSTO REAL Y EVIDENCIA FOTOGRÁFICA -->
-      <div class="col-12" style="border-top: 1px solid var(--border-subtle); padding-top: 12px; margin-top: 6px;">
-        <label class="form-label" style="color: #15803d; font-weight: 800;">Cierre de Ticket (Evidencia de Solución) *</label>
+      <div class="col-12" style="background:#fffbeb; border:1px solid #fef3c7; border-radius:6px; padding:8px 10px; font-size:11px; color:#b45309; line-height:1.3;">
+        ⚠️ <strong>Atención:</strong> Una vez guardada la fecha compromiso y el costo cotizado, quedarán congelados de forma definitiva para trazabilidad de tiempos.
+      </div>
+
+      <div class="col-12" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+        <button type="button" class="btn-submit" style="background: #64748b; height: 36px; width: auto; padding: 0 14px; margin-top:0;" onclick="cerrarModal('modalAsignar')">Cancelar</button>
+        <button type="button" class="btn-submit" id="btnGuardarAsignar" style="height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="confirmarYGuardarAsignacion()">
+          <span>💾</span> Guardar Compromiso
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: RESOLVER INCIDENCIA (CIERRE) -->
+<div class="modal-overlay" id="modalResolver">
+  <div class="modal-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 style="font-size: 13px; color: #15803d; text-transform: uppercase;" id="modalResolverTitulo">Concluir y Resolver Incidencia</h3>
+      <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModal('modalResolver')">✕</button>
+    </div>
+
+    <input type="hidden" id="resTicketId">
+    <div class="form-grid">
+      <div class="col-12 form-group">
+        <label class="form-label">Costo Real Final Incurrido (MXN) *</label>
+        <input type="number" id="resCostoReal" placeholder="0.00" min="0.01" step="0.01">
+      </div>
+      <div class="col-12">
+        <label class="form-label" style="color: #15803d;">Evidencia Fotográfica de Solución (Foto 1 Obligatoria) *</label>
         <div class="form-grid" style="margin-top: 6px;">
-          <div class="col-12 form-group">
-            <label class="form-label" style="color: #15803d;">Costo Real Final Incurrido (MXN) *</label>
-            <input type="number" id="editCostoReal" placeholder="0.00" min="0" step="0.01">
-          </div>
           <div class="col-4 photo-upload-box" onclick="document.getElementById('fileRes1').click()">
             <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">Foto Cierre 1 *</span>
             <input type="file" id="fileRes1" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevRes1')">
@@ -260,9 +296,9 @@
       </div>
 
       <div class="col-12" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
-        <button type="button" class="btn-submit" style="background: #64748b; height: 36px; width: auto; padding: 0 14px;" onclick="cerrarModalEdicion()">Cancelar</button>
-        <button type="button" class="btn-submit" id="btnGuardarEdicion" style="height: 36px; width: auto; padding: 0 18px;" onclick="guardarActualizacionTicket()">
-          <span>💾</span> Guardar Avance / Cerrar
+        <button type="button" class="btn-submit" style="background: #64748b; height: 36px; width: auto; padding: 0 14px; margin-top:0;" onclick="cerrarModal('modalResolver')">Cancelar</button>
+        <button type="button" class="btn-submit" id="btnGuardarResolver" style="background:#15803d; height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="guardarResolucionTicket()">
+          <span>✅</span> Concluir Ticket
         </button>
       </div>
     </div>
@@ -421,17 +457,18 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- VISTA 2: CONSULTAR EXISTENTES (ANTIDUPLICADOS) -->
+  <!-- VISTA 2: CONSULTAR EXISTENTES              -->
   <!-- ========================================== -->
   <div id="viewConsulta" class="view-section hidden">
     <div class="card-canvas">
       <div class="header-branding">
         <h1>Incidencias Reportadas</h1>
-        <p style="font-size: 12px; color: var(--text-muted);">Revisa los folios abiertos en tu agencia antes de levantar un nuevo reporte.</p>
+        <p style="font-size: 12px; color: var(--text-muted);">Revisa las fallas reportadas para evitar levantar duplicados.</p>
       </div>
 
+      <!-- BARRA DE BÚSQUEDA Y FILTRO -->
       <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
-        <select id="filtroConsultaAgencia" style="max-width: 260px; height: 38px;" onchange="cargarConsultaPublica()">
+        <select id="filtroConsultaAgencia" style="flex: 1; min-width: 200px; height: 38px;" onchange="filtrarConsultaPublicaEnVivo()">
           <option value="TODAS">Todas las Agencias</option>
           <option value="Montejo">Montejo</option>
           <option value="Itzáes">Itzáes</option>
@@ -441,6 +478,8 @@
           <option value="Caribe Cancún">Caribe Cancún</option>
           <option value="Caribe Playa">Caribe Playa</option>
         </select>
+        <input type="text" id="busquedaConsultaTexto" placeholder="🔍 Buscar por palabra clave en Área o Falla..." 
+               style="flex: 2; min-width: 250px; height: 38px;" oninput="filtrarConsultaPublicaEnVivo()">
       </div>
 
       <div class="table-container">
@@ -452,7 +491,7 @@
               <th>Área / Falla</th>
               <th>Impacto</th>
               <th>Estatus</th>
-              <th>Fecha Compromiso</th>
+              <th>Compromiso</th>
             </tr>
           </thead>
           <tbody>
@@ -471,16 +510,44 @@
       <div class="header-branding" style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
         <div>
           <h1>Consola Operativa de Mantenimiento</h1>
-          <p style="font-size: 12px; color: var(--text-muted);">Asigna compromisos inmutables y documenta resoluciones con fotos de cierre.</p>
+          <p style="font-size: 12px; color: var(--text-muted);">Asigna compromisos congelados y concluye con costo real y evidencia.</p>
         </div>
         <button type="button" class="btn-submit" style="width: auto; height: 34px; padding: 0 12px; font-size: 11px; margin-top: 0;" onclick="cargarConsolaMtto()">
           🔄 Actualizar
         </button>
       </div>
 
+      <!-- 3 INDICADORES DE CABECERA -->
+      <div class="kpi-container" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 14px;">
+        <div class="kpi-card" style="border-left: 4px solid #ef4444;">
+          <span class="kpi-title">Sin Empezar</span>
+          <span class="kpi-value" id="kpiConsolaSinEmpezar" style="color: #b91c1c;">0</span>
+          <span class="kpi-subtext">Pendientes de asignar</span>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
+          <span class="kpi-title">En Proceso</span>
+          <span class="kpi-value" id="kpiConsolaEnProceso" style="color: #b45309;">0</span>
+          <span class="kpi-subtext">Con compromiso activo</span>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #10b981;">
+          <span class="kpi-title">Terminadas</span>
+          <span class="kpi-value" id="kpiConsolaTerminadas" style="color: #15803d;">0</span>
+          <span class="kpi-subtext">Resueltas con foto</span>
+        </div>
+      </div>
+
+      <!-- SIMBOLOGÍA VISUAL -->
+      <div class="legend-bar">
+        <span style="font-weight:700; color:var(--primary);">Prioridad por Flujo:</span>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-Alto);"></div> Alto (Showroom / Clientes)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-Medio);"></div> Medio (Operación Interna / Taller)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-Bajo);"></div> Bajo (Estético / Sin Afectación)</div>
+      </div>
+
+      <!-- BARRA DE FILTROS Y BÚSQUEDA EN VIVO -->
       <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-        <select id="filtroAgencia" style="max-width: 240px; height: 36px;" onchange="filtrarDeck()">
-          <option value="TODAS">Todas las Distribuidoras</option>
+        <select id="filtroAgencia" style="flex: 1; min-width: 180px; height: 36px;" onchange="filtrarDeckEnVivo()">
+          <option value="TODAS">Todas las Agencias</option>
           <option value="Montejo">Montejo</option>
           <option value="Itzáes">Itzáes</option>
           <option value="Valladolid">Valladolid</option>
@@ -489,12 +556,14 @@
           <option value="Caribe Cancún">Caribe Cancún</option>
           <option value="Caribe Playa">Caribe Playa</option>
         </select>
-        <select id="filtroEstatus" style="max-width: 200px; height: 36px;" onchange="filtrarDeck()">
+        <select id="filtroEstatus" style="flex: 1; min-width: 150px; height: 36px;" onchange="filtrarDeckEnVivo()">
           <option value="TODOS">Todos los Estatus</option>
           <option value="Sin empezar">Sin empezar</option>
           <option value="En proceso">En proceso</option>
           <option value="Resuelto">Resuelto</option>
         </select>
+        <input type="text" id="busquedaConsolaTexto" placeholder="🔍 Buscar por palabra clave..." 
+               style="flex: 2; min-width: 220px; height: 36px;" oninput="filtrarDeckEnVivo()">
       </div>
 
       <div class="deck-grid" id="contenedorDeckMtto"></div>
@@ -508,25 +577,30 @@
     <div class="card-canvas">
       <div class="header-branding">
         <h1>Dashboard Ejecutivo de Mantenimiento</h1>
-        <p style="font-size: 12px; color: var(--text-muted);">Análisis de cumplimiento, retrasos y costos reales vs cotizados.</p>
+        <p style="font-size: 12px; color: var(--text-muted);">Monitoreo de tiempos de atención, anomalías de compromiso y costos reales.</p>
       </div>
 
+      <!-- 4 TARJETAS KPIS SOLICITADAS -->
       <div class="kpi-container">
+        <!-- TARJETA 1: TOTAL DESGLOSADO -->
         <div class="kpi-card">
           <span class="kpi-title">Incidencias Totales</span>
           <span class="kpi-value" id="kpiTotalTickets">0</span>
-          <span class="kpi-subtext" id="kpiDesgloseTickets">0 Sin empezar | 0 En proceso</span>
+          <span class="kpi-subtext" id="kpiDesgloseTickets">0 Sin empezar | 0 Proceso | 0 Resueltas</span>
         </div>
-        <div class="kpi-card">
-          <span class="kpi-title">Resueltas con Éxito</span>
-          <span class="kpi-value" id="kpiResueltas" style="color: #15803d;">0</span>
-          <span class="kpi-subtext" id="kpiPorcentajeCierre">0.0% tasa de cierre</span>
+        <!-- TARJETA 2: ALTO FLUJO SIN EMPEZAR (FOCO ROJO) -->
+        <div class="kpi-card" style="border-left: 4px solid #ef4444; background: #fff5f5;">
+          <span class="kpi-title" style="color: #b91c1c;">Focos Críticos</span>
+          <span class="kpi-value" id="kpiAltoFlujoSinEmpezar" style="color: #b91c1c;">0</span>
+          <span class="kpi-subtext" style="color: #b91c1c;">Flujo Alto Sin Empezar</span>
         </div>
+        <!-- TARJETA 3: TICKETS CON ATRASO -->
         <div class="kpi-card">
           <span class="kpi-title">Tickets con Atraso</span>
           <span class="kpi-value" id="kpiTicketsAtrasados" style="color: #ef4444;">0</span>
           <span class="kpi-subtext">Compromiso vencido</span>
         </div>
+        <!-- TARJETA 4: COSTO REAL ACUMULADO -->
         <div class="kpi-card">
           <span class="kpi-title">Costo Real Acumulado</span>
           <span class="kpi-value" id="kpiGastoTotal">$0.00 MXN</span>
@@ -534,11 +608,24 @@
         </div>
       </div>
 
+      <!-- REGISTRO MAESTRO CON FILTRO DE ESTATUS -->
       <div class="section-card">
-        <div class="section-header">
-          <div class="section-num">📋</div>
-          <div class="section-title">Registro Maestro de Mantenimiento</div>
+        <div class="section-header" style="justify-content: space-between; flex-wrap: wrap;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="section-num">📋</div>
+            <div class="section-title">Registro Maestro (Ordenado por Flujo)</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label class="form-label" style="margin:0;">Filtrar Estatus:</label>
+            <select id="filtroDashboardEstatus" style="width: 160px; height: 32px; font-size:11px;" onchange="filtrarDashboardTabla()">
+              <option value="TODOS">Todos los estatus</option>
+              <option value="Sin empezar">Sin empezar</option>
+              <option value="En proceso">En proceso</option>
+              <option value="Resuelto">Resuelto</option>
+            </select>
+          </div>
         </div>
+
         <div class="table-container">
           <table class="modern-table" id="tblDashboardMtto">
             <thead>
@@ -546,15 +633,17 @@
                 <th>Fecha</th>
                 <th>Agencia</th>
                 <th>Área / Falla</th>
+                <th>Impacto</th>
                 <th>Estatus</th>
                 <th>Compromiso</th>
                 <th>Atraso</th>
-                <th style="text-align: right;">Costo Cotizado</th>
+                <th style="text-align: right;">Cotizado</th>
                 <th style="text-align: right;">Costo Real</th>
+                <th style="width:30px; text-align:center;"></th>
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="8" class="text-center" style="padding:15px; color:#64748b;">Cargando incidencias...</td></tr>
+              <tr><td colspan="10" class="text-center" style="padding:15px; color:#64748b;">Cargando incidencias...</td></tr>
             </tbody>
           </table>
         </div>
@@ -566,6 +655,7 @@
 
 <script>
 let ticketsEnMemoria = [];
+let consultaPublicaEnMemoria = [];
 
 window.onload = function() {
   cambiarVista('captura');
@@ -597,6 +687,10 @@ function previewFoto(input, idImg) {
   }
 }
 
+function cerrarModal(id) {
+  document.getElementById(id).classList.remove("open");
+}
+
 async function subirImagenASupabase(file, carpeta = "reportes") {
   if (!file) return null;
   const ext = file.name.split('.').pop();
@@ -606,16 +700,27 @@ async function subirImagenASupabase(file, carpeta = "reportes") {
     .from('mtto-evidencias')
     .upload(nombreArchivo, file, { cacheControl: '3600', upsert: false });
 
-  if (error) {
-    console.error("Error al subir imagen:", error);
-    throw error;
-  }
-
+  if (error) throw error;
   const { data: pubData } = sb.storage.from('mtto-evidencias').getPublicUrl(nombreArchivo);
   return pubData.publicUrl;
 }
 
+// ==========================================
+// FUNCIÓN DE ORDENAMIENTO POR FLUJO
+// ==========================================
+function ordenarPorFlujo(lista) {
+  const peso = { 'Alto': 1, 'Medio': 2, 'Bajo': 3 };
+  return lista.sort((a, b) => {
+    const pA = peso[a.flujo_clientes] || 4;
+    const pB = peso[b.flujo_clientes] || 4;
+    if (pA !== pB) return pA - pB;
+    return new Date(b.fecha_reporte) - new Date(a.fecha_reporte);
+  });
+}
+
+// ==========================================
 // 1. GUARDAR NUEVO REPORTE (PÚBLICO)
+// ==========================================
 async function guardarNuevoReporte() {
   const btn = document.getElementById("btnEnviarReporte");
   const file1 = document.getElementById("fileInc1").files[0];
@@ -664,71 +769,110 @@ async function guardarNuevoReporte() {
   }
 }
 
-// 2. CONSULTAR EXISTENTES (PÚBLICA)
+// ==========================================
+// 2. CONSULTAR EXISTENTES (EN VIVO)
+// ==========================================
 async function cargarConsultaPublica() {
-  const ag = document.getElementById("filtroConsultaAgencia").value;
   const tb = document.querySelector("#tblConsultaPublica tbody");
   tb.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:15px; color:#64748b;">Consultando...</td></tr>';
 
   try {
-    let query = sb.from('vista_incidencias_mtto').select('*').order('fecha_reporte', { ascending: false });
-    if (ag !== "TODAS") query = query.eq('distribuidora', ag);
-
-    const { data, error } = await query;
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      tb.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:15px; color:#64748b;">No hay reportes abiertos.</td></tr>';
-      return;
-    }
-
-    tb.innerHTML = "";
-    data.forEach(t => {
-      let statusClass = "status-sin-empezar";
-      if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-      if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
-
-      const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
-      const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'En revisión';
-
-      tb.innerHTML += `<tr>
-        <td>${fReg}</td>
-        <td><strong>${t.distribuidora}</strong></td>
-        <td>${t.area} <span style="color:#64748b;">(${t.tipo})</span></td>
-        <td><span style="font-weight:700; color:var(--flujo-${t.flujo_clientes});">${t.flujo_clientes}</span></td>
-        <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
-        <td>${fComp}</td>
-      </tr>`;
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// 3. CONSOLA OPERATIVA (PROTEGIDA)
-async function cargarConsolaMtto() {
-  try {
     const { data, error } = await sb.from('vista_incidencias_mtto').select('*').order('fecha_reporte', { ascending: false });
     if (error) throw error;
-    ticketsEnMemoria = data || [];
-    filtrarDeck();
+    consultaPublicaEnMemoria = data || [];
+    filtrarConsultaPublicaEnVivo();
   } catch (err) {
     console.error(err);
   }
 }
 
-function filtrarDeck() {
+function filtrarConsultaPublicaEnVivo() {
+  const ag = document.getElementById("filtroConsultaAgencia").value;
+  const busq = document.getElementById("busquedaConsultaTexto").value.toLowerCase().trim();
+  const tb = document.querySelector("#tblConsultaPublica tbody");
+  tb.innerHTML = "";
+
+  let filtrados = consultaPublicaEnMemoria;
+  if (ag !== "TODAS") filtrados = filtrados.filter(t => t.distribuidora === ag);
+  if (busq) {
+    filtrados = filtrados.filter(t => 
+      (t.area && t.area.toLowerCase().includes(busq)) || 
+      (t.descripcion && t.descripcion.toLowerCase().includes(busq)) ||
+      (t.tipo && t.tipo.toLowerCase().includes(busq))
+    );
+  }
+
+  if (filtrados.length === 0) {
+    tb.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:15px; color:#64748b;">No hay reportes con este criterio.</td></tr>';
+    return;
+  }
+
+  filtrados.forEach(t => {
+    let statusClass = "status-sin-empezar";
+    if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
+    if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+
+    const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
+    const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'En revisión';
+
+    tb.innerHTML += `<tr>
+      <td>${fReg}</td>
+      <td><strong>${t.distribuidora}</strong></td>
+      <td><strong>${t.area}</strong> <span style="color:#64748b;">(${t.tipo})</span><br><span style="font-size:10px; color:#475569;">${t.descripcion}</span></td>
+      <td><span style="font-weight:700; color:var(--flujo-${t.flujo_clientes});">${t.flujo_clientes}</span></td>
+      <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
+      <td>${fComp}</td>
+    </tr>`;
+  });
+}
+
+// ==========================================
+// 3. CONSOLA DE TRABAJO (DIVIDIDA Y ORDENADA)
+// ==========================================
+async function cargarConsolaMtto() {
+  try {
+    const { data, error } = await sb.from('vista_incidencias_mtto').select('*');
+    if (error) throw error;
+    ticketsEnMemoria = ordenarPorFlujo(data || []);
+    actualizarContadoresConsola();
+    filtrarDeckEnVivo();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function actualizarContadoresConsola() {
+  let sinEmp = 0, enProc = 0, term = 0;
+  ticketsEnMemoria.forEach(t => {
+    if (t.estatus === 'Resuelto') term++;
+    else if (t.estatus === 'En proceso') enProc++;
+    else sinEmp++;
+  });
+  document.getElementById("kpiConsolaSinEmpezar").innerText = sinEmp;
+  document.getElementById("kpiConsolaEnProceso").innerText = enProc;
+  document.getElementById("kpiConsolaTerminadas").innerText = term;
+}
+
+function filtrarDeckEnVivo() {
   const ag = document.getElementById("filtroAgencia").value;
   const est = document.getElementById("filtroEstatus").value;
+  const busq = document.getElementById("busquedaConsolaTexto").value.toLowerCase().trim();
   const cont = document.getElementById("contenedorDeckMtto");
   cont.innerHTML = "";
 
   let filtrados = ticketsEnMemoria;
   if (ag !== "TODAS") filtrados = filtrados.filter(t => t.distribuidora === ag);
   if (est !== "TODOS") filtrados = filtrados.filter(t => t.estatus === est);
+  if (busq) {
+    filtrados = filtrados.filter(t => 
+      (t.area && t.area.toLowerCase().includes(busq)) || 
+      (t.descripcion && t.descripcion.toLowerCase().includes(busq)) ||
+      (t.responsable_mtto && t.responsable_mtto.toLowerCase().includes(busq))
+    );
+  }
 
   if (filtrados.length === 0) {
-    cont.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:#64748b;">No hay incidencias registradas.</div>';
+    cont.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:#64748b;">No hay incidencias que coincidan.</div>';
     return;
   }
 
@@ -753,7 +897,10 @@ function filtrarDeck() {
             <div class="deck-dist">${t.distribuidora} &bull; ${t.dpto_reporte}</div>
             <div class="deck-title">${t.area}</div>
           </div>
-          <span class="status-badge ${statusClass}">${t.estatus}</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="status-badge ${statusClass}">${t.estatus}</span>
+            <button type="button" class="btn-delete-row" title="Eliminar como Administrador" onclick="solicitarBorradoRegistro('${t.id}')">🗑️</button>
+          </div>
         </div>
 
         <div style="font-size:12px; color:#334155;">${t.descripcion}</div>
@@ -771,42 +918,105 @@ function filtrarDeck() {
             👤 ${t.responsable_mtto || 'Sin asignar'}<br>
             💰 Cotizado: $${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}
           </div>
-          <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 10px; margin-top:0;" onclick="abrirModalEdicion('${t.id}')">
-            🛠️ Atender
-          </button>
+          <div style="display:flex; gap:6px;">
+            <!-- BOTÓN 1: ASIGNAR Y COMPROMISO -->
+            <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:${t.compromiso_bloqueado ? '#94a3b8' : 'var(--primary)'};" onclick="abrirModalAsignar('${t.id}')">
+              📋 Asignar
+            </button>
+            <!-- BOTÓN 2: RESOLVER -->
+            <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:#15803d;" onclick="abrirModalResolver('${t.id}')">
+              ✅ Resolver
+            </button>
+          </div>
         </div>
       </div>
     `;
   });
 }
 
-function abrirModalEdicion(id) {
+// 3.1 GESTIÓN MODAL ASIGNAR (PRELIMINAR)
+function abrirModalAsignar(id) {
   const t = ticketsEnMemoria.find(item => item.id === id);
   if (!t) return;
 
-  document.getElementById("editTicketId").value = t.id;
-  document.getElementById("modalTicketTitulo").innerText = `${t.distribuidora} - ${t.area}`;
-  document.getElementById("editResponsable").value = t.responsable_mtto || "";
-  document.getElementById("editFechaCompromiso").value = t.fecha_compromiso || "";
-  document.getElementById("editCostoEstimado").value = t.costo_estimado || "0.00";
-  document.getElementById("editCostoReal").value = t.costo_real || "0.00";
-  document.getElementById("editComentarios").value = t.comentarios || "";
+  document.getElementById("asigTicketId").value = t.id;
+  document.getElementById("modalAsignarTitulo").innerText = `${t.distribuidora} - ${t.area}`;
+  document.getElementById("asigResponsable").value = t.responsable_mtto || "";
+  document.getElementById("asigFechaCompromiso").value = t.fecha_compromiso || "";
+  document.getElementById("asigCostoEstimado").value = t.costo_estimado || "0.00";
+  document.getElementById("asigComentarios").value = t.comentarios || "";
 
-  // Si ya se congeló el compromiso, bloquear inputs
-  const fCompInp = document.getElementById("editFechaCompromiso");
-  const costEstInp = document.getElementById("editCostoEstimado");
+  const fCompInp = document.getElementById("asigFechaCompromiso");
+  const cEstInp = document.getElementById("asigCostoEstimado");
+  const btn = document.getElementById("btnGuardarAsignar");
 
   if (t.compromiso_bloqueado) {
     fCompInp.disabled = true;
-    costEstInp.disabled = true;
+    cEstInp.disabled = true;
     fCompInp.classList.add("locked-input");
-    costEstInp.classList.add("locked-input");
+    cEstInp.classList.add("locked-input");
+    btn.disabled = true;
+    btn.innerText = "🔒 Compromiso Bloqueado";
   } else {
     fCompInp.disabled = false;
-    costEstInp.disabled = false;
+    cEstInp.disabled = false;
     fCompInp.classList.remove("locked-input");
-    costEstInp.classList.remove("locked-input");
+    cEstInp.classList.remove("locked-input");
+    btn.disabled = false;
+    btn.innerText = "💾 Guardar Compromiso";
   }
+
+  document.getElementById("modalAsignar").classList.add("open");
+}
+
+async function confirmarYGuardarAsignacion() {
+  const id = document.getElementById("asigTicketId").value;
+  const resp = document.getElementById("asigResponsable").value.trim();
+  const fComp = document.getElementById("asigFechaCompromiso").value;
+  const cEst = parseFloat(document.getElementById("asigCostoEstimado").value) || 0;
+
+  if (!resp || !fComp) {
+    alert("Debes indicar el Técnico Responsable y la Fecha Compromiso.");
+    return;
+  }
+
+  const confirma = confirm("⚠️ ATENCIÓN:\nUna vez guardada la fecha compromiso y el costo cotizado, quedarán congelados de forma definitiva.\n\n¿Deseas confirmar la asignación?");
+  if (!confirma) return;
+
+  const btn = document.getElementById("btnGuardarAsignar");
+  btn.disabled = true;
+  btn.innerText = "Guardando...";
+
+  try {
+    const { error } = await sb.from('incidencias_mtto').update({
+      responsable_mtto: resp,
+      fecha_compromiso: fComp,
+      costo_estimado: cEst,
+      comentarios: document.getElementById("asigComentarios").value.trim() || null,
+      compromiso_bloqueado: true
+    }).eq('id', id);
+
+    if (error) throw error;
+
+    mostrarToast("Compromiso Congelado", "La incidencia pasó a En Proceso.");
+    cerrarModal('modalAsignar');
+    cargarConsolaMtto();
+  } catch (err) {
+    alert("Error: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "💾 Guardar Compromiso";
+  }
+}
+
+// 3.2 GESTIÓN MODAL RESOLVER (CIERRE)
+function abrirModalResolver(id) {
+  const t = ticketsEnMemoria.find(item => item.id === id);
+  if (!t) return;
+
+  document.getElementById("resTicketId").value = t.id;
+  document.getElementById("modalResolverTitulo").innerText = `Cierre: ${t.distribuidora} - ${t.area}`;
+  document.getElementById("resCostoReal").value = t.costo_real > 0 ? t.costo_real : (t.costo_estimado || "0.00");
 
   document.getElementById("fileRes1").value = "";
   document.getElementById("fileRes2").value = "";
@@ -814,127 +1024,158 @@ function abrirModalEdicion(id) {
   document.getElementById("prevRes1").style.display = t.foto_resolucion_1 ? "block" : "none";
   if (t.foto_resolucion_1) document.getElementById("prevRes1").src = t.foto_resolucion_1;
 
-  document.getElementById("modalEdicion").classList.add("open");
+  document.getElementById("modalResolver").classList.add("open");
 }
 
-function cerrarModalEdicion() {
-  document.getElementById("modalEdicion").classList.remove("open");
-}
-
-async function guardarActualizacionTicket() {
-  const id = document.getElementById("editTicketId").value;
+async function guardarResolucionTicket() {
+  const id = document.getElementById("resTicketId").value;
+  const cReal = parseFloat(document.getElementById("resCostoReal").value) || 0;
+  const fileR1 = document.getElementById("fileRes1").files[0];
   const t = ticketsEnMemoria.find(item => item.id === id);
-  const btn = document.getElementById("btnGuardarEdicion");
+
+  if (cReal <= 0) {
+    alert("Debes indicar el Costo Real Incurrido mayor a $0.");
+    return;
+  }
+  if (!fileR1 && (!t || !t.foto_resolucion_1)) {
+    alert("Debes cargar obligatoriamente la Foto de Cierre 1 como comprobante.");
+    return;
+  }
+
+  const btn = document.getElementById("btnGuardarResolver");
   btn.disabled = true;
-  btn.innerText = "Guardando...";
+  btn.innerText = "Cerrando ticket...";
 
   try {
     let updatePayload = {
-      responsable_mtto: document.getElementById("editResponsable").value.trim() || null,
-      comentarios: document.getElementById("editComentarios").value.trim() || null
+      costo_real: cReal,
+      fecha_resolucion: new Date().toISOString().split('T')[0],
+      fecha_hora_resolucion: new Date().toISOString()
     };
 
-    // Si aún no estaba congelado y capturaron fecha tentativa y costo estimado, congelarlos
-    if (!t.compromiso_bloqueado) {
-      const fComp = document.getElementById("editFechaCompromiso").value;
-      const cEst = parseFloat(document.getElementById("editCostoEstimado").value) || 0;
-      if (fComp) {
-        updatePayload.fecha_compromiso = fComp;
-        updatePayload.costo_estimado = cEst;
-        updatePayload.compromiso_bloqueado = true; // SE CONGELA
-      }
-    }
-
-    // Si subieron foto de cierre, registrar fecha y hora exacta con costo real
-    const fileR1 = document.getElementById("fileRes1").files[0];
-    if (fileR1) {
-      const cReal = parseFloat(document.getElementById("editCostoReal").value) || 0;
-      if (cReal <= 0) {
-        alert("Para resolver el ticket debes indicar el Costo Real Incurrido.");
-        btn.disabled = false;
-        btn.innerText = "Guardar Avance / Cerrar";
-        return;
-      }
-      updatePayload.costo_real = cReal;
-      updatePayload.foto_resolucion_1 = await subirImagenASupabase(fileR1, "resoluciones");
-      updatePayload.fecha_resolucion = new Date().toISOString().split('T')[0];
-      updatePayload.fecha_hora_resolucion = new Date().toISOString(); // FECHA Y HORA EXACTA
-    }
+    if (fileR1) updatePayload.foto_resolucion_1 = await subirImagenASupabase(fileR1, "resoluciones");
+    const fileR2 = document.getElementById("fileRes2").files[0];
+    if (fileR2) updatePayload.foto_resolucion_2 = await subirImagenASupabase(fileR2, "resoluciones");
+    const fileR3 = document.getElementById("fileRes3").files[0];
+    if (fileR3) updatePayload.foto_resolucion_3 = await subirImagenASupabase(fileR3, "resoluciones");
 
     const { error } = await sb.from('incidencias_mtto').update(updatePayload).eq('id', id);
     if (error) throw error;
 
-    mostrarToast("Ticket Actualizado", "Los datos y evidencias han sido guardados.");
-    cerrarModalEdicion();
+    mostrarToast("Incidencia Resuelta", "El ticket quedó cerrado y con fecha/hora estampada.");
+    cerrarModal('modalResolver');
     cargarConsolaMtto();
   } catch (err) {
-    alert("Error al actualizar: " + err.message);
+    alert("Error al cerrar: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerText = "💾 Guardar Avance / Cerrar";
+    btn.innerText = "✅ Concluir Ticket";
   }
 }
 
-// 4. DASHBOARD GENERAL (PROTEGIDO)
+// ==========================================
+// 4. DASHBOARD GENERAL (ORDENADO Y FILTRADO)
+// ==========================================
 async function cargarDashboardMtto() {
-  const tb = document.querySelector("#tblDashboardMtto tbody");
-  tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:15px; color:#64748b;">Cargando...</td></tr>';
-
   try {
-    const { data, error } = await sb.from('vista_incidencias_mtto').select('*').order('fecha_reporte', { ascending: false });
+    const { data, error } = await sb.from('vista_incidencias_mtto').select('*');
     if (error) throw error;
-    ticketsEnMemoria = data || [];
+    ticketsEnMemoria = ordenarPorFlujo(data || []);
 
     let total = ticketsEnMemoria.length;
-    let resueltos = 0;
-    let sinEmpezar = 0;
-    let enProceso = 0;
+    let resueltos = 0, sinEmpezar = 0, enProceso = 0;
+    let altoSinEmpezar = 0;
     let atrasados = 0;
-    let gastoEstimado = 0;
-    let gastoReal = 0;
+    let gastoEstimado = 0, gastoReal = 0;
 
-    tb.innerHTML = "";
     ticketsEnMemoria.forEach(t => {
       if (t.estatus === 'Resuelto') resueltos++;
       else if (t.estatus === 'En proceso') enProceso++;
-      else sinEmpezar++;
+      else {
+        sinEmpezar++;
+        if (t.flujo_clientes === 'Alto') altoSinEmpezar++;
+      }
 
       const diasAtraso = parseInt(t.atraso_dias) || 0;
       if (diasAtraso > 0 && t.estatus !== 'Resuelto') atrasados++;
 
       gastoEstimado += parseFloat(t.costo_estimado) || 0;
       gastoReal += parseFloat(t.costo_real) || 0;
-
-      let statusClass = "status-sin-empezar";
-      if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-      if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
-
-      const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
-      const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : '--';
-
-      tb.innerHTML += `<tr>
-        <td>${fReg}</td>
-        <td><strong>${t.distribuidora}</strong></td>
-        <td>${t.area}</td>
-        <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
-        <td>${fComp}</td>
-        <td>${diasAtraso > 0 ? `<span class="atraso-pill">+${diasAtraso} d</span>` : '0 d'}</td>
-        <td style="text-align:right;">$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
-        <td style="text-align:right; font-weight:700; color:#15803d;">$${(parseFloat(t.costo_real) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
-      </tr>`;
     });
 
+    // 4 TARJETAS KPIS
     document.getElementById("kpiTotalTickets").innerText = total;
-    document.getElementById("kpiDesgloseTickets").innerText = `${sinEmpezar} Sin empezar | ${enProceso} En proceso`;
-    document.getElementById("kpiResueltas").innerText = resueltos;
-    const tasa = total > 0 ? ((resueltos / total) * 100).toFixed(1) : "0.0";
-    document.getElementById("kpiPorcentajeCierre").innerText = `${tasa}% efectividad`;
+    document.getElementById("kpiDesgloseTickets").innerText = `${sinEmpezar} Sin empezar | ${enProceso} Proceso | ${resueltos} Resueltas`;
+    document.getElementById("kpiAltoFlujoSinEmpezar").innerText = altoSinEmpezar;
     document.getElementById("kpiTicketsAtrasados").innerText = atrasados;
     document.getElementById("kpiGastoTotal").innerText = `$${gastoReal.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
     document.getElementById("kpiEstimadoVsReal").innerText = `Cotizado: $${gastoEstimado.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
 
+    filtrarDashboardTabla();
   } catch (err) {
     console.error(err);
+  }
+}
+
+function filtrarDashboardTabla() {
+  const estFiltro = document.getElementById("filtroDashboardEstatus").value;
+  const tb = document.querySelector("#tblDashboardMtto tbody");
+  tb.innerHTML = "";
+
+  let lista = ticketsEnMemoria;
+  if (estFiltro !== "TODOS") lista = lista.filter(t => t.estatus === estFiltro);
+
+  if (lista.length === 0) {
+    tb.innerHTML = '<tr><td colspan="10" class="text-center" style="padding:15px; color:#64748b;">No hay incidencias con este estatus.</td></tr>';
+    return;
+  }
+
+  lista.forEach(t => {
+    let statusClass = "status-sin-empezar";
+    if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
+    if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+
+    const diasAtraso = parseInt(t.atraso_dias) || 0;
+    const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
+    const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : '--';
+
+    tb.innerHTML += `<tr>
+      <td>${fReg}</td>
+      <td><strong>${t.distribuidora}</strong></td>
+      <td><strong>${t.area}</strong> <span style="color:#64748b;">(${t.tipo})</span></td>
+      <td><span style="font-weight:700; color:var(--flujo-${t.flujo_clientes});">${t.flujo_clientes}</span></td>
+      <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
+      <td>${fComp}</td>
+      <td>${diasAtraso > 0 ? `<span class="atraso-pill">+${diasAtraso} d</span>` : '0 d'}</td>
+      <td style="text-align:right;">$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+      <td style="text-align:right; font-weight:700; color:#15803d;">$${(parseFloat(t.costo_real) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+      <td style="text-align:center;">
+        <button type="button" class="btn-delete-row" title="Eliminar como Administrador" onclick="solicitarBorradoRegistro('${t.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  });
+}
+
+// ==========================================
+// 5. BORRADO EXCLUSIVO ADMINISTRADOR
+// ==========================================
+async function solicitarBorradoRegistro(id) {
+  const clave = prompt("⚠️ ACCIÓN RESERVADA PARA ADMINISTRACIÓN\nIngresa la clave maestra para eliminar definitivamente este registro:");
+  if (clave === CLAVE_ADMIN_BORRADO) {
+    const confirma = confirm("¿Estás 100% seguro de eliminar este ticket y todo su historial de la base de datos?");
+    if (!confirma) return;
+
+    try {
+      const { error } = await sb.from('incidencias_mtto').delete().eq('id', id);
+      if (error) throw error;
+      mostrarToast("Registro Eliminado", "La incidencia fue borrada de la base de datos.");
+      cargarConsolaMtto();
+      cargarDashboardMtto();
+    } catch (err) {
+      alert("Error al eliminar: " + err.message);
+    }
+  } else if (clave !== null) {
+    alert("Clave de administrador incorrecta. Eliminación denegada.");
   }
 }
 </script>
