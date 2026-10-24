@@ -70,14 +70,12 @@
     .header-branding { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-subtle); }
     .header-branding h1 { color: var(--primary); font-size: 18px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
 
-    /* KPIS */
     .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .kpi-card { background: var(--surface); border-radius: var(--radius-md); padding: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 3px; }
     .kpi-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     .kpi-value { font-size: 20px; font-weight: 800; color: var(--primary); }
     .kpi-subtext { font-size: 10px; color: var(--text-muted); }
 
-    /* FORMULARIOS */
     .section-card { padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border-subtle); }
     .section-card:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
     .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -116,7 +114,6 @@
     }
     .btn-submit:hover { background: var(--primary-hover); }
 
-    /* SIMBOLOGÍA */
     .legend-bar {
       display: flex; gap: 14px; background: #f8fafc; padding: 8px 14px; border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle); font-size: 11px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
@@ -124,7 +121,6 @@
     .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #334155; }
     .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 
-    /* TARJETAS CONSOLA */
     .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-top: 14px; }
     .deck-card {
       background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
@@ -159,13 +155,16 @@
       opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-box { background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+    .modal-box { background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
 
-    .btn-delete-row {
-      background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 13px;
-      transition: color 0.2s; padding: 4px;
+    .btn-action-icon {
+      background: none; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer;
+      font-size: 13px; padding: 3px 6px; display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
     }
-    .btn-delete-row:hover { color: #ef4444; }
+    .btn-action-icon:hover { background: #f1f5f9; }
+    .btn-action-delete { color: #ef4444; }
+    .btn-action-delete:hover { background: #fee2e2; border-color: #fca5a5; }
 
     #toastContainer { position: fixed; top: 15px; right: 15px; z-index: 99999; display: flex; flex-direction: column; gap: 6px; }
     .toast { min-width: 240px; padding: 10px 12px; border-radius: var(--radius-sm); background: #ffffff; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 4px solid var(--primary); font-size: 11px; }
@@ -301,6 +300,60 @@
           <span>✅</span> Concluir Ticket
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 3: EXPEDIENTE COMPLETO DASHBOARD (EL OJO) -->
+<div class="modal-overlay" id="modalExpediente">
+  <div class="modal-box" style="max-width: 620px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 14px;">
+      <div>
+        <h3 style="font-size: 14px; color: var(--primary); text-transform: uppercase;" id="expAgenciaArea">Expediente de Incidencia</h3>
+        <span style="font-size: 10px; color: var(--text-muted);" id="expFechaFolio"></span>
+      </div>
+      <button type="button" style="border:none; background:none; font-size:18px; cursor:pointer;" onclick="cerrarModal('modalExpediente')">✕</button>
+    </div>
+
+    <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+      <span id="expBadgeEstatus" class="status-badge"></span>
+      <span id="expBadgeFlujo" style="font-size: 11px; font-weight: 700;"></span>
+      <span id="expBadgeAtraso" class="atraso-pill hidden"></span>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 10px; margin-bottom: 12px;">
+      <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Descripción de la Falla</div>
+      <div style="font-size: 12px; color: var(--text-main); line-height: 1.4;" id="expDescripcion"></div>
+      <div style="font-size: 11px; color: #64748b; font-style: italic; margin-top: 4px;" id="expComentarios"></div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; font-size: 11px;">
+      <div style="background:#fff; border:1px solid #e2e8f0; padding:8px; border-radius:6px;">
+        <span style="font-weight:700; color:#475569;">Asignación:</span><br>
+        👤 Técnico: <strong id="expResponsable">--</strong><br>
+        📅 Compromiso: <strong id="expCompromiso">--</strong>
+      </div>
+      <div style="background:#fff; border:1px solid #e2e8f0; padding:8px; border-radius:6px;">
+        <span style="font-weight:700; color:#475569;">Finanzas:</span><br>
+        💰 Cotizado: <span id="expCotizado">$0.00</span><br>
+        💵 Real: <strong style="color:#15803d;" id="expReal">$0.00</strong>
+      </div>
+    </div>
+
+    <!-- SECCIÓN FOTOGRÁFICA COMPARATIVA -->
+    <div style="margin-bottom: 10px;">
+      <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Evidencia Fotográfica Inicial</div>
+      <div class="deck-photos" id="expFotosReporte"></div>
+    </div>
+
+    <div>
+      <div style="font-size: 10px; font-weight: 700; color: #15803d; text-transform: uppercase; margin-bottom: 6px;">Evidencia de Cierre y Resolución</div>
+      <div class="deck-photos" id="expFotosCierre"></div>
+      <div style="font-size: 10px; color: #64748b; margin-top: 4px;" id="expFechaHoraCierre"></div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+      <button type="button" class="btn-submit" style="background:#64748b; height:32px; width:auto; padding:0 16px; margin:0; font-size:11px;" onclick="cerrarModal('modalExpediente')">Cerrar</button>
     </div>
   </div>
 </div>
@@ -466,7 +519,6 @@
         <p style="font-size: 12px; color: var(--text-muted);">Revisa las fallas reportadas para evitar levantar duplicados.</p>
       </div>
 
-      <!-- BARRA DE BÚSQUEDA Y FILTRO -->
       <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
         <select id="filtroConsultaAgencia" style="flex: 1; min-width: 200px; height: 38px;" onchange="filtrarConsultaPublicaEnVivo()">
           <option value="TODAS">Todas las Agencias</option>
@@ -517,7 +569,6 @@
         </button>
       </div>
 
-      <!-- 3 INDICADORES DE CABECERA -->
       <div class="kpi-container" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 14px;">
         <div class="kpi-card" style="border-left: 4px solid #ef4444;">
           <span class="kpi-title">Sin Empezar</span>
@@ -536,7 +587,6 @@
         </div>
       </div>
 
-      <!-- SIMBOLOGÍA VISUAL -->
       <div class="legend-bar">
         <span style="font-weight:700; color:var(--primary);">Prioridad por Flujo:</span>
         <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-Alto);"></div> Alto (Showroom / Clientes)</div>
@@ -544,7 +594,6 @@
         <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-Bajo);"></div> Bajo (Estético / Sin Afectación)</div>
       </div>
 
-      <!-- BARRA DE FILTROS Y BÚSQUEDA EN VIVO -->
       <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
         <select id="filtroAgencia" style="flex: 1; min-width: 180px; height: 36px;" onchange="filtrarDeckEnVivo()">
           <option value="TODAS">Todas las Agencias</option>
@@ -580,27 +629,22 @@
         <p style="font-size: 12px; color: var(--text-muted);">Monitoreo de tiempos de atención, anomalías de compromiso y costos reales.</p>
       </div>
 
-      <!-- 4 TARJETAS KPIS SOLICITADAS -->
       <div class="kpi-container">
-        <!-- TARJETA 1: TOTAL DESGLOSADO -->
         <div class="kpi-card">
           <span class="kpi-title">Incidencias Totales</span>
           <span class="kpi-value" id="kpiTotalTickets">0</span>
           <span class="kpi-subtext" id="kpiDesgloseTickets">0 Sin empezar | 0 Proceso | 0 Resueltas</span>
         </div>
-        <!-- TARJETA 2: ALTO FLUJO SIN EMPEZAR (FOCO ROJO) -->
         <div class="kpi-card" style="border-left: 4px solid #ef4444; background: #fff5f5;">
           <span class="kpi-title" style="color: #b91c1c;">Focos Críticos</span>
           <span class="kpi-value" id="kpiAltoFlujoSinEmpezar" style="color: #b91c1c;">0</span>
           <span class="kpi-subtext" style="color: #b91c1c;">Flujo Alto Sin Empezar</span>
         </div>
-        <!-- TARJETA 3: TICKETS CON ATRASO -->
         <div class="kpi-card">
           <span class="kpi-title">Tickets con Atraso</span>
           <span class="kpi-value" id="kpiTicketsAtrasados" style="color: #ef4444;">0</span>
           <span class="kpi-subtext">Compromiso vencido</span>
         </div>
-        <!-- TARJETA 4: COSTO REAL ACUMULADO -->
         <div class="kpi-card">
           <span class="kpi-title">Costo Real Acumulado</span>
           <span class="kpi-value" id="kpiGastoTotal">$0.00 MXN</span>
@@ -608,7 +652,6 @@
         </div>
       </div>
 
-      <!-- REGISTRO MAESTRO CON FILTRO DE ESTATUS -->
       <div class="section-card">
         <div class="section-header" style="justify-content: space-between; flex-wrap: wrap;">
           <div style="display:flex; align-items:center; gap:8px;">
@@ -639,7 +682,7 @@
                 <th>Atraso</th>
                 <th style="text-align: right;">Cotizado</th>
                 <th style="text-align: right;">Costo Real</th>
-                <th style="width:30px; text-align:center;"></th>
+                <th style="width:36px; text-align:center;">Ver</th>
               </tr>
             </thead>
             <tbody>
@@ -705,9 +748,6 @@ async function subirImagenASupabase(file, carpeta = "reportes") {
   return pubData.publicUrl;
 }
 
-// ==========================================
-// FUNCIÓN DE ORDENAMIENTO POR FLUJO
-// ==========================================
 function ordenarPorFlujo(lista) {
   const peso = { 'Alto': 1, 'Medio': 2, 'Bajo': 3 };
   return lista.sort((a, b) => {
@@ -718,9 +758,7 @@ function ordenarPorFlujo(lista) {
   });
 }
 
-// ==========================================
-// 1. GUARDAR NUEVO REPORTE (PÚBLICO)
-// ==========================================
+// 1. GUARDAR NUEVO REPORTE
 async function guardarNuevoReporte() {
   const btn = document.getElementById("btnEnviarReporte");
   const file1 = document.getElementById("fileInc1").files[0];
@@ -769,9 +807,7 @@ async function guardarNuevoReporte() {
   }
 }
 
-// ==========================================
-// 2. CONSULTAR EXISTENTES (EN VIVO)
-// ==========================================
+// 2. CONSULTAR EXISTENTES
 async function cargarConsultaPublica() {
   const tb = document.querySelector("#tblConsultaPublica tbody");
   tb.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:15px; color:#64748b;">Consultando...</td></tr>';
@@ -826,9 +862,7 @@ function filtrarConsultaPublicaEnVivo() {
   });
 }
 
-// ==========================================
-// 3. CONSOLA DE TRABAJO (DIVIDIDA Y ORDENADA)
-// ==========================================
+// 3. CONSOLA DE TRABAJO (CON PAPELERA OPERATIVA)
 async function cargarConsolaMtto() {
   try {
     const { data, error } = await sb.from('vista_incidencias_mtto').select('*');
@@ -899,7 +933,7 @@ function filtrarDeckEnVivo() {
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
             <span class="status-badge ${statusClass}">${t.estatus}</span>
-            <button type="button" class="btn-delete-row" title="Eliminar como Administrador" onclick="solicitarBorradoRegistro('${t.id}')">🗑️</button>
+            <button type="button" class="btn-action-icon btn-action-delete" title="Eliminar como Administrador" onclick="solicitarBorradoRegistro('${t.id}')">🗑️</button>
           </div>
         </div>
 
@@ -919,11 +953,9 @@ function filtrarDeckEnVivo() {
             💰 Cotizado: $${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}
           </div>
           <div style="display:flex; gap:6px;">
-            <!-- BOTÓN 1: ASIGNAR Y COMPROMISO -->
             <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:${t.compromiso_bloqueado ? '#94a3b8' : 'var(--primary)'};" onclick="abrirModalAsignar('${t.id}')">
               📋 Asignar
             </button>
-            <!-- BOTÓN 2: RESOLVER -->
             <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:#15803d;" onclick="abrirModalResolver('${t.id}')">
               ✅ Resolver
             </button>
@@ -934,7 +966,7 @@ function filtrarDeckEnVivo() {
   });
 }
 
-// 3.1 GESTIÓN MODAL ASIGNAR (PRELIMINAR)
+// 3.1 MODAL ASIGNAR
 function abrirModalAsignar(id) {
   const t = ticketsEnMemoria.find(item => item.id === id);
   if (!t) return;
@@ -1009,7 +1041,7 @@ async function confirmarYGuardarAsignacion() {
   }
 }
 
-// 3.2 GESTIÓN MODAL RESOLVER (CIERRE)
+// 3.2 MODAL RESOLVER
 function abrirModalResolver(id) {
   const t = ticketsEnMemoria.find(item => item.id === id);
   if (!t) return;
@@ -1074,7 +1106,7 @@ async function guardarResolucionTicket() {
 }
 
 // ==========================================
-// 4. DASHBOARD GENERAL (ORDENADO Y FILTRADO)
+// 4. DASHBOARD GENERAL (CON BOTÓN DE OJO 👁️)
 // ==========================================
 async function cargarDashboardMtto() {
   try {
@@ -1103,7 +1135,6 @@ async function cargarDashboardMtto() {
       gastoReal += parseFloat(t.costo_real) || 0;
     });
 
-    // 4 TARJETAS KPIS
     document.getElementById("kpiTotalTickets").innerText = total;
     document.getElementById("kpiDesgloseTickets").innerText = `${sinEmpezar} Sin empezar | ${enProceso} Proceso | ${resueltos} Resueltas`;
     document.getElementById("kpiAltoFlujoSinEmpezar").innerText = altoSinEmpezar;
@@ -1142,7 +1173,7 @@ function filtrarDashboardTabla() {
     tb.innerHTML += `<tr>
       <td>${fReg}</td>
       <td><strong>${t.distribuidora}</strong></td>
-      <td><strong>${t.area}</strong> <span style="color:#64748b;">(${t.tipo})</span></td>
+      <td><strong>${t.area}</strong></td>
       <td><span style="font-weight:700; color:var(--flujo-${t.flujo_clientes});">${t.flujo_clientes}</span></td>
       <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
       <td>${fComp}</td>
@@ -1150,14 +1181,77 @@ function filtrarDashboardTabla() {
       <td style="text-align:right;">$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
       <td style="text-align:right; font-weight:700; color:#15803d;">$${(parseFloat(t.costo_real) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
       <td style="text-align:center;">
-        <button type="button" class="btn-delete-row" title="Eliminar como Administrador" onclick="solicitarBorradoRegistro('${t.id}')">🗑️</button>
+        <button type="button" class="btn-action-icon" title="Ver Expediente Completo" onclick="abrirModalExpediente('${t.id}')">👁️</button>
       </td>
     </tr>`;
   });
 }
 
+// 4.1 VISOR DE EXPEDIENTE COMPLETO (EL OJO)
+function abrirModalExpediente(id) {
+  const t = ticketsEnMemoria.find(item => item.id === id);
+  if (!t) return;
+
+  document.getElementById("expAgenciaArea").innerText = `${t.distribuidora} - ${t.area}`;
+  const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
+  document.getElementById("expFechaFolio").innerText = `Reportado el: ${fReg} | Departamento: ${t.dpto_reporte} | Tipo: ${t.tipo}`;
+
+  let statusClass = "status-sin-empezar";
+  if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
+  if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+  const stEl = document.getElementById("expBadgeEstatus");
+  stEl.innerText = t.estatus;
+  stEl.className = `status-badge ${statusClass}`;
+
+  const flEl = document.getElementById("expBadgeFlujo");
+  flEl.innerText = `Impacto: ${t.flujo_clientes}`;
+  flEl.style.color = `var(--flujo-${t.flujo_clientes})`;
+
+  const atrEl = document.getElementById("expBadgeAtraso");
+  const diasAtraso = parseInt(t.atraso_dias) || 0;
+  if (diasAtraso > 0 && t.estatus !== 'Resuelto') {
+    atrEl.classList.remove("hidden");
+    atrEl.innerText = `⚠️ Retraso: ${diasAtraso} días`;
+  } else {
+    atrEl.classList.add("hidden");
+  }
+
+  document.getElementById("expDescripcion").innerText = t.descripcion || 'Sin descripción';
+  document.getElementById("expComentarios").innerText = t.comentarios ? `Nota: ${t.comentarios}` : '';
+  document.getElementById("expResponsable").innerText = t.responsable_mtto || 'Sin asignar';
+  document.getElementById("expCompromiso").innerText = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'Sin fecha';
+  document.getElementById("expCotizado").innerText = `$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+  document.getElementById("expReal").innerText = `$${(parseFloat(t.costo_real) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+
+  // Fotos Iniciales
+  const fRepBox = document.getElementById("expFotosReporte");
+  fRepBox.innerHTML = "";
+  if (t.foto_incidencia_1) fRepBox.innerHTML += `<img src="${t.foto_incidencia_1}" onclick="window.open('${t.foto_incidencia_1}')" title="Foto 1">`;
+  if (t.foto_incidencia_2) fRepBox.innerHTML += `<img src="${t.foto_incidencia_2}" onclick="window.open('${t.foto_incidencia_2}')" title="Foto 2">`;
+  if (t.foto_incidencia_3) fRepBox.innerHTML += `<img src="${t.foto_incidencia_3}" onclick="window.open('${t.foto_incidencia_3}')" title="Foto 3">`;
+  if (!t.foto_incidencia_1) fRepBox.innerHTML = '<span style="font-size:11px; color:#94a3b8; font-style:italic;">Sin fotos registradas</span>';
+
+  // Fotos Cierre
+  const fCieBox = document.getElementById("expFotosCierre");
+  fCieBox.innerHTML = "";
+  if (t.foto_resolucion_1) fCieBox.innerHTML += `<img src="${t.foto_resolucion_1}" onclick="window.open('${t.foto_resolucion_1}')" title="Foto Cierre 1" style="border:2px solid #15803d;">`;
+  if (t.foto_resolucion_2) fCieBox.innerHTML += `<img src="${t.foto_resolucion_2}" onclick="window.open('${t.foto_resolucion_2}')" title="Foto Cierre 2" style="border:2px solid #15803d;">`;
+  if (t.foto_resolucion_3) fCieBox.innerHTML += `<img src="${t.foto_resolucion_3}" onclick="window.open('${t.foto_resolucion_3}')" title="Foto Cierre 3" style="border:2px solid #15803d;">`;
+  
+  const fHoraEl = document.getElementById("expFechaHoraCierre");
+  if (t.foto_resolucion_1) {
+    const fHora = t.fecha_hora_resolucion ? new Date(t.fecha_hora_resolucion).toLocaleString('es-MX') : (t.fecha_resolucion || '');
+    fHoraEl.innerText = `Sello de resolución: ${fHora}`;
+  } else {
+    fCieBox.innerHTML = '<span style="font-size:11px; color:#94a3b8; font-style:italic;">Pendiente de resolver</span>';
+    fHoraEl.innerText = '';
+  }
+
+  document.getElementById("modalExpediente").classList.add("open");
+}
+
 // ==========================================
-// 5. BORRADO EXCLUSIVO ADMINISTRADOR
+// 5. BORRADO EXCLUSIVO CON RLS CORREGIDO
 // ==========================================
 async function solicitarBorradoRegistro(id) {
   const clave = prompt("⚠️ ACCIÓN RESERVADA PARA ADMINISTRACIÓN\nIngresa la clave maestra para eliminar definitivamente este registro:");
@@ -1166,8 +1260,14 @@ async function solicitarBorradoRegistro(id) {
     if (!confirma) return;
 
     try {
-      const { error } = await sb.from('incidencias_mtto').delete().eq('id', id);
+      // Elimina directamente por la llave primaria única (id UUID)
+      const { error } = await sb
+        .from('incidencias_mtto')
+        .delete()
+        .eq('id', id);
+
       if (error) throw error;
+
       mostrarToast("Registro Eliminado", "La incidencia fue borrada de la base de datos.");
       cargarConsolaMtto();
       cargarDashboardMtto();
