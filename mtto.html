@@ -6,7 +6,7 @@
   <title>Control de Incidencias & Mantenimiento | Grupo CER</title>
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,64 +18,105 @@
       --primary-soft: #edf2f9;
       --accent: #2563eb;
       --accent-soft: #eff6ff;
-      --surface: #ffffff;
-      --surface-subtle: #f8fafc;
-      --border-subtle: #e2e8f0;
-      --border-strong: #cbd5e1;
+      --surface-glass: rgba(255, 255, 255, 0.82);
+      --surface-card: rgba(255, 255, 255, 0.72);
+      --border-glass: rgba(255, 255, 255, 0.75);
+      --border-subtle: rgba(226, 232, 240, 0.8);
+      --border-strong: rgba(203, 213, 225, 0.85);
       --text-main: #0f172a;
-      --text-muted: #64748b;
+      --text-muted: #475569;
       --text-soft: #94a3b8;
-      --bg-page: #f1f5f9;
 
-      /* Semáforo Flujo */
-      --flujo-Alto: #dc2626;
-      --flujo-Medio: #f59e0b;
-      --flujo-Bajo: #10b981;
+      /* Semáforo de Criticidad */
+      --flujo-alto: #dc2626;
+      --flujo-alto-soft: rgba(254, 242, 242, 0.9);
+      --flujo-medio: #d97706;
+      --flujo-medio-soft: rgba(255, 251, 235, 0.9);
+      --flujo-bajo: #059669;
+      --flujo-bajo-soft: rgba(236, 253, 245, 0.9);
 
       --sidebar-w: 260px;
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --shadow-sm: 0 2px 4px rgba(11, 30, 66, 0.04);
-      --shadow-card: 0 10px 25px -5px rgba(11, 30, 66, 0.06), 0 4px 10px -2px rgba(11, 30, 66, 0.03);
-      --shadow-elevated: 0 20px 35px -10px rgba(11, 30, 66, 0.15);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --shadow-sm: 0 4px 10px rgba(11, 30, 66, 0.04);
+      --shadow-card: 0 16px 36px -10px rgba(11, 30, 66, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+      --shadow-elevated: 0 24px 48px -12px rgba(11, 30, 66, 0.22);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background-color: var(--bg-page); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
+    
+    /* FONDO CON MALLA Y BLUEPRINT GRID */
+    body {
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(11, 30, 66, 0.16) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
+        radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px;
+      background-attachment: fixed;
+    }
 
-    /* BARRA LATERAL (SIDEBAR) */
+    /* BARRA LATERAL (SIDEBAR GLASS) */
     .app-sidebar {
-      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border-subtle);
-      display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
+      width: var(--sidebar-w);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      z-index: 100;
+      box-shadow: 4px 0 20px rgba(11, 30, 66, 0.03);
     }
     .sidebar-brand { padding: 22px 18px; border-bottom: 1px solid var(--border-subtle); text-align: center; }
-    .sidebar-brand img { height: 40px; margin-bottom: 6px; }
+    .sidebar-brand img { height: 42px; margin-bottom: 6px; }
     .sidebar-brand h2 { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
 
     .sidebar-user {
-      padding: 14px 16px; margin: 10px 12px; background: var(--primary-soft); border-radius: var(--radius-md);
+      padding: 12px 14px; margin: 12px 12px 6px 12px; background: rgba(237, 242, 249, 0.85);
+      border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.9);
       display: flex; flex-direction: column; gap: 2px;
     }
-    .user-name { font-size: 12px; font-weight: 700; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-name { font-size: 12px; font-weight: 800; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-meta { font-size: 10px; color: var(--text-muted); font-weight: 600; }
 
     .sidebar-nav { padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
     .nav-label { font-size: 9px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; padding: 10px 8px 4px 8px; letter-spacing: 0.5px; }
     .nav-btn {
       height: 42px; padding: 0 12px; border-radius: var(--radius-sm); border: none; background: transparent;
-      color: var(--text-muted); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 10px;
+      color: var(--text-muted); font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 10px;
       cursor: pointer; text-align: left; transition: all 0.2s ease; width: 100%;
     }
-    .nav-btn:hover { background: var(--surface-subtle); color: var(--primary); }
-    .nav-btn.active { background: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(11, 30, 66, 0.2); }
+    .nav-btn:hover { background: rgba(255, 255, 255, 0.9); color: var(--primary); transform: translateX(2px); }
+    .nav-btn.active {
+      background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(11, 30, 66, 0.25);
+    }
     
     .sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
-    .btn-logout { background: none; border: none; font-size: 11px; color: var(--text-muted); cursor: pointer; text-decoration: underline; }
+    .btn-logout { background: none; border: none; font-size: 11px; color: var(--accent); font-weight: 700; cursor: pointer; text-decoration: underline; }
 
     /* CONTENEDOR PRINCIPAL */
-    .app-main { margin-left: var(--sidebar-w); flex: 1; padding: 28px; max-width: calc(100vw - var(--sidebar-w)); }
-    .card-canvas { max-width: 1080px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-lg); padding: 35px; box-shadow: var(--shadow-card); border: 1px solid var(--border-subtle); }
+    .app-main { margin-left: var(--sidebar-w); flex: 1; padding: 32px; max-width: calc(100vw - var(--sidebar-w)); }
+    .glass-canvas {
+      max-width: 1080px; margin: 0 auto;
+      background: var(--surface-glass);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: var(--radius-lg);
+      padding: 38px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-glass);
+    }
 
     @media (max-width: 768px) {
       body { flex-direction: column; }
@@ -87,91 +128,163 @@
       .sidebar-nav { flex-direction: row; padding: 4px; justify-content: space-around; width: 100%; }
       .nav-btn { height: 100%; flex-direction: column; justify-content: center; align-items: center; font-size: 9px; gap: 2px; padding: 2px; }
       .app-main { margin-left: 0; padding: 12px 10px 80px 10px; max-width: 100vw; }
-      .card-canvas { padding: 20px 14px; border-radius: var(--radius-md); }
+      .glass-canvas { padding: 20px 14px; border-radius: var(--radius-md); }
     }
 
-    .header-branding { text-align: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border-subtle); }
-    .header-branding h1 { color: var(--primary); font-size: 20px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
-    .header-branding p { font-size: 12px; color: var(--text-muted); }
+    .header-branding { text-align: center; margin-bottom: 26px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle); }
+    .header-branding img { height: 42px; margin-bottom: 10px; }
+    .header-branding h1 { color: var(--primary); font-size: 21px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .header-branding p { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
-    /* KPIS EJECUTIVOS */
-    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 22px; }
+    /* KPIS ELEVADOS */
+    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
     .kpi-card {
-      background: var(--surface); border-radius: var(--radius-md); padding: 16px 18px;
-      border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px;
+      background: var(--surface-card);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md); padding: 18px 20px;
+      border: 1px solid var(--border-glass); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .kpi-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(11, 30, 66, 0.06); }
+    .kpi-title { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .kpi-value { font-size: 22px; font-weight: 800; color: var(--primary); }
-    .kpi-subtext { font-size: 10px; color: var(--text-muted); }
+    .kpi-subtext { font-size: 10px; color: var(--text-muted); font-weight: 600; }
 
     /* FORMULARIOS */
-    .section-card { padding-top: 20px; margin-top: 20px; border-top: 1px solid var(--border-subtle); }
+    .section-card { padding-top: 22px; margin-top: 22px; border-top: 1px solid var(--border-subtle); }
     .section-card:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
-    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .section-num { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
-    .section-title { font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .section-num {
+      width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #ffffff;
+      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;
+      box-shadow: 0 4px 10px rgba(11, 30, 66, 0.25);
+    }
+    .section-title { font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
 
     .form-grid { display: flex; flex-wrap: wrap; gap: 14px; }
     .col-12 { flex: 0 0 100%; width: 100%; }
     .col-6  { flex: 0 0 calc(50% - 7px); width: calc(50% - 7px); }
-    .col-4  { flex: 0 0 calc(33.333% - 9.333% ); width: calc(33.333% - 9.333%); }
+    .col-4  { flex: 0 0 calc(33.333% - 9.333%); width: calc(33.333% - 9.333%); }
     @media (max-width: 600px) { .col-6, .col-4 { flex: 0 0 100%; width: 100%; } }
 
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .form-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
     input[type="text"], input[type="date"], input[type="number"], select, textarea {
-      height: 42px; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong);
-      font-size: 12px; color: var(--text-main); background-color: #ffffff; outline: none; transition: all 0.2s ease; width: 100%;
+      height: 44px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border-strong);
+      font-size: 12px; color: var(--text-main); background: rgba(255, 255, 255, 0.85); outline: none; transition: all 0.2s ease; width: 100%;
     }
-    textarea { height: auto; min-height: 80px; resize: vertical; }
-    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
-    .locked-input { background-color: var(--surface-subtle) !important; border-color: var(--border-subtle) !important; color: var(--text-muted) !important; cursor: not-allowed; }
+    textarea { height: auto; min-height: 85px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
+    .locked-input { background: rgba(241, 245, 249, 0.75) !important; border-color: var(--border-subtle) !important; color: var(--text-muted) !important; cursor: not-allowed; }
 
-    .photo-upload-box {
-      border: 2px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 12px; text-align: center;
-      background: var(--surface-subtle); cursor: pointer; transition: all 0.2s ease;
+    /* ======================================================= */
+    /* SELECTOR VISUAL DE CRITICIDAD (CARDS TÁCTILES)          */
+    /* ======================================================= */
+    .criticidad-cards-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; }
+    @media (max-width: 680px) { .criticidad-cards-container { grid-template-columns: 1fr; } }
+
+    .criticidad-card {
+      background: rgba(255, 255, 255, 0.65);
+      border: 2px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;
+      backdrop-filter: blur(8px);
     }
-    .photo-upload-box:hover { border-color: var(--accent); background: var(--accent-soft); }
-    .photo-preview { width: 100%; height: 90px; object-fit: cover; border-radius: 6px; margin-top: 6px; display: none; }
+    .criticidad-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(11, 30, 66, 0.08); background: rgba(255, 255, 255, 0.9); }
+
+    .card-top-row { display: flex; justify-content: space-between; align-items: center; }
+    .criticidad-icon-bubble {
+      width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center;
+      justify-content: center; font-size: 20px; transition: transform 0.25s ease;
+    }
+    .badge-pill { font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; letter-spacing: 0.5px; }
+    .criticidad-titulo { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+    .criticidad-desc { font-size: 11px; color: var(--text-muted); font-weight: 500; line-height: 1.4; }
+
+    .check-indicador {
+      position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid rgba(203, 213, 225, 0.9); display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: transparent; transition: all 0.2s ease;
+    }
+
+    /* ESTILOS POR CRITICIDAD */
+    .criticidad-card.alto.selected {
+      border-color: var(--flujo-alto); background: var(--flujo-alto-soft);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
+    }
+    .criticidad-card.alto.selected .check-indicador { background: var(--flujo-alto); border-color: var(--flujo-alto); color: #ffffff; }
+    .criticidad-card.alto.selected .criticidad-titulo { color: var(--flujo-alto); }
+    .criticidad-card.alto .criticidad-icon-bubble { background: #fee2e2; }
+    .criticidad-card.alto .badge-pill { background: #fef2f2; color: var(--flujo-alto); border: 1px solid #fecaca; }
+
+    .criticidad-card.medio.selected {
+      border-color: var(--flujo-medio); background: var(--flujo-medio-soft);
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18);
+    }
+    .criticidad-card.medio.selected .check-indicador { background: var(--flujo-medio); border-color: var(--flujo-medio); color: #ffffff; }
+    .criticidad-card.medio.selected .criticidad-titulo { color: #b45309; }
+    .criticidad-card.medio .criticidad-icon-bubble { background: #fef3c7; }
+    .criticidad-card.medio .badge-pill { background: #fffbeb; color: var(--flujo-medio); border: 1px solid #fde68a; }
+
+    .criticidad-card.bajo.selected {
+      border-color: var(--flujo-bajo); background: var(--flujo-bajo-soft);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18);
+    }
+    .criticidad-card.bajo.selected .check-indicador { background: var(--flujo-bajo); border-color: var(--flujo-bajo); color: #ffffff; }
+    .criticidad-card.bajo.selected .criticidad-titulo { color: #047857; }
+    .criticidad-card.bajo .criticidad-icon-bubble { background: #d1fae5; }
+    .criticidad-card.bajo .badge-pill { background: #ecfdf5; color: var(--flujo-bajo); border: 1px solid #a7f3d0; }
+
+    /* FOTOS */
+    .photo-upload-box {
+      border: 2px dashed rgba(148, 163, 184, 0.8); border-radius: var(--radius-sm); padding: 16px 12px;
+      text-align: center; background: rgba(248, 250, 252, 0.6); cursor: pointer; transition: all 0.2s ease;
+    }
+    .photo-upload-box:hover { border-color: var(--accent); background: rgba(239, 246, 255, 0.85); }
+    .photo-preview { width: 100%; height: 85px; object-fit: cover; border-radius: 6px; margin-top: 6px; display: none; }
 
     .btn-submit {
-      height: 44px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
-      background: var(--primary); color: #ffffff; border: none; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 18px; transition: all 0.2s ease;
+      height: 48px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 800;
+      background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
+      color: #ffffff; border: none; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 20px;
+      box-shadow: 0 8px 20px rgba(11, 30, 66, 0.25); transition: all 0.2s ease;
     }
-    .btn-submit:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(11, 30, 66, 0.35); filter: brightness(1.05); }
 
-    /* LEYENDA */
+    /* CONSOLA DE TRABAJO */
     .legend-bar {
-      display: flex; gap: 14px; background: var(--surface-subtle); padding: 10px 16px; border-radius: var(--radius-sm);
+      display: flex; gap: 14px; background: rgba(255, 255, 255, 0.65); padding: 10px 16px; border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle); font-size: 11px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-muted); }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--text-muted); }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-    /* TARJETAS CONSOLA */
     .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; margin-top: 16px; }
     .deck-card {
-      background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md); border: 1px solid var(--border-glass);
       box-shadow: var(--shadow-sm); padding: 16px; display: flex; flex-direction: column; gap: 10px;
-      position: relative; border-left: 6px solid #94a3b8; transition: transform 0.2s;
+      position: relative; border-left: 6px solid #94a3b8; transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .deck-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
-    .deck-card.flujo-Alto { border-left-color: var(--flujo-Alto); }
-    .deck-card.flujo-Medio { border-left-color: var(--flujo-Medio); }
-    .deck-card.flujo-Bajo { border-left-color: var(--flujo-Bajo); }
-    .deck-card.retrabajo-activo { background: #fff5f5; border-color: #fca5a5; }
+    .deck-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); background: #ffffff; }
+    .deck-card.flujo-Alto { border-left-color: var(--flujo-alto); }
+    .deck-card.flujo-Medio { border-left-color: var(--flujo-medio); }
+    .deck-card.flujo-Bajo { border-left-color: var(--flujo-bajo); }
+    .deck-card.retrabajo-activo { background: rgba(254, 242, 242, 0.85); border-color: #fca5a5; }
 
     .deck-header { display: flex; justify-content: space-between; align-items: flex-start; }
     .deck-dist { font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
-    .deck-title { font-size: 13px; font-weight: 700; color: var(--text-main); }
+    .deck-title { font-size: 13px; font-weight: 800; color: var(--text-main); }
     .deck-meta { font-size: 10px; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
     .deck-photos { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0; }
     .deck-photos img { width: 52px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-subtle); cursor: pointer; }
 
     /* ESTATUS BADGES */
-    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
     .status-sin-empezar { background: #fee2e2; color: #b91c1c; }
     .status-en-proceso  { background: #fef3c7; color: #b45309; }
     .status-por-validar { background: #e0e7ff; color: #4338ca; }
@@ -182,25 +295,30 @@
     .atraso-pill { font-size: 9px; font-weight: 800; color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 999px; }
 
     /* TABLAS */
-    .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow-x: auto; margin-top: 14px; background: #ffffff; }
+    .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow-x: auto; margin-top: 14px; background: rgba(255, 255, 255, 0.7); }
     .modern-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    .modern-table th { background: var(--surface-subtle); color: var(--primary); font-weight: 700; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
-    .modern-table td { padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
+    .modern-table th { background: rgba(248, 250, 252, 0.9); color: var(--primary); font-weight: 800; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+    .modern-table td { padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; background: rgba(255, 255, 255, 0.65); }
 
     /* MODALES */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 30, 66, 0.6);
-      backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 10000;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(11, 30, 66, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 10000;
       opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
     .modal-box {
-      background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 580px; max-height: 90vh;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-lg); width: 92%; max-width: 580px; max-height: 90vh;
       overflow-y: auto; padding: 26px; box-shadow: var(--shadow-elevated);
+      border: 1px solid var(--border-glass);
     }
 
     /* ESTRELLAS DE CALIFICACIÓN */
-    .star-rating { display: flex; gap: 8px; font-size: 28px; cursor: pointer; color: #cbd5e1; margin: 8px 0; }
+    .star-rating { display: flex; gap: 8px; font-size: 28px; cursor: pointer; color: #cbd5e1; margin: 8px 0; justify-content: center; }
     .star-rating span:hover, .star-rating span.active { color: #f59e0b; }
 
     .btn-action-icon {
@@ -208,12 +326,12 @@
       font-size: 13px; padding: 4px 8px; display: inline-flex; align-items: center; justify-content: center;
       transition: all 0.2s;
     }
-    .btn-action-icon:hover { background: var(--surface-subtle); border-color: var(--accent); }
+    .btn-action-icon:hover { background: var(--surface-glass); border-color: var(--accent); }
 
     #toastContainer { position: fixed; top: 18px; right: 18px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; }
     .toast {
       min-width: 260px; padding: 12px 16px; border-radius: var(--radius-sm); background: #ffffff;
-      box-shadow: var(--shadow-card); border-left: 4px solid var(--primary); font-size: 11px;
+      box-shadow: var(--shadow-elevated); border-left: 4px solid var(--primary); font-size: 11px;
     }
     .hidden { display: none !important; }
   </style>
@@ -251,10 +369,10 @@
 
 <div id="toastContainer"></div>
 
-<!-- MODAL 0: IDENTIFICACIÓN PRIMERIZA (LOGIN SIN PASSWORD) -->
+<!-- MODAL 0: IDENTIFICACIÓN PRIMERIZA (PADRÓN) -->
 <div class="modal-overlay" id="modalLogin">
   <div class="modal-box" style="max-width: 420px; text-align: center;">
-    <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" style="height: 48px; margin-bottom: 12px;" onerror="this.style.display='none'">
+    <img src="logo-grupocer.png" alt="Grupo CER" style="height: 48px; margin-bottom: 12px;" onerror="this.style.display='none'">
     <h3 style="font-size: 16px; color: var(--primary); text-transform: uppercase; margin-bottom: 4px;">Acceso al Portal MTTO</h3>
     <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 18px;">Ingresa tu correo institucional registrado en el padrón para identificarte.</p>
 
@@ -296,7 +414,7 @@
         <textarea id="asigComentarios" placeholder="Detalles de materiales o refacciones..."></textarea>
       </div>
 
-      <div class="col-12" style="background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; padding:10px; font-size:11px; color:#b45309; line-height:1.4;">
+      <div class="col-12" style="background:var(--flujo-medio-soft); border:1px solid #fde68a; border-radius:8px; padding:10px; font-size:11px; color:#b45309; line-height:1.4;">
         ⚠️ <strong>Atención:</strong> Una vez guardada la fecha compromiso y el costo cotizado, quedarán congelados de forma definitiva para trazabilidad de tiempos.
       </div>
 
@@ -314,7 +432,7 @@
 <div class="modal-overlay" id="modalResolver">
   <div class="modal-box">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <h3 style="font-size: 13px; color: #15803d; text-transform: uppercase;" id="modalResolverTitulo">Entrega de Mantenimiento (Listo)</h3>
+      <h3 style="font-size: 13px; color: var(--flujo-bajo); text-transform: uppercase;" id="modalResolverTitulo">Entrega de Mantenimiento (Listo)</h3>
       <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModal('modalResolver')">✕</button>
     </div>
 
@@ -325,7 +443,7 @@
         <input type="number" id="resCostoReal" placeholder="0.00" min="0.01" step="0.01">
       </div>
       <div class="col-12">
-        <label class="form-label" style="color: #15803d;">Evidencia Fotográfica de Solución (Foto 1 Obligatoria) *</label>
+        <label class="form-label" style="color: var(--flujo-bajo);">Evidencia Fotográfica de Solución (Foto 1 Obligatoria) *</label>
         <div class="form-grid" style="margin-top: 6px;">
           <div class="col-4 photo-upload-box" onclick="document.getElementById('fileRes1').click()">
             <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">Foto Cierre 1 *</span>
@@ -347,7 +465,7 @@
 
       <div class="col-12" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
         <button type="button" class="btn-submit" style="background: #64748b; height: 36px; width: auto; padding: 0 14px; margin-top:0;" onclick="cerrarModal('modalResolver')">Cancelar</button>
-        <button type="button" class="btn-submit" id="btnGuardarResolver" style="background:#15803d; height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="guardarResolucionTicket()">
+        <button type="button" class="btn-submit" id="btnGuardarResolver" style="background:var(--flujo-bajo); height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="guardarResolucionTicket()">
           <span>📤</span> Entregar para Validación
         </button>
       </div>
@@ -364,8 +482,8 @@
     </div>
 
     <input type="hidden" id="evalTicketId">
-    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-      Califica el resultado del mantenimiento realizado en tu área.
+    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; text-align: center;">
+      Califica el resultado del mantenimiento realizado en tu área:
     </div>
 
     <!-- SELECTOR DE ESTRELLAS -->
@@ -388,9 +506,9 @@
 
       <!-- FOTO EVIDENCIA DE QUEJA (SOLO 1 O 2 ESTRELLAS) -->
       <div class="col-12 hidden" id="boxFotoQueja">
-        <label class="form-label" style="color: #dc2626; font-weight: 800;">Evidencia de Trabajo Deficiente (Foto Obligatoria) *</label>
-        <div class="photo-upload-box" style="border-color:#fca5a5; background:#fff5f5; margin-top:4px;" onclick="document.getElementById('fileQueja').click()">
-          <span style="font-size: 10px; font-weight: 700; color: #dc2626;">Tomar Foto del Problema No Resuelto *</span>
+        <label class="form-label" style="color: var(--flujo-alto); font-weight: 800;">Evidencia de Trabajo Deficiente (Foto Obligatoria) *</label>
+        <div class="photo-upload-box" style="border-color:#fca5a5; background:var(--flujo-alto-soft); margin-top:4px;" onclick="document.getElementById('fileQueja').click()">
+          <span style="font-size: 10px; font-weight: 700; color: var(--flujo-alto);">Tomar Foto del Problema No Resuelto *</span>
           <input type="file" id="fileQueja" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevQueja')">
           <img id="prevQueja" class="photo-preview">
         </div>
@@ -410,7 +528,7 @@
 <div class="modal-overlay" id="modalRetrabajo">
   <div class="modal-box">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <h3 style="font-size: 13px; color: #dc2626; text-transform: uppercase;">Corrección y Re-trabajo de Incidencia</h3>
+      <h3 style="font-size: 13px; color: var(--flujo-alto); text-transform: uppercase;">Corrección y Re-trabajo de Incidencia</h3>
       <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModal('modalRetrabajo')">✕</button>
     </div>
 
@@ -425,7 +543,7 @@
         <textarea id="retNotas" placeholder="Explica las reparaciones adicionales efectuadas..."></textarea>
       </div>
       <div class="col-12">
-        <label class="form-label" style="color: #15803d;">Nueva Foto de Evidencia Corregida *</label>
+        <label class="form-label" style="color: var(--flujo-bajo);">Nueva Foto de Evidencia Corregida *</label>
         <div class="photo-upload-box" onclick="document.getElementById('fileRetrabajo').click()">
           <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">Foto de Solución Final *</span>
           <input type="file" id="fileRetrabajo" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevRetrabajo')">
@@ -435,7 +553,7 @@
 
       <div class="col-12" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
         <button type="button" class="btn-submit" style="background: #64748b; height: 36px; width: auto; padding: 0 14px; margin-top:0;" onclick="cerrarModal('modalRetrabajo')">Cancelar</button>
-        <button type="button" class="btn-submit" id="btnGuardarRetrabajo" style="background:#dc2626; height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="guardarRetrabajoMtto()">
+        <button type="button" class="btn-submit" id="btnGuardarRetrabajo" style="background:var(--flujo-alto); height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="guardarRetrabajoMtto()">
           <span>🔄</span> Re-entregar Trabajo
         </button>
       </div>
@@ -456,28 +574,28 @@
 
     <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap;">
       <span id="expBadgeEstatus" class="status-badge"></span>
-      <span id="expBadgeFlujo" style="font-size: 11px; font-weight: 700;"></span>
+      <span id="expBadgeFlujo" style="font-size: 11px; font-weight: 800;"></span>
       <span id="expBadgeAtraso" class="atraso-pill hidden"></span>
       <span id="expBadgeCalificacion" style="font-size: 11px; font-weight: 800; color: #f59e0b;"></span>
     </div>
 
-    <div style="background: var(--accent-soft); border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 11px; color: #1e40af;">
+    <div style="background: var(--accent-soft); border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 10px; margin-bottom: 12px; font-size: 11px; color: #1e40af;">
       <strong>Reportado por:</strong> <span id="expReportante">--</span> | <strong>Puesto:</strong> <span id="expPuesto">--</span> | <strong>Tel:</strong> <span id="expTel">--</span>
     </div>
 
-    <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
-      <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Descripción de la Falla</div>
+    <div style="background: rgba(248, 250, 252, 0.7); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px;">
+      <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Descripción de la Falla</div>
       <div style="font-size: 12px; color: var(--text-main); line-height: 1.4;" id="expDescripcion"></div>
       <div style="font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px;" id="expComentarios"></div>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; font-size: 11px;">
-      <div style="background:#fff; border:1px solid var(--border-subtle); padding:10px; border-radius:8px;">
+      <div style="background:#fff; border:1px solid var(--border-subtle); padding:10px; border-radius:var(--radius-sm);">
         <span style="font-weight:700; color:var(--text-muted);">Asignación:</span><br>
         👤 Técnico: <strong id="expResponsable">--</strong><br>
         📅 Compromiso: <strong id="expCompromiso">--</strong>
       </div>
-      <div style="background:#fff; border:1px solid var(--border-subtle); padding:10px; border-radius:8px;">
+      <div style="background:#fff; border:1px solid var(--border-subtle); padding:10px; border-radius:var(--radius-sm);">
         <span style="font-weight:700; color:var(--text-muted);">Finanzas:</span><br>
         💰 Cotizado: <span id="expCotizado">$0.00</span><br>
         💵 Real: <span id="expReal">$0.00</span><br>
@@ -488,24 +606,24 @@
 
     <!-- COMPARATIVO FOTOGRÁFICO HISTÓRICO -->
     <div style="margin-bottom: 12px;">
-      <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">1. Evidencia Fotográfica Inicial</div>
+      <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">1. Evidencia Fotográfica Inicial</div>
       <div class="deck-photos" id="expFotosReporte"></div>
     </div>
 
     <div style="margin-bottom: 12px;">
-      <div style="font-size: 10px; font-weight: 700; color: #15803d; text-transform: uppercase; margin-bottom: 6px;">2. Solución Preliminar Mtto</div>
+      <div style="font-size: 10px; font-weight: 800; color: var(--flujo-bajo); text-transform: uppercase; margin-bottom: 6px;">2. Solución Preliminar Mtto</div>
       <div class="deck-photos" id="expFotosCierre"></div>
       <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" id="expFechaHoraCierre"></div>
     </div>
 
     <div style="margin-bottom: 12px;" id="boxExpQuejaVisual">
-      <div style="font-size: 10px; font-weight: 700; color: #dc2626; text-transform: uppercase; margin-bottom: 6px;">3. Queja y Evidencia de Trabajo Deficiente</div>
+      <div style="font-size: 10px; font-weight: 800; color: var(--flujo-alto); text-transform: uppercase; margin-bottom: 6px;">3. Queja y Evidencia de Trabajo Deficiente</div>
       <div style="font-size: 11px; color:#b91c1c; font-style:italic; margin-bottom:4px;" id="expTextoQueja"></div>
       <div class="deck-photos" id="expFotosQueja"></div>
     </div>
 
     <div style="margin-bottom: 12px;" id="boxExpRetrabajoVisual">
-      <div style="font-size: 10px; font-weight: 700; color: #2563eb; text-transform: uppercase; margin-bottom: 6px;">4. Solución Definitiva de Re-trabajo</div>
+      <div style="font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 6px;">4. Solución Definitiva de Re-trabajo</div>
       <div style="font-size: 11px; color:#1d4ed8; font-style:italic; margin-bottom:4px;" id="expTextoRetrabajo"></div>
       <div class="deck-photos" id="expFotosRetrabajo"></div>
     </div>
@@ -519,7 +637,7 @@
 <!-- SIDEBAR IZQUIERDA -->
 <aside class="app-sidebar">
   <div class="sidebar-brand">
-    <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display='none'">
+    <img src="logo-grupocer.png" alt="Grupo CER" onerror="this.style.display='none'">
     <h2>Mantenimiento CER</h2>
   </div>
 
@@ -558,8 +676,9 @@
   <!-- VISTA 1: LEVANTAR REPORTE                  -->
   <!-- ========================================== -->
   <div id="viewCaptura" class="view-section">
-    <div class="card-canvas">
+    <div class="glass-canvas">
       <div class="header-branding">
+        <img src="logo-grupocer.png" alt="Grupo CER" onerror="this.style.display='none'">
         <h1>Levantamiento de Incidencia</h1>
         <p>Reporte ágil y directo. Las evidencias fotográficas se procesan en la nube para atención inmediata.</p>
       </div>
@@ -616,7 +735,7 @@
               <select id="repDpto" required>
                 <option value="">Seleccione...</option>
                 <option value="Ventas / Showroom">Ventas / Showroom</option>
-                <option value="Servicio / Taller">Servicio / Taller</option>
+                <option value="Servicio">Servicio</option>
                 <option value="Refacciones">Refacciones</option>
                 <option value="Hojalatería y Pintura (HyP)">Hojalatería y Pintura (HyP)</option>
                 <option value="Administración / Finanzas">Administración / Finanzas</option>
@@ -630,7 +749,7 @@
               <label class="form-label">Área Específica (Ubicación física) *</label>
               <input type="text" id="repArea" required placeholder="Ej. Baño de clientes showroom, Bahía 3...">
             </div>
-            <div class="col-6 form-group">
+            <div class="col-12 form-group">
               <label class="form-label">Tipo de Daño / Clasificación *</label>
               <select id="repTipo" required>
                 <option value="">Seleccione Tipo...</option>
@@ -643,22 +762,65 @@
                 <option value="Mobiliario / Otro">Mobiliario / Otro</option>
               </select>
             </div>
-            <div class="col-6 form-group">
-              <label class="form-label">Flujo de Clientes (Impacto Comercial) *</label>
-              <select id="repFlujo" required>
-                <option value="Alto">Alto (Afecta directamente la experiencia del cliente)</option>
-                <option value="Medio" selected>Medio (Operación interna / bahías / oficinas)</option>
-                <option value="Bajo">Bajo (Detalle estético sin freno operativo)</option>
-              </select>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: CRITICIDAD / GRAVEDAD (SELECTOR TÁCTIL) -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-num">3</div>
+            <div class="section-title">Nivel de Impacto Comercial (Flujo de Clientes)</div>
+          </div>
+
+          <input type="hidden" id="valorFlujo" value="Alto">
+
+          <div class="criticidad-cards-container">
+            <!-- CRÍTICO -->
+            <div class="criticidad-card alto selected" onclick="seleccionarCriticidad(this, 'Alto')">
+              <div class="check-indicador">✓</div>
+              <div class="card-top-row">
+                <div class="criticidad-icon-bubble">🚨</div>
+                <span class="badge-pill">Impacto Crítico</span>
+              </div>
+              <div>
+                <div class="criticidad-titulo">Flujo Alto</div>
+                <div class="criticidad-desc">Afecta showroom, sala de espera o baños de clientes. Riesgo directo a la experiencia comercial.</div>
+              </div>
+            </div>
+
+            <!-- MEDIO -->
+            <div class="criticidad-card medio" onclick="seleccionarCriticidad(this, 'Medio')">
+              <div class="check-indicador">✓</div>
+              <div class="card-top-row">
+                <div class="criticidad-icon-bubble">⚙️</div>
+                <span class="badge-pill">Operación Interna</span>
+              </div>
+              <div>
+                <div class="criticidad-titulo">Flujo Medio</div>
+                <div class="criticidad-desc">Afecta bahías de servicio, pasillos de personal o almacén sin vista directa al cliente.</div>
+              </div>
+            </div>
+
+            <!-- BAJO -->
+            <div class="criticidad-card bajo" onclick="seleccionarCriticidad(this, 'Bajo')">
+              <div class="check-indicador">✓</div>
+              <div class="card-top-row">
+                <div class="criticidad-icon-bubble">✨</div>
+                <span class="badge-pill">Detalle Leve</span>
+              </div>
+              <div>
+                <div class="criticidad-titulo">Flujo Bajo</div>
+                <div class="criticidad-desc">Detalle estético, pintura o daño puntual que no interrumpe ninguna actividad.</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- SECCIÓN 2: DETALLE -->
+        <!-- SECCIÓN 3: DETALLE Y FOTOS -->
         <div class="section-card">
           <div class="section-header">
-            <div class="section-num">3</div>
-            <div class="section-title">Detalle de la Falla y Evidencia</div>
+            <div class="section-num">4</div>
+            <div class="section-title">Descripción y Evidencia Fotográfica</div>
           </div>
           <div class="form-grid">
             <div class="col-12 form-group">
@@ -699,15 +861,15 @@
   <!-- VISTA 2: CONSULTAR EXISTENTES              -->
   <!-- ========================================== -->
   <div id="viewConsulta" class="view-section hidden">
-    <div class="card-canvas">
+    <div class="glass-canvas">
       <div class="header-branding">
+        <img src="logo-grupocer.png" alt="Grupo CER" onerror="this.style.display='none'">
         <h1>Incidencias Registradas</h1>
         <p>Consulta las fallas abiertas o evalúa la entrega de los reportes levantados por ti.</p>
       </div>
 
-      <!-- FILTROS Y TOGGLE MIS REPORTES -->
       <div style="display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;">
-        <button type="button" id="btnFiltroMisReportes" class="btn-submit" style="width: auto; height: 38px; padding: 0 16px; margin: 0; background: var(--surface-subtle); color: var(--primary); border: 1px solid var(--border-strong);" onclick="toggleMisReportes()">
+        <button type="button" id="btnFiltroMisReportes" class="btn-submit" style="width: auto; height: 38px; padding: 0 16px; margin: 0; background: rgba(255, 255, 255, 0.8); color: var(--primary); border: 1px solid var(--border-strong);" onclick="toggleMisReportes()">
           👤 Ver Solo Mis Reportes
         </button>
         <select id="filtroConsultaDistribuidora" style="flex: 1; min-width: 180px; height: 38px;" onchange="filtrarConsultaPublicaEnVivo()">
@@ -747,7 +909,7 @@
   <!-- VISTA 3: CONSOLA DE TRABAJO (MTTO / ADMIN) -->
   <!-- ========================================== -->
   <div id="viewConsola" class="view-section hidden">
-    <div class="card-canvas">
+    <div class="glass-canvas">
       <div class="header-branding" style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
         <div>
           <h1>Consola Operativa de Mantenimiento</h1>
@@ -759,33 +921,33 @@
       </div>
 
       <div class="kpi-container" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 14px;">
-        <div class="kpi-card" style="border-left: 4px solid #ef4444;">
+        <div class="kpi-card" style="border-left: 4px solid var(--flujo-alto);">
           <span class="kpi-title">Sin Empezar</span>
           <span class="kpi-value" id="kpiConsolaSinEmpezar" style="color: #b91c1c;">0</span>
           <span class="kpi-subtext">Por asignar</span>
         </div>
-        <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
+        <div class="kpi-card" style="border-left: 4px solid var(--flujo-medio);">
           <span class="kpi-title">En Proceso</span>
           <span class="kpi-value" id="kpiConsolaEnProceso" style="color: #b45309;">0</span>
           <span class="kpi-subtext">Con compromiso</span>
         </div>
-        <div class="kpi-card" style="border-left: 4px solid #dc2626; background: #fff5f5;">
+        <div class="kpi-card" style="border-left: 4px solid var(--flujo-alto); background: var(--flujo-alto-soft);">
           <span class="kpi-title" style="color: #b91c1c;">Re-trabajos</span>
-          <span class="kpi-value" id="kpiConsolaRetrabajos" style="color: #dc2626;">0</span>
+          <span class="kpi-value" id="kpiConsolaRetrabajos" style="color: var(--flujo-alto);">0</span>
           <span class="kpi-subtext" style="color: #b91c1c;">Rechazados por cliente</span>
         </div>
-        <div class="kpi-card" style="border-left: 4px solid #10b981;">
+        <div class="kpi-card" style="border-left: 4px solid var(--flujo-bajo);">
           <span class="kpi-title">Concluidas</span>
-          <span class="kpi-value" id="kpiConsolaTerminadas" style="color: #15803d;">0</span>
+          <span class="kpi-value" id="kpiConsolaTerminadas" style="color: var(--flujo-bajo);">0</span>
           <span class="kpi-subtext">Aprobadas</span>
         </div>
       </div>
 
       <div class="legend-bar">
-        <span style="font-weight:700; color:var(--primary);">Prioridad por Flujo:</span>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-Alto);"></div> Alto (Showroom / Clientes)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-Medio);"></div> Medio (Operación Interna / Taller)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-Bajo);"></div> Bajo (Estético / Sin Afectación)</div>
+        <span style="font-weight:800; color:var(--primary);">Prioridad por Criticidad:</span>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-alto);"></div> 🚨 Alto (Showroom / Clientes)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-medio);"></div> ⚙️ Medio (Operación Interna / Servicio)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--flujo-bajo);"></div> ✨ Bajo (Estético / Sin Afectación)</div>
       </div>
 
       <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
@@ -816,8 +978,9 @@
   <!-- VISTA 4: DASHBOARD EJECUTIVO               -->
   <!-- ========================================== -->
   <div id="viewDashboard" class="view-section hidden">
-    <div class="card-canvas">
+    <div class="glass-canvas">
       <div class="header-branding">
+        <img src="logo-grupocer.png" alt="Grupo CER" onerror="this.style.display='none'">
         <h1>Tablero Ejecutivo & Alertas de Mantenimiento</h1>
         <p>Auditoría de cumplimiento de compromisos, gastos reales y evaluación de calidad interna.</p>
       </div>
@@ -828,12 +991,12 @@
           <span class="kpi-value" id="kpiTotalTickets">0</span>
           <span class="kpi-subtext" id="kpiDesgloseTickets">0 Sin empezar | 0 Proceso | 0 Concluidas</span>
         </div>
-        <div class="kpi-card" style="border-left: 4px solid #ef4444; background: #fff5f5;">
+        <div class="kpi-card" style="border-left: 4px solid var(--flujo-alto); background: var(--flujo-alto-soft);">
           <span class="kpi-title" style="color: #b91c1c;">Críticos Sin Empezar</span>
           <span class="kpi-value" id="kpiAltoFlujoSinEmpezar" style="color: #b91c1c;">0</span>
           <span class="kpi-subtext" style="color: #b91c1c;">Flujo Alto Sin Asignar</span>
         </div>
-        <div class="kpi-card" style="border-left: 4px solid #dc2626;">
+        <div class="kpi-card" style="border-left: 4px solid var(--flujo-alto);">
           <span class="kpi-title" style="color: #b91c1c;">Re-trabajos Activos</span>
           <span class="kpi-value" id="kpiDashRetrabajos" style="color: #dc2626;">0</span>
           <span class="kpi-subtext">Trabajos rechazados</span>
@@ -911,7 +1074,7 @@ function mostrarToast(titulo, mensaje) {
   const cont = document.getElementById("toastContainer");
   const t = document.createElement("div");
   t.className = "toast";
-  t.innerHTML = `<div><div style="font-weight:700;">${titulo}</div><div style="font-size:10px; color:var(--text-muted);">${mensaje}</div></div>`;
+  t.innerHTML = `<div><div style="font-weight:800; color:var(--primary);">${titulo}</div><div style="font-size:10px; color:var(--text-muted); margin-top:2px;">${mensaje}</div></div>`;
   cont.appendChild(t);
   setTimeout(() => t.remove(), 4000);
 }
@@ -930,6 +1093,12 @@ function previewFoto(input, idImg) {
 
 function cerrarModal(id) {
   document.getElementById(id).classList.remove("open");
+}
+
+function seleccionarCriticidad(card, valor) {
+  document.querySelectorAll('.criticidad-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('valorFlujo').value = valor;
 }
 
 async function subirImagenASupabase(file, carpeta = "reportes") {
@@ -1085,7 +1254,7 @@ async function guardarNuevoReporte() {
       area: `${document.getElementById("repAgencia").value} - ${document.getElementById("repArea").value.trim()}`,
       dpto_reporte: document.getElementById("repDpto").value,
       tipo: document.getElementById("repTipo").value,
-      flujo_clientes: document.getElementById("repFlujo").value,
+      flujo_clientes: document.getElementById("valorFlujo").value,
       descripcion: document.getElementById("repDescripcion").value.trim(),
       comentarios: document.getElementById("repComentarios").value.trim() || null,
       foto_incidencia_1: urlFoto1,
@@ -1133,7 +1302,7 @@ function toggleMisReportes() {
     btn.style.color = "#ffffff";
     btn.innerText = "✓ Viendo Mis Reportes";
   } else {
-    btn.style.background = "var(--surface-subtle)";
+    btn.style.background = "rgba(255, 255, 255, 0.8)";
     btn.style.color = "var(--primary)";
     btn.innerText = "👤 Ver Solo Mis Reportes";
   }
@@ -1176,7 +1345,6 @@ function filtrarConsultaPublicaEnVivo() {
     const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'En revisión';
     const solicitante = t.reportado_por_nombre ? `${t.reportado_por_nombre} (${t.reportado_por_puesto})` : t.dpto_reporte;
 
-    // Solo el solicitante que abrió el reporte puede evaluar
     let btnEvaluarHtml = '<span style="color:var(--text-soft); font-size:10px;">--</span>';
     const esMio = (usuarioActual && t.reportado_por_email === usuarioActual.email_corporativo);
 
@@ -1226,18 +1394,18 @@ function seleccionarEstrella(num) {
 
   if (num === 5) {
     lblDiag.innerText = "⭐⭐⭐⭐⭐ Excelente / Trabajo 100% Conforme";
-    lblDiag.style.color = "#15803d";
+    lblDiag.style.color = "var(--flujo-bajo)";
     boxCom.classList.add("hidden");
     boxQueja.classList.add("hidden");
   } else if (num >= 3) {
     lblDiag.innerText = "Aceptable con Observaciones";
-    lblDiag.style.color = "#b45309";
+    lblDiag.style.color = "var(--flujo-medio)";
     boxCom.classList.remove("hidden");
     document.getElementById("lblRetroComentario").innerText = "Comentario de Observación Obligatorio *";
     boxQueja.classList.add("hidden");
   } else if (num >= 1) {
     lblDiag.innerText = "⚠️ Trabajo Deficiente / Rechazado (Escalamiento a Dirección)";
-    lblDiag.style.color = "#dc2626";
+    lblDiag.style.color = "var(--flujo-alto)";
     boxCom.classList.remove("hidden");
     document.getElementById("lblRetroComentario").innerText = "Motivo del Rechazo (Obligatorio) *";
     boxQueja.classList.remove("hidden");
@@ -1389,16 +1557,15 @@ function filtrarDeckEnVivo() {
     if (t.foto_queja_retrabajo) fotosHtml += `<img src="${t.foto_queja_retrabajo}" onclick="window.open('${t.foto_queja_retrabajo}')" title="Queja / Trabajo Mal Hecho" style="border:2px solid #dc2626;">`;
     if (t.foto_retrabajo) fotosHtml += `<img src="${t.foto_retrabajo}" onclick="window.open('${t.foto_retrabajo}')" title="Re-trabajo" style="border:2px solid #2563eb;">`;
 
-    // Botones dinámicos según estatus
     let accionesHtml = '';
     if (t.estatus === 'Rechazado / Re-trabajo') {
-      accionesHtml = `<button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 10px; margin-top:0; background:#dc2626;" onclick="abrirModalRetrabajo('${t.id}')">🔄 Re-trabajo</button>`;
+      accionesHtml = `<button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 10px; margin-top:0; background:var(--flujo-alto);" onclick="abrirModalRetrabajo('${t.id}')">🔄 Re-trabajo</button>`;
     } else {
       accionesHtml = `
         <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:${t.compromiso_bloqueado ? '#94a3b8' : 'var(--primary)'};" onclick="abrirModalAsignar('${t.id}')">
           📋 Asignar
         </button>
-        <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:#15803d;" onclick="abrirModalResolver('${t.id}')">
+        <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:var(--flujo-bajo);" onclick="abrirModalResolver('${t.id}')">
           ✅ Entregar
         </button>
       `;
@@ -1620,7 +1787,6 @@ async function guardarRetrabajoMtto() {
       costo_retrabajo: cRet,
       foto_retrabajo: urlRet,
       notas_retrabajo: notas,
-      // Se reinicia calificación para que el usuario vuelva a validar
       calificacion_estrellas: null
     }).eq('id', id);
 
@@ -1756,7 +1922,7 @@ function abrirModalExpediente(id) {
 
   const flEl = document.getElementById("expBadgeFlujo");
   flEl.innerText = `Impacto: ${t.flujo_clientes}`;
-  flEl.style.color = `var(--flujo-${t.flujo_clientes})`;
+  flEl.style.color = `var(--flujo-${t.flujo_clientes.toLowerCase()})`;
 
   const atrEl = document.getElementById("expBadgeAtraso");
   const diasAtraso = parseInt(t.atraso_dias) || 0;
@@ -1795,8 +1961,8 @@ function abrirModalExpediente(id) {
   // Fotos Cierre Mtto
   const fCieBox = document.getElementById("expFotosCierre");
   fCieBox.innerHTML = "";
-  if (t.foto_resolucion_1) fCieBox.innerHTML += `<img src="${t.foto_resolucion_1}" onclick="window.open('${t.foto_resolucion_1}')" title="Foto Solución 1" style="border:2px solid #15803d;">`;
-  if (t.foto_resolucion_2) fCieBox.innerHTML += `<img src="${t.foto_resolucion_2}" onclick="window.open('${t.foto_resolucion_2}')" title="Foto Solución 2" style="border:2px solid #15803d;">`;
+  if (t.foto_resolucion_1) fCieBox.innerHTML += `<img src="${t.foto_resolucion_1}" onclick="window.open('${t.foto_resolucion_1}')" title="Foto Solución 1" style="border:2px solid var(--flujo-bajo);">`;
+  if (t.foto_resolucion_2) fCieBox.innerHTML += `<img src="${t.foto_resolucion_2}" onclick="window.open('${t.foto_resolucion_2}')" title="Foto Solución 2" style="border:2px solid var(--flujo-bajo);">`;
   
   const fHoraEl = document.getElementById("expFechaHoraCierre");
   if (t.foto_resolucion_1) {
@@ -1813,7 +1979,7 @@ function abrirModalExpediente(id) {
     boxQ.classList.remove("hidden");
     document.getElementById("expTextoQueja").innerText = `"${t.retroalimentacion_usuario || 'Sin comentario detallado'}"`;
     const fQuejaBox = document.getElementById("expFotosQueja");
-    fQuejaBox.innerHTML = t.foto_queja_retrabajo ? `<img src="${t.foto_queja_retrabajo}" onclick="window.open('${t.foto_queja_retrabajo}')" style="border:2px solid #dc2626;">` : '<span>Sin foto</span>';
+    fQuejaBox.innerHTML = t.foto_queja_retrabajo ? `<img src="${t.foto_queja_retrabajo}" onclick="window.open('${t.foto_queja_retrabajo}')" style="border:2px solid var(--flujo-alto);">` : '<span>Sin foto</span>';
   } else {
     boxQ.classList.add("hidden");
   }
@@ -1823,7 +1989,7 @@ function abrirModalExpediente(id) {
   if (t.foto_retrabajo) {
     boxR.classList.remove("hidden");
     document.getElementById("expTextoRetrabajo").innerText = `"${t.notas_retrabajo || 'Corrección aplicada'}"`;
-    document.getElementById("expFotosRetrabajo").innerHTML = `<img src="${t.foto_retrabajo}" onclick="window.open('${t.foto_retrabajo}')" style="border:2px solid #2563eb;">`;
+    document.getElementById("expFotosRetrabajo").innerHTML = `<img src="${t.foto_retrabajo}" onclick="window.open('${t.foto_retrabajo}')" style="border:2px solid var(--accent);">`;
   } else {
     boxR.classList.add("hidden");
   }
