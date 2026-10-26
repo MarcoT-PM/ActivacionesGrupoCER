@@ -3,171 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mantenimiento - HUB Grupo CER</title>
+  <title>Control de Incidencias & Mantenimiento | Grupo CER</title>
+  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --primary: #002060;
-      --primary-hover: #001540;
-      --primary-soft: #f0f4fa;
+      --primary: #0b1e42;
+      --primary-hover: #071329;
+      --primary-soft: #edf2f9;
       --accent: #2563eb;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --bg-page: #f1f5f9;
+      --accent-soft: #eff6ff;
       --surface: #ffffff;
+      --surface-subtle: #f8fafc;
       --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-soft: #94a3b8;
+      --bg-page: #f1f5f9;
+
+      /* Semáforo Flujo */
+      --flujo-Alto: #dc2626;
+      --flujo-Medio: #f59e0b;
+      --flujo-Bajo: #10b981;
+
       --sidebar-w: 260px;
       --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --shadow-card: 0 4px 12px -2px rgba(0, 32, 96, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
-
-      --flujo-Alto: #ef4444;
-      --flujo-Medio: #f97316;
-      --flujo-Bajo: #eab308;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 2px 4px rgba(11, 30, 66, 0.04);
+      --shadow-card: 0 10px 25px -5px rgba(11, 30, 66, 0.06), 0 4px 10px -2px rgba(11, 30, 66, 0.03);
+      --shadow-elevated: 0 20px 35px -10px rgba(11, 30, 66, 0.15);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { background-color: var(--bg-page); color: var(--text-main); display: flex; min-height: 100vh; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg-page); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
 
+    /* BARRA LATERAL (SIDEBAR) */
     .app-sidebar {
       width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border-subtle);
       display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100;
     }
-    .sidebar-brand { padding: 20px; border-bottom: 1px solid var(--border-subtle); text-align: center; }
-    .sidebar-brand img { height: 38px; margin-bottom: 6px; }
+    .sidebar-brand { padding: 22px 18px; border-bottom: 1px solid var(--border-subtle); text-align: center; }
+    .sidebar-brand img { height: 40px; margin-bottom: 6px; }
     .sidebar-brand h2 { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    .sidebar-nav { padding: 14px 10px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-    .nav-label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; padding: 8px 10px 2px 10px; }
-    
-    .nav-btn {
-      height: 40px; padding: 0 12px; border-radius: var(--radius-sm); border: none; background: transparent;
-      color: var(--text-muted); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 10px;
-      cursor: pointer; text-align: left; transition: all 0.2s; width: 100%;
-    }
-    .nav-btn:hover { background: var(--primary-soft); color: var(--primary); }
-    .nav-btn.active { background: var(--primary); color: #ffffff; box-shadow: 0 4px 10px rgba(0, 32, 96, 0.15); }
-    
-    .sidebar-footer { padding: 14px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
 
-    .app-main { margin-left: var(--sidebar-w); flex: 1; padding: 25px; max-width: calc(100vw - var(--sidebar-w)); }
-    .card-canvas { max-width: 1060px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow-card); border: 1px solid var(--border-subtle); }
+    .sidebar-user {
+      padding: 14px 16px; margin: 10px 12px; background: var(--primary-soft); border-radius: var(--radius-md);
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .user-name { font-size: 12px; font-weight: 700; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-meta { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+
+    .sidebar-nav { padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .nav-label { font-size: 9px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; padding: 10px 8px 4px 8px; letter-spacing: 0.5px; }
+    .nav-btn {
+      height: 42px; padding: 0 12px; border-radius: var(--radius-sm); border: none; background: transparent;
+      color: var(--text-muted); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 10px;
+      cursor: pointer; text-align: left; transition: all 0.2s ease; width: 100%;
+    }
+    .nav-btn:hover { background: var(--surface-subtle); color: var(--primary); }
+    .nav-btn.active { background: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(11, 30, 66, 0.2); }
+    
+    .sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+    .btn-logout { background: none; border: none; font-size: 11px; color: var(--text-muted); cursor: pointer; text-decoration: underline; }
+
+    /* CONTENEDOR PRINCIPAL */
+    .app-main { margin-left: var(--sidebar-w); flex: 1; padding: 28px; max-width: calc(100vw - var(--sidebar-w)); }
+    .card-canvas { max-width: 1080px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-lg); padding: 35px; box-shadow: var(--shadow-card); border: 1px solid var(--border-subtle); }
 
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .app-sidebar {
-        position: fixed; bottom: 0; top: auto; left: 0; right: 0; width: 100%; height: 56px;
+        position: fixed; bottom: 0; top: auto; left: 0; right: 0; width: 100%; height: 60px;
         flex-direction: row; border-right: none; border-top: 1px solid var(--border-subtle); background: #ffffff; z-index: 1000;
       }
-      .sidebar-brand, .sidebar-footer, .nav-label { display: none; }
+      .sidebar-brand, .sidebar-user, .sidebar-footer, .nav-label { display: none; }
       .sidebar-nav { flex-direction: row; padding: 4px; justify-content: space-around; width: 100%; }
       .nav-btn { height: 100%; flex-direction: column; justify-content: center; align-items: center; font-size: 9px; gap: 2px; padding: 2px; }
-      .app-main { margin-left: 0; padding: 12px 10px 75px 10px; max-width: 100vw; }
-      .card-canvas { padding: 18px 12px; }
+      .app-main { margin-left: 0; padding: 12px 10px 80px 10px; max-width: 100vw; }
+      .card-canvas { padding: 20px 14px; border-radius: var(--radius-md); }
     }
 
-    .header-branding { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-subtle); }
-    .header-branding h1 { color: var(--primary); font-size: 18px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+    .header-branding { text-align: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border-subtle); }
+    .header-branding h1 { color: var(--primary); font-size: 20px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+    .header-branding p { font-size: 12px; color: var(--text-muted); }
 
-    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .kpi-card { background: var(--surface); border-radius: var(--radius-md); padding: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 3px; }
-    .kpi-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-    .kpi-value { font-size: 20px; font-weight: 800; color: var(--primary); }
+    /* KPIS EJECUTIVOS */
+    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 22px; }
+    .kpi-card {
+      background: var(--surface); border-radius: var(--radius-md); padding: 16px 18px;
+      border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px;
+    }
+    .kpi-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 22px; font-weight: 800; color: var(--primary); }
     .kpi-subtext { font-size: 10px; color: var(--text-muted); }
 
-    .section-card { padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border-subtle); }
+    /* FORMULARIOS */
+    .section-card { padding-top: 20px; margin-top: 20px; border-top: 1px solid var(--border-subtle); }
     .section-card:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
-    .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-    .section-num { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
-    .section-title { font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .section-num { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+    .section-title { font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .form-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    .form-grid { display: flex; flex-wrap: wrap; gap: 14px; }
     .col-12 { flex: 0 0 100%; width: 100%; }
-    .col-6  { flex: 0 0 calc(50% - 6px); width: calc(50% - 6px); }
-    .col-4  { flex: 0 0 calc(33.333% - 8px); width: calc(33.333% - 8px); }
+    .col-6  { flex: 0 0 calc(50% - 7px); width: calc(50% - 7px); }
+    .col-4  { flex: 0 0 calc(33.333% - 9.333% ); width: calc(33.333% - 9.333%); }
     @media (max-width: 600px) { .col-6, .col-4 { flex: 0 0 100%; width: 100%; } }
 
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 
     input[type="text"], input[type="date"], input[type="number"], select, textarea {
-      height: 40px; padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);
-      font-size: 12px; color: var(--text-main); background-color: #fffbeb; outline: none; transition: all 0.2s; width: 100%;
+      height: 42px; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong);
+      font-size: 12px; color: var(--text-main); background-color: #ffffff; outline: none; transition: all 0.2s ease; width: 100%;
     }
-    textarea { height: auto; min-height: 70px; resize: none; }
-    input:focus, select:focus, textarea:focus { border-color: var(--accent); background-color: #ffffff !important; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
-    .filled { background-color: #ffffff !important; }
-    .locked-input { background-color: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #64748b !important; cursor: not-allowed; }
+    textarea { height: auto; min-height: 80px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+    .locked-input { background-color: var(--surface-subtle) !important; border-color: var(--border-subtle) !important; color: var(--text-muted) !important; cursor: not-allowed; }
 
     .photo-upload-box {
-      border: 2px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 10px; text-align: center;
-      background: #f8fafc; cursor: pointer; transition: all 0.2s;
+      border: 2px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 12px; text-align: center;
+      background: var(--surface-subtle); cursor: pointer; transition: all 0.2s ease;
     }
-    .photo-upload-box:hover { border-color: var(--primary); background: var(--primary-soft); }
-    .photo-preview { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-top: 4px; display: none; }
+    .photo-upload-box:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .photo-preview { width: 100%; height: 90px; object-fit: cover; border-radius: 6px; margin-top: 6px; display: none; }
 
     .btn-submit {
-      height: 42px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
+      height: 44px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
       background: var(--primary); color: #ffffff; border: none; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; gap: 6px; width: 100%; margin-top: 15px; transition: all 0.2s;
+      align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 18px; transition: all 0.2s ease;
     }
-    .btn-submit:hover { background: var(--primary-hover); }
+    .btn-submit:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
+    /* LEYENDA */
     .legend-bar {
-      display: flex; gap: 14px; background: #f8fafc; padding: 8px 14px; border-radius: var(--radius-sm);
+      display: flex; gap: 14px; background: var(--surface-subtle); padding: 10px 16px; border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle); font-size: 11px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #334155; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-    .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-top: 14px; }
+    /* TARJETAS CONSOLA */
+    .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; margin-top: 16px; }
     .deck-card {
       background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
-      box-shadow: var(--shadow-card); padding: 14px; display: flex; flex-direction: column; gap: 8px;
-      position: relative; border-left: 6px solid #94a3b8;
+      box-shadow: var(--shadow-sm); padding: 16px; display: flex; flex-direction: column; gap: 10px;
+      position: relative; border-left: 6px solid #94a3b8; transition: transform 0.2s;
     }
+    .deck-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
     .deck-card.flujo-Alto { border-left-color: var(--flujo-Alto); }
     .deck-card.flujo-Medio { border-left-color: var(--flujo-Medio); }
     .deck-card.flujo-Bajo { border-left-color: var(--flujo-Bajo); }
+    .deck-card.retrabajo-activo { background: #fff5f5; border-color: #fca5a5; }
 
     .deck-header { display: flex; justify-content: space-between; align-items: flex-start; }
     .deck-dist { font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
-    .deck-title { font-size: 13px; font-weight: 700; color: #0f172a; }
+    .deck-title { font-size: 13px; font-weight: 700; color: var(--text-main); }
     .deck-meta { font-size: 10px; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
-    .deck-photos { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0; }
-    .deck-photos img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; cursor: pointer; }
+    .deck-photos { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0; }
+    .deck-photos img { width: 52px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-subtle); cursor: pointer; }
 
-    .status-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+    /* ESTATUS BADGES */
+    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
     .status-sin-empezar { background: #fee2e2; color: #b91c1c; }
     .status-en-proceso  { background: #fef3c7; color: #b45309; }
-    .status-resuelto    { background: #dcfce7; color: #15803d; }
-    .atraso-pill { font-size: 9px; font-weight: 700; color: #ef4444; background: #fee2e2; padding: 1px 5px; border-radius: 999px; }
+    .status-por-validar { background: #e0e7ff; color: #4338ca; }
+    .status-retrabajo   { background: #dc2626; color: #ffffff; animation: pulse 1.5s infinite; }
+    .status-concluido   { background: #dcfce7; color: #15803d; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.75; } 100% { opacity: 1; } }
 
-    .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow-x: auto; margin-top: 12px; }
+    .atraso-pill { font-size: 9px; font-weight: 800; color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 999px; }
+
+    /* TABLAS */
+    .table-container { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); overflow-x: auto; margin-top: 14px; background: #ffffff; }
     .modern-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    .modern-table th { background: var(--primary-soft); color: var(--primary); font-weight: 700; padding: 8px 10px; text-align: left; }
-    .modern-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; background: #ffffff; }
+    .modern-table th { background: var(--surface-subtle); color: var(--primary); font-weight: 700; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+    .modern-table td { padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
 
+    /* MODALES */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.55);
-      backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 10000;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 30, 66, 0.6);
+      backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 10000;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-box { background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+    .modal-box {
+      background: #ffffff; border-radius: var(--radius-lg); width: 92%; max-width: 580px; max-height: 90vh;
+      overflow-y: auto; padding: 26px; box-shadow: var(--shadow-elevated);
+    }
+
+    /* ESTRELLAS DE CALIFICACIÓN */
+    .star-rating { display: flex; gap: 8px; font-size: 28px; cursor: pointer; color: #cbd5e1; margin: 8px 0; }
+    .star-rating span:hover, .star-rating span.active { color: #f59e0b; }
 
     .btn-action-icon {
-      background: none; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer;
-      font-size: 13px; padding: 3px 6px; display: inline-flex; align-items: center; justify-content: center;
+      background: #ffffff; border: 1px solid var(--border-strong); border-radius: 6px; cursor: pointer;
+      font-size: 13px; padding: 4px 8px; display: inline-flex; align-items: center; justify-content: center;
       transition: all 0.2s;
     }
-    .btn-action-icon:hover { background: #f1f5f9; }
-    .btn-action-delete { color: #ef4444; }
-    .btn-action-delete:hover { background: #fee2e2; border-color: #fca5a5; }
+    .btn-action-icon:hover { background: var(--surface-subtle); border-color: var(--accent); }
 
-    #toastContainer { position: fixed; top: 15px; right: 15px; z-index: 99999; display: flex; flex-direction: column; gap: 6px; }
-    .toast { min-width: 240px; padding: 10px 12px; border-radius: var(--radius-sm); background: #ffffff; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 4px solid var(--primary); font-size: 11px; }
+    #toastContainer { position: fixed; top: 18px; right: 18px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      min-width: 260px; padding: 12px 16px; border-radius: var(--radius-sm); background: #ffffff;
+      box-shadow: var(--shadow-card); border-left: 4px solid var(--primary); font-size: 11px;
+    }
     .hidden { display: none !important; }
   </style>
 
@@ -176,16 +223,14 @@
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weHpreWl2b2tzcHphb2tmZnhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NTg1MDksImV4cCI6MjEwODMzNDUwOX0.Wvr7SBmvdLqVnfj6ZfC6a8vV9GlF72vE2B7OLtMZfEc";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    const PIN_MTTO = "CER2026";
     const CLAVE_ADMIN_BORRADO = "TEOM021128";
-    let sesionMttoAutorizada = false;
+    let usuarioActual = null;
+
+    // Destinatarios oficiales para escalamiento crítico
+    const CORREO_DIRECTOR = "jumartinez@grupocer.com.mx";
+    const CORREOS_COPIA = ["gcervera@avasa.com.mx", "jarjona@avasa.com.mx", "jlara@grupocer.com.mx", "mtellez@avasa.com.mx"];
 
     function cambiarVista(vista) {
-      if ((vista === 'dashboard' || vista === 'consola') && !sesionMttoAutorizada) {
-        solicitarAccesoMtto(vista);
-        return;
-      }
-
       document.getElementById("viewCaptura").classList.toggle("hidden", vista !== 'captura');
       document.getElementById("viewConsulta").classList.toggle("hidden", vista !== 'consulta');
       document.getElementById("viewDashboard").classList.toggle("hidden", vista !== 'dashboard');
@@ -200,23 +245,29 @@
       if (vista === 'dashboard') cargarDashboardMtto();
       if (vista === 'consola') cargarConsolaMtto();
     }
-
-    function solicitarAccesoMtto(destinoVista) {
-      const pin = prompt("🔒 Acceso Restringido (Mantenimiento y Dirección)\nIngresa el PIN de autorización:");
-      if (pin === PIN_MTTO) {
-        sesionMttoAutorizada = true;
-        document.getElementById("badgeCandado").innerText = "🔓 Modo Mantenimiento";
-        document.getElementById("badgeCandado").style.color = "#15803d";
-        cambiarVista(destinoVista);
-      } else if (pin !== null) {
-        alert("PIN incorrecto. Acceso denegado.");
-      }
-    }
   </script>
 </head>
 <body>
 
 <div id="toastContainer"></div>
+
+<!-- MODAL 0: IDENTIFICACIÓN PRIMERIZA (LOGIN SIN PASSWORD) -->
+<div class="modal-overlay" id="modalLogin">
+  <div class="modal-box" style="max-width: 420px; text-align: center;">
+    <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" style="height: 48px; margin-bottom: 12px;" onerror="this.style.display='none'">
+    <h3 style="font-size: 16px; color: var(--primary); text-transform: uppercase; margin-bottom: 4px;">Acceso al Portal MTTO</h3>
+    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 18px;">Ingresa tu correo institucional registrado en el padrón para identificarte.</p>
+
+    <div class="form-group" style="text-align: left; margin-bottom: 14px;">
+      <label class="form-label">Correo Corporativo *</label>
+      <input type="text" id="loginEmail" placeholder="ejemplo@avasa.com.mx / grupocer..." onkeypress="if(event.key==='Enter') verificarIdentidadCorreo()">
+    </div>
+
+    <button type="button" class="btn-submit" id="btnLoginValidar" onclick="verificarIdentidadCorreo()">
+      <span>🔐</span> Ingresar al Sistema
+    </button>
+  </div>
+</div>
 
 <!-- MODAL 1: ASIGNAR Y COMPROMISO (PRELIMINAR) -->
 <div class="modal-overlay" id="modalAsignar">
@@ -242,10 +293,10 @@
       </div>
       <div class="col-12 form-group">
         <label class="form-label">Notas y Comentarios Operativos</label>
-        <textarea id="asigComentarios" placeholder="Detalles preliminares, refacciones solicitadas..."></textarea>
+        <textarea id="asigComentarios" placeholder="Detalles de materiales o refacciones..."></textarea>
       </div>
 
-      <div class="col-12" style="background:#fffbeb; border:1px solid #fef3c7; border-radius:6px; padding:8px 10px; font-size:11px; color:#b45309; line-height:1.3;">
+      <div class="col-12" style="background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; padding:10px; font-size:11px; color:#b45309; line-height:1.4;">
         ⚠️ <strong>Atención:</strong> Una vez guardada la fecha compromiso y el costo cotizado, quedarán congelados de forma definitiva para trazabilidad de tiempos.
       </div>
 
@@ -259,11 +310,11 @@
   </div>
 </div>
 
-<!-- MODAL 2: RESOLVER INCIDENCIA (CIERRE) -->
+<!-- MODAL 2: RESOLVER INCIDENCIA (ENTREGA DE MTTO) -->
 <div class="modal-overlay" id="modalResolver">
   <div class="modal-box">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <h3 style="font-size: 13px; color: #15803d; text-transform: uppercase;" id="modalResolverTitulo">Concluir y Resolver Incidencia</h3>
+      <h3 style="font-size: 13px; color: #15803d; text-transform: uppercase;" id="modalResolverTitulo">Entrega de Mantenimiento (Listo)</h3>
       <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModal('modalResolver')">✕</button>
     </div>
 
@@ -297,17 +348,105 @@
       <div class="col-12" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
         <button type="button" class="btn-submit" style="background: #64748b; height: 36px; width: auto; padding: 0 14px; margin-top:0;" onclick="cerrarModal('modalResolver')">Cancelar</button>
         <button type="button" class="btn-submit" id="btnGuardarResolver" style="background:#15803d; height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="guardarResolucionTicket()">
-          <span>✅</span> Concluir Ticket
+          <span>📤</span> Entregar para Validación
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL 3: EXPEDIENTE COMPLETO DASHBOARD (EL OJO) -->
+<!-- MODAL 3: EVALUACIÓN DE SATISFACCIÓN (EL CLIENTE INTERNO CIERRA O RECHAZA) -->
+<div class="modal-overlay" id="modalEvaluacion">
+  <div class="modal-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <h3 style="font-size: 13px; color: var(--primary); text-transform: uppercase;">Validación de Entrega de Trabajo</h3>
+      <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModal('modalEvaluacion')">✕</button>
+    </div>
+
+    <input type="hidden" id="evalTicketId">
+    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+      Califica el resultado del mantenimiento realizado en tu área.
+    </div>
+
+    <!-- SELECTOR DE ESTRELLAS -->
+    <div style="text-align: center; margin-bottom: 14px;">
+      <div class="star-rating" id="contenedorEstrellas">
+        <span onclick="seleccionarEstrella(1)">★</span>
+        <span onclick="seleccionarEstrella(2)">★</span>
+        <span onclick="seleccionarEstrella(3)">★</span>
+        <span onclick="seleccionarEstrella(4)">★</span>
+        <span onclick="seleccionarEstrella(5)">★</span>
+      </div>
+      <div id="lblDiagnosticoEstrellas" style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Selecciona de 1 a 5 estrellas</div>
+    </div>
+
+    <div class="form-grid">
+      <div class="col-12 form-group hidden" id="boxRetroComentario">
+        <label class="form-label" id="lblRetroComentario">Comentario / Observaciones *</label>
+        <textarea id="evalComentario" placeholder="Explica detalladamente qué faltó o por qué no quedó resuelto..."></textarea>
+      </div>
+
+      <!-- FOTO EVIDENCIA DE QUEJA (SOLO 1 O 2 ESTRELLAS) -->
+      <div class="col-12 hidden" id="boxFotoQueja">
+        <label class="form-label" style="color: #dc2626; font-weight: 800;">Evidencia de Trabajo Deficiente (Foto Obligatoria) *</label>
+        <div class="photo-upload-box" style="border-color:#fca5a5; background:#fff5f5; margin-top:4px;" onclick="document.getElementById('fileQueja').click()">
+          <span style="font-size: 10px; font-weight: 700; color: #dc2626;">Tomar Foto del Problema No Resuelto *</span>
+          <input type="file" id="fileQueja" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevQueja')">
+          <img id="prevQueja" class="photo-preview">
+        </div>
+      </div>
+
+      <div class="col-12" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+        <button type="button" class="btn-submit" style="background: #64748b; height: 36px; width: auto; padding: 0 14px; margin-top:0;" onclick="cerrarModal('modalEvaluacion')">Cancelar</button>
+        <button type="button" class="btn-submit" id="btnGuardarEvaluacion" style="height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="guardarEvaluacionSolicitante()">
+          <span>✓</span> Confirmar Calificación
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 4: REGISTRAR RE-TRABAJO (SOLO MTTO) -->
+<div class="modal-overlay" id="modalRetrabajo">
+  <div class="modal-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 style="font-size: 13px; color: #dc2626; text-transform: uppercase;">Corrección y Re-trabajo de Incidencia</h3>
+      <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModal('modalRetrabajo')">✕</button>
+    </div>
+
+    <input type="hidden" id="retTicketId">
+    <div class="form-grid">
+      <div class="col-12 form-group">
+        <label class="form-label">Costo Adicional Incurrido por Re-trabajo (MXN) *</label>
+        <input type="number" id="retCosto" placeholder="0.00 (Se sumará al costo original)" min="0" step="0.01">
+      </div>
+      <div class="col-12 form-group">
+        <label class="form-label">Notas de Corrección Ejecutada *</label>
+        <textarea id="retNotas" placeholder="Explica las reparaciones adicionales efectuadas..."></textarea>
+      </div>
+      <div class="col-12">
+        <label class="form-label" style="color: #15803d;">Nueva Foto de Evidencia Corregida *</label>
+        <div class="photo-upload-box" onclick="document.getElementById('fileRetrabajo').click()">
+          <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">Foto de Solución Final *</span>
+          <input type="file" id="fileRetrabajo" accept="image/*" capture="environment" style="display:none;" onchange="previewFoto(this, 'prevRetrabajo')">
+          <img id="prevRetrabajo" class="photo-preview">
+        </div>
+      </div>
+
+      <div class="col-12" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+        <button type="button" class="btn-submit" style="background: #64748b; height: 36px; width: auto; padding: 0 14px; margin-top:0;" onclick="cerrarModal('modalRetrabajo')">Cancelar</button>
+        <button type="button" class="btn-submit" id="btnGuardarRetrabajo" style="background:#dc2626; height: 36px; width: auto; padding: 0 18px; margin-top:0;" onclick="guardarRetrabajoMtto()">
+          <span>🔄</span> Re-entregar Trabajo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 5: EXPEDIENTE COMPLETO (EL OJO) -->
 <div class="modal-overlay" id="modalExpediente">
   <div class="modal-box" style="max-width: 620px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 12px;">
       <div>
         <h3 style="font-size: 14px; color: var(--primary); text-transform: uppercase;" id="expAgenciaArea">Expediente de Incidencia</h3>
         <span style="font-size: 10px; color: var(--text-muted);" id="expFechaFolio"></span>
@@ -315,41 +454,60 @@
       <button type="button" style="border:none; background:none; font-size:18px; cursor:pointer;" onclick="cerrarModal('modalExpediente')">✕</button>
     </div>
 
-    <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+    <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap;">
       <span id="expBadgeEstatus" class="status-badge"></span>
       <span id="expBadgeFlujo" style="font-size: 11px; font-weight: 700;"></span>
       <span id="expBadgeAtraso" class="atraso-pill hidden"></span>
+      <span id="expBadgeCalificacion" style="font-size: 11px; font-weight: 800; color: #f59e0b;"></span>
     </div>
 
-    <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 10px; margin-bottom: 12px;">
+    <div style="background: var(--accent-soft); border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 11px; color: #1e40af;">
+      <strong>Reportado por:</strong> <span id="expReportante">--</span> | <strong>Puesto:</strong> <span id="expPuesto">--</span> | <strong>Tel:</strong> <span id="expTel">--</span>
+    </div>
+
+    <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
       <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Descripción de la Falla</div>
       <div style="font-size: 12px; color: var(--text-main); line-height: 1.4;" id="expDescripcion"></div>
-      <div style="font-size: 11px; color: #64748b; font-style: italic; margin-top: 4px;" id="expComentarios"></div>
+      <div style="font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px;" id="expComentarios"></div>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; font-size: 11px;">
-      <div style="background:#fff; border:1px solid #e2e8f0; padding:8px; border-radius:6px;">
-        <span style="font-weight:700; color:#475569;">Asignación:</span><br>
+      <div style="background:#fff; border:1px solid var(--border-subtle); padding:10px; border-radius:8px;">
+        <span style="font-weight:700; color:var(--text-muted);">Asignación:</span><br>
         👤 Técnico: <strong id="expResponsable">--</strong><br>
         📅 Compromiso: <strong id="expCompromiso">--</strong>
       </div>
-      <div style="background:#fff; border:1px solid #e2e8f0; padding:8px; border-radius:6px;">
-        <span style="font-weight:700; color:#475569;">Finanzas:</span><br>
+      <div style="background:#fff; border:1px solid var(--border-subtle); padding:10px; border-radius:8px;">
+        <span style="font-weight:700; color:var(--text-muted);">Finanzas:</span><br>
         💰 Cotizado: <span id="expCotizado">$0.00</span><br>
-        💵 Real: <strong style="color:#15803d;" id="expReal">$0.00</strong>
+        💵 Real: <span id="expReal">$0.00</span><br>
+        🔄 Re-trabajo: <span id="expRetrabajoCost">$0.00</span><br>
+        <strong style="color:var(--primary);">Total Acumulado: <span id="expTotalAcum">$0.00</span></strong>
       </div>
     </div>
 
-    <!-- SECCIÓN FOTOGRÁFICA COMPARATIVA -->
-    <div style="margin-bottom: 10px;">
-      <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Evidencia Fotográfica Inicial</div>
+    <!-- COMPARATIVO FOTOGRÁFICO HISTÓRICO -->
+    <div style="margin-bottom: 12px;">
+      <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">1. Evidencia Fotográfica Inicial</div>
       <div class="deck-photos" id="expFotosReporte"></div>
     </div>
 
-    <div>
-      <div style="font-size: 10px; font-weight: 700; color: #15803d; text-transform: uppercase; margin-bottom: 6px;">Evidencia de Cierre y Resolución</div>
+    <div style="margin-bottom: 12px;">
+      <div style="font-size: 10px; font-weight: 700; color: #15803d; text-transform: uppercase; margin-bottom: 6px;">2. Solución Preliminar Mtto</div>
       <div class="deck-photos" id="expFotosCierre"></div>
-      <div style="font-size: 10px; color: #64748b; margin-top: 4px;" id="expFechaHoraCierre"></div>
+      <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" id="expFechaHoraCierre"></div>
+    </div>
+
+    <div style="margin-bottom: 12px;" id="boxExpQuejaVisual">
+      <div style="font-size: 10px; font-weight: 700; color: #dc2626; text-transform: uppercase; margin-bottom: 6px;">3. Queja y Evidencia de Trabajo Deficiente</div>
+      <div style="font-size: 11px; color:#b91c1c; font-style:italic; margin-bottom:4px;" id="expTextoQueja"></div>
+      <div class="deck-photos" id="expFotosQueja"></div>
+    </div>
+
+    <div style="margin-bottom: 12px;" id="boxExpRetrabajoVisual">
+      <div style="font-size: 10px; font-weight: 700; color: #2563eb; text-transform: uppercase; margin-bottom: 6px;">4. Solución Definitiva de Re-trabajo</div>
+      <div style="font-size: 11px; color:#1d4ed8; font-style:italic; margin-bottom:4px;" id="expTextoRetrabajo"></div>
+      <div class="deck-photos" id="expFotosRetrabajo"></div>
     </div>
 
     <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
@@ -364,8 +522,14 @@
     <img src="https://seeklogo.com/images/G/grupo-cer-logo-C7EB071F6A-seeklogo.com.png" alt="Grupo CER" onerror="this.style.display='none'">
     <h2>Mantenimiento CER</h2>
   </div>
+
+  <div class="sidebar-user" id="boxPerfilUsuario">
+    <span class="user-name" id="sbNombreUsuario">Cargando...</span>
+    <span class="user-meta" id="sbAreaUsuario">Puesto</span>
+  </div>
+
   <nav class="sidebar-nav">
-    <div class="nav-label">Acceso General</div>
+    <div class="nav-label">General</div>
     <button type="button" class="nav-btn active" data-view="captura" onclick="cambiarVista('captura')">
       <span>📷</span> Levantar Reporte
     </button>
@@ -373,55 +537,84 @@
       <span>🔍</span> Consultar Existentes
     </button>
 
-    <div class="nav-label" style="margin-top: 10px;">Gestión y Control</div>
-    <button type="button" class="nav-btn" data-view="consola" onclick="cambiarVista('consola')">
+    <div class="nav-label" id="lblNavGestion" style="margin-top: 6px;">Gestión y Control</div>
+    <button type="button" class="nav-btn" id="btnNavConsola" data-view="consola" onclick="cambiarVista('consola')">
       <span>🔧</span> Consola de Trabajo
     </button>
-    <button type="button" class="nav-btn" data-view="dashboard" onclick="cambiarVista('dashboard')">
-      <span>📊</span> Dashboard General
+    <button type="button" class="nav-btn" id="btnNavDashboard" data-view="dashboard" onclick="cambiarVista('dashboard')">
+      <span>📊</span> Dashboard Ejecutivo
     </button>
   </nav>
+
   <div class="sidebar-footer">
-    <span id="badgeCandado" style="font-size: 10px; font-weight: 700; color: #64748b;">🔒 Mantenimiento Bloqueado</span>
+    <span id="sbRolPill" style="font-size: 10px; font-weight: 800; color: var(--accent);">--</span>
+    <button type="button" class="btn-logout" onclick="cerrarSesionLocal()">Salir</button>
   </div>
 </aside>
 
 <main class="app-main">
 
   <!-- ========================================== -->
-  <!-- VISTA 1: LEVANTAR REPORTE (PÚBLICO)        -->
+  <!-- VISTA 1: LEVANTAR REPORTE                  -->
   <!-- ========================================== -->
   <div id="viewCaptura" class="view-section">
     <div class="card-canvas">
       <div class="header-branding">
         <h1>Levantamiento de Incidencia</h1>
-        <p style="font-size: 12px; color: var(--text-muted);">Reporte ágil sin contraseñas. Documenta la falla con fotografías para atención inmediata.</p>
+        <p>Reporte ágil y directo. Las evidencias fotográficas se procesan en la nube para atención inmediata.</p>
       </div>
 
       <form id="formReporte" onsubmit="event.preventDefault(); guardarNuevoReporte();">
-        <div class="section-card">
+        <!-- SECCIÓN 0: IDENTIDAD -->
+        <div class="section-card" style="padding-top:0; margin-top:0; border-top:none;">
           <div class="section-header">
             <div class="section-num">1</div>
-            <div class="section-title">Ubicación y Departamento</div>
+            <div class="section-title">Datos del Solicitante (Bloqueados por Padrón)</div>
+          </div>
+          <div class="form-grid">
+            <div class="col-4 form-group">
+              <label class="form-label">Nombre Completo</label>
+              <input type="text" id="repNombre" class="locked-input" readonly>
+            </div>
+            <div class="col-4 form-group">
+              <label class="form-label">Área / Puesto</label>
+              <input type="text" id="repPuesto" class="locked-input" readonly>
+            </div>
+            <div class="col-4 form-group">
+              <label class="form-label">Correo Corporativo</label>
+              <input type="text" id="repEmail" class="locked-input" readonly>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 1: UBICACIÓN -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-num">2</div>
+            <div class="section-title">Ubicación de la Incidencia</div>
           </div>
           <div class="form-grid">
             <div class="col-6 form-group">
-              <label class="form-label">Distribuidora / Agencia *</label>
-              <select id="repDistribuidora" required onchange="marcarLleno(this)">
-                <option value="">Seleccione Agencia...</option>
-                <option value="Montejo">Automaya - Montejo</option>
-                <option value="Itzáes">Automaya - Itzáes</option>
-                <option value="Valladolid">Automaya - Valladolid</option>
+              <label class="form-label">Razón Social / Distribuidora *</label>
+              <select id="repDistribuidora" required onchange="filtrarAgenciasPorDistribuidora(this.value)">
+                <option value="">Seleccione Razón Social...</option>
+                <option value="Automaya">Automaya</option>
+                <option value="Caribe">Automotriz Caribe</option>
                 <option value="Chetumal">Chetumal Automotores</option>
-                <option value="Mitsubishi">Millenium (Mitsubishi)</option>
-                <option value="Caribe Cancún">Automotriz Caribe - Cancún</option>
-                <option value="Caribe Playa">Automotriz Caribe - Playa del Carmen</option>
+                <option value="Millenium">Millenium Motors (Mitsubishi)</option>
+                <option value="GrupoCER">Corporativo / Grupo CER</option>
               </select>
             </div>
             <div class="col-6 form-group">
-              <label class="form-label">Departamento Solicitante *</label>
-              <select id="repDpto" required onchange="marcarLleno(this)">
-                <option value="">Seleccione Departamento...</option>
+              <label class="form-label">Agencia / Sucursal Específica *</label>
+              <select id="repAgencia" required>
+                <option value="">Seleccione Sucursal...</option>
+              </select>
+            </div>
+            <div class="col-6 form-group">
+              <label class="form-label">Departamento Afectado *</label>
+              <select id="repDpto" required>
+                <option value="">Seleccione...</option>
                 <option value="Ventas / Showroom">Ventas / Showroom</option>
                 <option value="Servicio / Taller">Servicio / Taller</option>
                 <option value="Refacciones">Refacciones</option>
@@ -434,12 +627,12 @@
               </select>
             </div>
             <div class="col-6 form-group">
-              <label class="form-label">Área Específica (Ubicación puntual) *</label>
-              <input type="text" id="repArea" required placeholder="Ej. Baños Clientes, Bahía 4, Recepción..." oninput="marcarLleno(this)">
+              <label class="form-label">Área Específica (Ubicación física) *</label>
+              <input type="text" id="repArea" required placeholder="Ej. Baño de clientes showroom, Bahía 3...">
             </div>
             <div class="col-6 form-group">
               <label class="form-label">Tipo de Daño / Clasificación *</label>
-              <select id="repTipo" required onchange="marcarLleno(this)">
+              <select id="repTipo" required>
                 <option value="">Seleccione Tipo...</option>
                 <option value="Eléctrico / Iluminación">Eléctrico / Iluminación</option>
                 <option value="Pintura y Acabados">Pintura y Acabados</option>
@@ -450,40 +643,33 @@
                 <option value="Mobiliario / Otro">Mobiliario / Otro</option>
               </select>
             </div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-header">
-            <div class="section-num">2</div>
-            <div class="section-title">Detalle del Problema e Impacto</div>
-          </div>
-          <div class="form-grid">
             <div class="col-6 form-group">
               <label class="form-label">Flujo de Clientes (Impacto Comercial) *</label>
-              <select id="repFlujo" required onchange="marcarLleno(this)">
-                <option value="Alto">Alto (Afecta directamente atención al cliente o showroom)</option>
-                <option value="Medio" selected>Medio (Operación interna de soporte)</option>
+              <select id="repFlujo" required>
+                <option value="Alto">Alto (Afecta directamente la experiencia del cliente)</option>
+                <option value="Medio" selected>Medio (Operación interna / bahías / oficinas)</option>
                 <option value="Bajo">Bajo (Detalle estético sin freno operativo)</option>
               </select>
             </div>
-            <div class="col-12 form-group">
-              <label class="form-label">Descripción Técnica de la Falla *</label>
-              <textarea id="repDescripcion" required placeholder="Describe puntualmente el problema observado..." oninput="marcarLleno(this)"></textarea>
-            </div>
-            <div class="col-12 form-group">
-              <label class="form-label">Comentarios Adicionales (Opcional)</label>
-              <input type="text" id="repComentarios" placeholder="Notas adicionales o referencias..." oninput="marcarLleno(this)">
-            </div>
           </div>
         </div>
 
+        <!-- SECCIÓN 2: DETALLE -->
         <div class="section-card">
           <div class="section-header">
             <div class="section-num">3</div>
-            <div class="section-title">Evidencia Fotográfica Inicial</div>
+            <div class="section-title">Detalle de la Falla y Evidencia</div>
           </div>
           <div class="form-grid">
+            <div class="col-12 form-group">
+              <label class="form-label">Descripción Técnica *</label>
+              <textarea id="repDescripcion" required placeholder="Explica detalladamente la falla observada..."></textarea>
+            </div>
+            <div class="col-12 form-group">
+              <label class="form-label">Notas Adicionales (Opcional)</label>
+              <input type="text" id="repComentarios" placeholder="Horarios de acceso, referencias...">
+            </div>
+
             <div class="col-4 photo-upload-box" onclick="document.getElementById('fileInc1').click()">
               <span style="font-size: 10px; font-weight: 700; color: var(--primary);">Foto Inicial 1 *</span>
               <input type="file" id="fileInc1" accept="image/*" capture="environment" style="display:none;" required onchange="previewFoto(this, 'prevInc1')">
@@ -515,23 +701,24 @@
   <div id="viewConsulta" class="view-section hidden">
     <div class="card-canvas">
       <div class="header-branding">
-        <h1>Incidencias Reportadas</h1>
-        <p style="font-size: 12px; color: var(--text-muted);">Revisa las fallas reportadas para evitar levantar duplicados.</p>
+        <h1>Incidencias Registradas</h1>
+        <p>Consulta las fallas abiertas o evalúa la entrega de los reportes levantados por ti.</p>
       </div>
 
-      <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
-        <select id="filtroConsultaAgencia" style="flex: 1; min-width: 200px; height: 38px;" onchange="filtrarConsultaPublicaEnVivo()">
-          <option value="TODAS">Todas las Agencias</option>
-          <option value="Montejo">Montejo</option>
-          <option value="Itzáes">Itzáes</option>
-          <option value="Valladolid">Valladolid</option>
-          <option value="Chetumal">Chetumal</option>
-          <option value="Mitsubishi">Mitsubishi</option>
-          <option value="Caribe Cancún">Caribe Cancún</option>
-          <option value="Caribe Playa">Caribe Playa</option>
+      <!-- FILTROS Y TOGGLE MIS REPORTES -->
+      <div style="display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;">
+        <button type="button" id="btnFiltroMisReportes" class="btn-submit" style="width: auto; height: 38px; padding: 0 16px; margin: 0; background: var(--surface-subtle); color: var(--primary); border: 1px solid var(--border-strong);" onclick="toggleMisReportes()">
+          👤 Ver Solo Mis Reportes
+        </button>
+        <select id="filtroConsultaDistribuidora" style="flex: 1; min-width: 180px; height: 38px;" onchange="filtrarConsultaPublicaEnVivo()">
+          <option value="TODAS">Todas las Razones Sociales</option>
+          <option value="Automaya">Automaya</option>
+          <option value="Caribe">Automotriz Caribe</option>
+          <option value="Chetumal">Chetumal Automotores</option>
+          <option value="Millenium">Millenium Motors</option>
         </select>
         <input type="text" id="busquedaConsultaTexto" placeholder="🔍 Buscar por palabra clave en Área o Falla..." 
-               style="flex: 2; min-width: 250px; height: 38px;" oninput="filtrarConsultaPublicaEnVivo()">
+               style="flex: 2; min-width: 220px; height: 38px;" oninput="filtrarConsultaPublicaEnVivo()">
       </div>
 
       <div class="table-container">
@@ -539,15 +726,17 @@
           <thead>
             <tr>
               <th>Fecha</th>
-              <th>Agencia</th>
+              <th>Distribuidora</th>
               <th>Área / Falla</th>
-              <th>Impacto</th>
+              <th>Solicitante</th>
               <th>Estatus</th>
               <th>Compromiso</th>
+              <th style="text-align:center;">Evaluar</th>
+              <th style="width:36px; text-align:center;">Ver</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="6" class="text-center" style="padding:15px; color:#64748b;">Cargando...</td></tr>
+            <tr><td colspan="8" class="text-center" style="padding:18px; color:var(--text-muted);">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -555,35 +744,40 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- VISTA 3: CONSOLA DE TRABAJO (PROTEGIDA)    -->
+  <!-- VISTA 3: CONSOLA DE TRABAJO (MTTO / ADMIN) -->
   <!-- ========================================== -->
   <div id="viewConsola" class="view-section hidden">
     <div class="card-canvas">
       <div class="header-branding" style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
         <div>
           <h1>Consola Operativa de Mantenimiento</h1>
-          <p style="font-size: 12px; color: var(--text-muted);">Asigna compromisos congelados y concluye con costo real y evidencia.</p>
+          <p>Gestiona fechas compromiso inmutables, resoluciones preliminares y atiende re-trabajos.</p>
         </div>
-        <button type="button" class="btn-submit" style="width: auto; height: 34px; padding: 0 12px; font-size: 11px; margin-top: 0;" onclick="cargarConsolaMtto()">
+        <button type="button" class="btn-submit" style="width: auto; height: 36px; padding: 0 14px; font-size: 11px; margin-top: 0;" onclick="cargarConsolaMtto()">
           🔄 Actualizar
         </button>
       </div>
 
-      <div class="kpi-container" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 14px;">
+      <div class="kpi-container" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 14px;">
         <div class="kpi-card" style="border-left: 4px solid #ef4444;">
           <span class="kpi-title">Sin Empezar</span>
           <span class="kpi-value" id="kpiConsolaSinEmpezar" style="color: #b91c1c;">0</span>
-          <span class="kpi-subtext">Pendientes de asignar</span>
+          <span class="kpi-subtext">Por asignar</span>
         </div>
         <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
           <span class="kpi-title">En Proceso</span>
           <span class="kpi-value" id="kpiConsolaEnProceso" style="color: #b45309;">0</span>
-          <span class="kpi-subtext">Con compromiso activo</span>
+          <span class="kpi-subtext">Con compromiso</span>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #dc2626; background: #fff5f5;">
+          <span class="kpi-title" style="color: #b91c1c;">Re-trabajos</span>
+          <span class="kpi-value" id="kpiConsolaRetrabajos" style="color: #dc2626;">0</span>
+          <span class="kpi-subtext" style="color: #b91c1c;">Rechazados por cliente</span>
         </div>
         <div class="kpi-card" style="border-left: 4px solid #10b981;">
-          <span class="kpi-title">Terminadas</span>
+          <span class="kpi-title">Concluidas</span>
           <span class="kpi-value" id="kpiConsolaTerminadas" style="color: #15803d;">0</span>
-          <span class="kpi-subtext">Resueltas con foto</span>
+          <span class="kpi-subtext">Aprobadas</span>
         </div>
       </div>
 
@@ -595,24 +789,23 @@
       </div>
 
       <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-        <select id="filtroAgencia" style="flex: 1; min-width: 180px; height: 36px;" onchange="filtrarDeckEnVivo()">
-          <option value="TODAS">Todas las Agencias</option>
-          <option value="Montejo">Montejo</option>
-          <option value="Itzáes">Itzáes</option>
-          <option value="Valladolid">Valladolid</option>
-          <option value="Chetumal">Chetumal</option>
-          <option value="Mitsubishi">Mitsubishi</option>
-          <option value="Caribe Cancún">Caribe Cancún</option>
-          <option value="Caribe Playa">Caribe Playa</option>
+        <select id="filtroConsolaDist" style="flex: 1; min-width: 180px; height: 38px;" onchange="filtrarDeckEnVivo()">
+          <option value="TODAS">Todas las Razones Sociales</option>
+          <option value="Automaya">Automaya</option>
+          <option value="Caribe">Automotriz Caribe</option>
+          <option value="Chetumal">Chetumal Automotores</option>
+          <option value="Millenium">Millenium Motors</option>
         </select>
-        <select id="filtroEstatus" style="flex: 1; min-width: 150px; height: 36px;" onchange="filtrarDeckEnVivo()">
+        <select id="filtroConsolaEstatus" style="flex: 1; min-width: 160px; height: 38px;" onchange="filtrarDeckEnVivo()">
           <option value="TODOS">Todos los Estatus</option>
           <option value="Sin empezar">Sin empezar</option>
           <option value="En proceso">En proceso</option>
-          <option value="Resuelto">Resuelto</option>
+          <option value="Por Validar (Mtto Listo)">Por Validar</option>
+          <option value="Rechazado / Re-trabajo">Re-trabajo Requerido</option>
+          <option value="Concluido Conforme">Concluido</option>
         </select>
         <input type="text" id="busquedaConsolaTexto" placeholder="🔍 Buscar por palabra clave..." 
-               style="flex: 2; min-width: 220px; height: 36px;" oninput="filtrarDeckEnVivo()">
+               style="flex: 2; min-width: 200px; height: 38px;" oninput="filtrarDeckEnVivo()">
       </div>
 
       <div class="deck-grid" id="contenedorDeckMtto"></div>
@@ -620,33 +813,38 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- VISTA 4: DASHBOARD GENERAL (PROTEGIDA)     -->
+  <!-- VISTA 4: DASHBOARD EJECUTIVO               -->
   <!-- ========================================== -->
   <div id="viewDashboard" class="view-section hidden">
     <div class="card-canvas">
       <div class="header-branding">
-        <h1>Dashboard Ejecutivo de Mantenimiento</h1>
-        <p style="font-size: 12px; color: var(--text-muted);">Monitoreo de tiempos de atención, anomalías de compromiso y costos reales.</p>
+        <h1>Tablero Ejecutivo & Alertas de Mantenimiento</h1>
+        <p>Auditoría de cumplimiento de compromisos, gastos reales y evaluación de calidad interna.</p>
       </div>
 
       <div class="kpi-container">
         <div class="kpi-card">
           <span class="kpi-title">Incidencias Totales</span>
           <span class="kpi-value" id="kpiTotalTickets">0</span>
-          <span class="kpi-subtext" id="kpiDesgloseTickets">0 Sin empezar | 0 Proceso | 0 Resueltas</span>
+          <span class="kpi-subtext" id="kpiDesgloseTickets">0 Sin empezar | 0 Proceso | 0 Concluidas</span>
         </div>
         <div class="kpi-card" style="border-left: 4px solid #ef4444; background: #fff5f5;">
-          <span class="kpi-title" style="color: #b91c1c;">Focos Críticos</span>
+          <span class="kpi-title" style="color: #b91c1c;">Críticos Sin Empezar</span>
           <span class="kpi-value" id="kpiAltoFlujoSinEmpezar" style="color: #b91c1c;">0</span>
-          <span class="kpi-subtext" style="color: #b91c1c;">Flujo Alto Sin Empezar</span>
+          <span class="kpi-subtext" style="color: #b91c1c;">Flujo Alto Sin Asignar</span>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #dc2626;">
+          <span class="kpi-title" style="color: #b91c1c;">Re-trabajos Activos</span>
+          <span class="kpi-value" id="kpiDashRetrabajos" style="color: #dc2626;">0</span>
+          <span class="kpi-subtext">Trabajos rechazados</span>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
+          <span class="kpi-title">Satisfacción Promedio</span>
+          <span class="kpi-value" id="kpiSatisfaccionProm" style="color: #d97706;">0.0 ★</span>
+          <span class="kpi-subtext" id="kpiTotalEvaluados">0 reportes calificados</span>
         </div>
         <div class="kpi-card">
-          <span class="kpi-title">Tickets con Atraso</span>
-          <span class="kpi-value" id="kpiTicketsAtrasados" style="color: #ef4444;">0</span>
-          <span class="kpi-subtext">Compromiso vencido</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-title">Costo Real Acumulado</span>
+          <span class="kpi-title">Gasto Real Acumulado</span>
           <span class="kpi-value" id="kpiGastoTotal">$0.00 MXN</span>
           <span class="kpi-subtext" id="kpiEstimadoVsReal">Cotizado: $0.00 MXN</span>
         </div>
@@ -656,15 +854,17 @@
         <div class="section-header" style="justify-content: space-between; flex-wrap: wrap;">
           <div style="display:flex; align-items:center; gap:8px;">
             <div class="section-num">📋</div>
-            <div class="section-title">Registro Maestro (Ordenado por Flujo)</div>
+            <div class="section-title">Registro Maestro de Mantenimiento</div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <label class="form-label" style="margin:0;">Filtrar Estatus:</label>
-            <select id="filtroDashboardEstatus" style="width: 160px; height: 32px; font-size:11px;" onchange="filtrarDashboardTabla()">
+            <label class="form-label" style="margin:0;">Filtrar:</label>
+            <select id="filtroDashboardEstatus" style="width: 170px; height: 34px; font-size:11px;" onchange="filtrarDashboardTabla()">
               <option value="TODOS">Todos los estatus</option>
               <option value="Sin empezar">Sin empezar</option>
               <option value="En proceso">En proceso</option>
-              <option value="Resuelto">Resuelto</option>
+              <option value="Por Validar (Mtto Listo)">Por Validar</option>
+              <option value="Rechazado / Re-trabajo">Rechazado / Re-trabajo</option>
+              <option value="Concluido Conforme">Concluido Conforme</option>
             </select>
           </div>
         </div>
@@ -674,19 +874,20 @@
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Agencia</th>
+                <th>Distribuidora</th>
                 <th>Área / Falla</th>
-                <th>Impacto</th>
+                <th>Solicitante</th>
                 <th>Estatus</th>
                 <th>Compromiso</th>
                 <th>Atraso</th>
                 <th style="text-align: right;">Cotizado</th>
-                <th style="text-align: right;">Costo Real</th>
+                <th style="text-align: right;">Costo Total</th>
+                <th style="text-align: center;">Calificación</th>
                 <th style="width:36px; text-align:center;">Ver</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="10" class="text-center" style="padding:15px; color:#64748b;">Cargando incidencias...</td></tr>
+              <tr><td colspan="11" class="text-center" style="padding:18px; color:var(--text-muted);">Cargando incidencias...</td></tr>
             </tbody>
           </table>
         </div>
@@ -699,23 +900,20 @@
 <script>
 let ticketsEnMemoria = [];
 let consultaPublicaEnMemoria = [];
+let filtroMisReportesActivo = false;
+let calificacionSeleccionada = 0;
 
 window.onload = function() {
-  cambiarVista('captura');
+  verificarSesion();
 };
 
 function mostrarToast(titulo, mensaje) {
   const cont = document.getElementById("toastContainer");
   const t = document.createElement("div");
   t.className = "toast";
-  t.innerHTML = `<div><div style="font-weight:700;">${titulo}</div><div style="font-size:10px; color:#64748b;">${mensaje}</div></div>`;
+  t.innerHTML = `<div><div style="font-weight:700;">${titulo}</div><div style="font-size:10px; color:var(--text-muted);">${mensaje}</div></div>`;
   cont.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
-}
-
-function marcarLleno(el) {
-  if (el.value && el.value.trim() !== "") el.classList.add("filled");
-  else el.classList.remove("filled");
+  setTimeout(() => t.remove(), 4000);
 }
 
 function previewFoto(input, idImg) {
@@ -758,7 +956,107 @@ function ordenarPorFlujo(lista) {
   });
 }
 
+// ==========================================
+// SESIÓN Y IDENTIFICACIÓN (PADRÓN)
+// ==========================================
+function verificarSesion() {
+  const guardado = localStorage.getItem("grupocer_mtto_user");
+  if (guardado) {
+    usuarioActual = JSON.parse(guardado);
+    aplicarPerfilEnInterfaz();
+  } else {
+    document.getElementById("modalLogin").classList.add("open");
+  }
+}
+
+async function verificarIdentidadCorreo() {
+  const emailInput = document.getElementById("loginEmail").value.trim().toLowerCase();
+  if (!emailInput) {
+    alert("Por favor ingresa tu correo institucional.");
+    return;
+  }
+
+  const btn = document.getElementById("btnLoginValidar");
+  btn.disabled = true;
+  btn.innerText = "Verificando en padrón...";
+
+  try {
+    const { data, error } = await sb
+      .from('usuarios_autorizados')
+      .select('*')
+      .ilike('email_corporativo', emailInput)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+      alert("El correo " + emailInput + " no está registrado en el padrón de accesos.\nContacta al Administrador del sistema.");
+      btn.disabled = false;
+      btn.innerText = "Ingresar al Sistema";
+      return;
+    }
+
+    usuarioActual = data;
+    localStorage.setItem("grupocer_mtto_user", JSON.stringify(data));
+    cerrarModal("modalLogin");
+    aplicarPerfilEnInterfaz();
+    mostrarToast("Bienvenido", `Identificado como ${data.nombre_completo}`);
+  } catch (err) {
+    alert("Error de validación: " + err.message);
+    btn.disabled = false;
+    btn.innerText = "Ingresar al Sistema";
+  }
+}
+
+function cerrarSesionLocal() {
+  if (confirm("¿Deseas cerrar tu sesión en este dispositivo?")) {
+    localStorage.removeItem("grupocer_mtto_user");
+    location.reload();
+  }
+}
+
+function aplicarPerfilEnInterfaz() {
+  document.getElementById("sbNombreUsuario").innerText = usuarioActual.nombre_completo;
+  document.getElementById("sbAreaUsuario").innerText = `${usuarioActual.area} - ${usuarioActual.distribuidoras}`;
+  document.getElementById("sbRolPill").innerText = `ROL: ${usuarioActual.rol_interfaz}`;
+
+  // Formulario bloqueado
+  document.getElementById("repNombre").value = usuarioActual.nombre_completo;
+  document.getElementById("repPuesto").value = usuarioActual.area;
+  document.getElementById("repEmail").value = usuarioActual.email_corporativo;
+
+  // Filtrado de navegación según el rol
+  const rol = usuarioActual.rol_interfaz;
+  const esMtto = (rol === 'Mtto' || rol === 'Admin');
+  const esDirectivo = (rol === 'Directivo' || rol === 'Admin');
+
+  document.getElementById("btnNavConsola").classList.toggle("hidden", !esMtto);
+  document.getElementById("btnNavDashboard").classList.toggle("hidden", !esDirectivo);
+  document.getElementById("lblNavGestion").classList.toggle("hidden", !esMtto && !esDirectivo);
+
+  cambiarVista('captura');
+}
+
+function filtrarAgenciasPorDistribuidora(dist) {
+  const sel = document.getElementById("repAgencia");
+  sel.innerHTML = '<option value="">Seleccione Sucursal...</option>';
+
+  if (dist === "Automaya") {
+    sel.innerHTML += '<option value="Montejo">Montejo</option><option value="Itzáes">Itzáes</option><option value="Valladolid">Valladolid</option>';
+  } else if (dist === "Caribe") {
+    sel.innerHTML += '<option value="Cancún">Cancún</option><option value="Playa del Carmen">Playa del Carmen</option>';
+  } else if (dist === "Chetumal") {
+    sel.innerHTML += '<option value="Chetumal Matriz">Chetumal Matriz</option>';
+  } else if (dist === "Millenium") {
+    sel.innerHTML += '<option value="Millenium Matriz">Millenium Matriz</option>';
+  } else if (dist === "GrupoCER") {
+    sel.innerHTML += '<option value="Oficinas Corporativas">Oficinas Corporativas</option>';
+  }
+}
+
+// ==========================================
 // 1. GUARDAR NUEVO REPORTE
+// ==========================================
 async function guardarNuevoReporte() {
   const btn = document.getElementById("btnEnviarReporte");
   const file1 = document.getElementById("fileInc1").files[0];
@@ -779,9 +1077,13 @@ async function guardarNuevoReporte() {
     const urlFoto3 = file3 ? await subirImagenASupabase(file3, "incidencias") : null;
 
     const { error } = await sb.from('incidencias_mtto').insert([{
+      reportado_por_nombre: usuarioActual.nombre_completo,
+      reportado_por_puesto: usuarioActual.area,
+      reportado_por_email: usuarioActual.email_corporativo,
+      reportado_por_telefono: usuarioActual.telefono,
       distribuidora: document.getElementById("repDistribuidora").value,
+      area: `${document.getElementById("repAgencia").value} - ${document.getElementById("repArea").value.trim()}`,
       dpto_reporte: document.getElementById("repDpto").value,
-      area: document.getElementById("repArea").value.trim(),
       tipo: document.getElementById("repTipo").value,
       flujo_clientes: document.getElementById("repFlujo").value,
       descripcion: document.getElementById("repDescripcion").value.trim(),
@@ -796,21 +1098,22 @@ async function guardarNuevoReporte() {
     mostrarToast("Reporte Registrado", "La falla fue enviada a Mantenimiento.");
     document.getElementById("formReporte").reset();
     document.querySelectorAll(".photo-preview").forEach(img => { img.src = ""; img.style.display = "none"; });
-    document.querySelectorAll("input, select, textarea").forEach(el => el.classList.remove("filled"));
-
+    aplicarPerfilEnInterfaz();
     cambiarVista('consulta');
   } catch (err) {
-    alert("Error de registro: " + (err.message || "Verifica los datos."));
+    alert("Error de registro: " + err.message);
   } finally {
     btn.disabled = false;
     btn.innerText = "📤 Enviar Reporte de Incidencia";
   }
 }
 
-// 2. CONSULTAR EXISTENTES
+// ==========================================
+// 2. CONSULTAR EXISTENTES & EVALUAR
+// ==========================================
 async function cargarConsultaPublica() {
   const tb = document.querySelector("#tblConsultaPublica tbody");
-  tb.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:15px; color:#64748b;">Consultando...</td></tr>';
+  tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:18px; color:var(--text-muted);">Consultando...</td></tr>';
 
   try {
     const { data, error } = await sb.from('vista_incidencias_mtto').select('*').order('fecha_reporte', { ascending: false });
@@ -822,47 +1125,204 @@ async function cargarConsultaPublica() {
   }
 }
 
+function toggleMisReportes() {
+  filtroMisReportesActivo = !filtroMisReportesActivo;
+  const btn = document.getElementById("btnFiltroMisReportes");
+  if (filtroMisReportesActivo) {
+    btn.style.background = "var(--primary)";
+    btn.style.color = "#ffffff";
+    btn.innerText = "✓ Viendo Mis Reportes";
+  } else {
+    btn.style.background = "var(--surface-subtle)";
+    btn.style.color = "var(--primary)";
+    btn.innerText = "👤 Ver Solo Mis Reportes";
+  }
+  filtrarConsultaPublicaEnVivo();
+}
+
 function filtrarConsultaPublicaEnVivo() {
-  const ag = document.getElementById("filtroConsultaAgencia").value;
+  const dist = document.getElementById("filtroConsultaDistribuidora").value;
   const busq = document.getElementById("busquedaConsultaTexto").value.toLowerCase().trim();
   const tb = document.querySelector("#tblConsultaPublica tbody");
   tb.innerHTML = "";
 
   let filtrados = consultaPublicaEnMemoria;
-  if (ag !== "TODAS") filtrados = filtrados.filter(t => t.distribuidora === ag);
+
+  if (filtroMisReportesActivo && usuarioActual) {
+    filtrados = filtrados.filter(t => t.reportado_por_email === usuarioActual.email_corporativo);
+  }
+  if (dist !== "TODAS") filtrados = filtrados.filter(t => t.distribuidora === dist);
   if (busq) {
     filtrados = filtrados.filter(t => 
       (t.area && t.area.toLowerCase().includes(busq)) || 
       (t.descripcion && t.descripcion.toLowerCase().includes(busq)) ||
-      (t.tipo && t.tipo.toLowerCase().includes(busq))
+      (t.reportado_por_nombre && t.reportado_por_nombre.toLowerCase().includes(busq))
     );
   }
 
   if (filtrados.length === 0) {
-    tb.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:15px; color:#64748b;">No hay reportes con este criterio.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:18px; color:var(--text-muted);">No hay reportes con este criterio.</td></tr>';
     return;
   }
 
   filtrados.forEach(t => {
     let statusClass = "status-sin-empezar";
     if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-    if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+    if (t.estatus === 'Por Validar (Mtto Listo)') statusClass = "status-por-validar";
+    if (t.estatus === 'Rechazado / Re-trabajo') statusClass = "status-retrabajo";
+    if (t.estatus === 'Concluido Conforme') statusClass = "status-concluido";
 
     const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
     const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'En revisión';
+    const solicitante = t.reportado_por_nombre ? `${t.reportado_por_nombre} (${t.reportado_por_puesto})` : t.dpto_reporte;
+
+    // Solo el solicitante que abrió el reporte puede evaluar
+    let btnEvaluarHtml = '<span style="color:var(--text-soft); font-size:10px;">--</span>';
+    const esMio = (usuarioActual && t.reportado_por_email === usuarioActual.email_corporativo);
+
+    if (t.estatus === 'Por Validar (Mtto Listo)' && esMio) {
+      btnEvaluarHtml = `<button type="button" class="btn-submit" style="height:26px; font-size:10px; padding:0 10px; margin:0; background:#f59e0b;" onclick="abrirModalEvaluacion('${t.id}')">⭐ Evaluar</button>`;
+    } else if (t.calificacion_estrellas) {
+      btnEvaluarHtml = `<span style="font-weight:800; color:#f59e0b;">${t.calificacion_estrellas} ★</span>`;
+    }
 
     tb.innerHTML += `<tr>
       <td>${fReg}</td>
       <td><strong>${t.distribuidora}</strong></td>
-      <td><strong>${t.area}</strong> <span style="color:#64748b;">(${t.tipo})</span><br><span style="font-size:10px; color:#475569;">${t.descripcion}</span></td>
-      <td><span style="font-weight:700; color:var(--flujo-${t.flujo_clientes});">${t.flujo_clientes}</span></td>
+      <td><strong>${t.area}</strong></td>
+      <td><span style="font-size:10px; color:#475569;">${solicitante}</span></td>
       <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
       <td>${fComp}</td>
+      <td style="text-align:center;">${btnEvaluarHtml}</td>
+      <td style="text-align:center;">
+        <button type="button" class="btn-action-icon" title="Ver Expediente" onclick="abrirModalExpediente('${t.id}')">👁️</button>
+      </td>
     </tr>`;
   });
 }
 
-// 3. CONSOLA DE TRABAJO (CON PAPELERA OPERATIVA)
+// ==========================================
+// 2.1 EVALUACIÓN Y ESCALAMIENTO POR CORREO
+// ==========================================
+function abrirModalEvaluacion(id) {
+  document.getElementById("evalTicketId").value = id;
+  calificacionSeleccionada = 0;
+  seleccionarEstrella(0);
+  document.getElementById("evalComentario").value = "";
+  document.getElementById("prevQueja").style.display = "none";
+  document.getElementById("modalEvaluacion").classList.add("open");
+}
+
+function seleccionarEstrella(num) {
+  calificacionSeleccionada = num;
+  const estrellas = document.querySelectorAll("#contenedorEstrellas span");
+  estrellas.forEach((s, idx) => {
+    s.classList.toggle("active", idx < num);
+  });
+
+  const boxCom = document.getElementById("boxRetroComentario");
+  const boxQueja = document.getElementById("boxFotoQueja");
+  const lblDiag = document.getElementById("lblDiagnosticoEstrellas");
+
+  if (num === 5) {
+    lblDiag.innerText = "⭐⭐⭐⭐⭐ Excelente / Trabajo 100% Conforme";
+    lblDiag.style.color = "#15803d";
+    boxCom.classList.add("hidden");
+    boxQueja.classList.add("hidden");
+  } else if (num >= 3) {
+    lblDiag.innerText = "Aceptable con Observaciones";
+    lblDiag.style.color = "#b45309";
+    boxCom.classList.remove("hidden");
+    document.getElementById("lblRetroComentario").innerText = "Comentario de Observación Obligatorio *";
+    boxQueja.classList.add("hidden");
+  } else if (num >= 1) {
+    lblDiag.innerText = "⚠️ Trabajo Deficiente / Rechazado (Escalamiento a Dirección)";
+    lblDiag.style.color = "#dc2626";
+    boxCom.classList.remove("hidden");
+    document.getElementById("lblRetroComentario").innerText = "Motivo del Rechazo (Obligatorio) *";
+    boxQueja.classList.remove("hidden");
+  }
+}
+
+async function guardarEvaluacionSolicitante() {
+  if (calificacionSeleccionada === 0) {
+    alert("Por favor selecciona una calificación de 1 a 5 estrellas.");
+    return;
+  }
+
+  const id = document.getElementById("evalTicketId").value;
+  const comentario = document.getElementById("evalComentario").value.trim();
+  const fileQ = document.getElementById("fileQueja").files[0];
+  const btn = document.getElementById("btnGuardarEvaluacion");
+
+  if (calificacionSeleccionada <= 4 && !comentario) {
+    alert("Debes escribir un comentario explicando la calificación.");
+    return;
+  }
+  if (calificacionSeleccionada <= 2 && !fileQ) {
+    alert("Para reportar un trabajo deficiente debes anexar obligatoriamente la fotografía de evidencia.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = "Guardando...";
+
+  try {
+    let urlFotoQueja = null;
+    if (fileQ) urlFotoQueja = await subirImagenASupabase(fileQ, "quejas");
+
+    const payload = {
+      calificacion_estrellas: calificacionSeleccionada,
+      retroalimentacion_usuario: comentario || null,
+      foto_queja_retrabajo: urlFotoQueja,
+      fecha_evaluacion: new Date().toISOString()
+    };
+
+    const { error } = await sb.from('incidencias_mtto').update(payload).eq('id', id);
+    if (error) throw error;
+
+    // Disparar correo de escalamiento si es 1 o 2 estrellas
+    if (calificacionSeleccionada <= 2) {
+      const ticket = consultaPublicaEnMemoria.find(t => t.id === id);
+      dispararCorreoEscalamientoDireccion(ticket, comentario, urlFotoQueja);
+    }
+
+    mostrarToast("Evaluación Registrada", "Gracias por retroalimentar el servicio.");
+    cerrarModal("modalEvaluacion");
+    cargarConsultaPublica();
+  } catch (err) {
+    alert("Error al calificar: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "✓ Confirmar Calificación";
+  }
+}
+
+function dispararCorreoEscalamientoDireccion(ticket, queja, urlFoto) {
+  const asunto = encodeURIComponent(`🚨 ESCALAMIENTO | Trabajo Deficiente Mtto en ${ticket.distribuidora} - ${ticket.area}`);
+  const cuerpo = encodeURIComponent(
+    `ATENCIÓN DIRECCIÓN GENERAL Y CALIDAD:\n\n` +
+    `Se ha reportado un trabajo DEFICIENTE de mantenimiento calificado con ${calificacionSeleccionada} estrella(s).\n\n` +
+    `--- DETALLES DEL REPORTE ---\n` +
+    `• Agencia / Área: ${ticket.distribuidora} - ${ticket.area}\n` +
+    `• Solicitante: ${ticket.reportado_por_nombre} (${ticket.reportado_por_puesto})\n` +
+    `• Técnico Asignado: ${ticket.responsable_mtto || 'Sin asignar'}\n` +
+    `• Costo Incurrido Preliminar: $${ticket.costo_real} MXN\n\n` +
+    `--- MOTIVO DE LA QUEJA ---\n` +
+    `"${queja}"\n\n` +
+    `• Evidencia del trabajo mal hecho: ${urlFoto || 'Sin foto'}\n` +
+    `• Foto solución previa de Mtto: ${ticket.foto_resolucion_1 || 'Sin foto'}\n\n` +
+    `El folio ha sido retornado a Mantenimiento con estatus de RE-TRABAJO obligatorio.`
+  );
+
+  const cc = CORREOS_COPIA.join(",");
+  const enlaceMailto = `mailto:${CORREO_DIRECTOR}?cc=${cc}&subject=${asunto}&body=${cuerpo}`;
+  window.open(enlaceMailto, '_blank');
+}
+
+// ==========================================
+// 3. CONSOLA OPERATIVA DE MTTO
+// ==========================================
 async function cargarConsolaMtto() {
   try {
     const { data, error } = await sb.from('vista_incidencias_mtto').select('*');
@@ -876,26 +1336,28 @@ async function cargarConsolaMtto() {
 }
 
 function actualizarContadoresConsola() {
-  let sinEmp = 0, enProc = 0, term = 0;
+  let sinEmp = 0, enProc = 0, retrab = 0, term = 0;
   ticketsEnMemoria.forEach(t => {
-    if (t.estatus === 'Resuelto') term++;
+    if (t.estatus === 'Concluido Conforme') term++;
+    else if (t.estatus === 'Rechazado / Re-trabajo') retrab++;
     else if (t.estatus === 'En proceso') enProc++;
     else sinEmp++;
   });
   document.getElementById("kpiConsolaSinEmpezar").innerText = sinEmp;
   document.getElementById("kpiConsolaEnProceso").innerText = enProc;
+  document.getElementById("kpiConsolaRetrabajos").innerText = retrab;
   document.getElementById("kpiConsolaTerminadas").innerText = term;
 }
 
 function filtrarDeckEnVivo() {
-  const ag = document.getElementById("filtroAgencia").value;
-  const est = document.getElementById("filtroEstatus").value;
+  const dist = document.getElementById("filtroConsolaDist").value;
+  const est = document.getElementById("filtroConsolaEstatus").value;
   const busq = document.getElementById("busquedaConsolaTexto").value.toLowerCase().trim();
   const cont = document.getElementById("contenedorDeckMtto");
   cont.innerHTML = "";
 
   let filtrados = ticketsEnMemoria;
-  if (ag !== "TODAS") filtrados = filtrados.filter(t => t.distribuidora === ag);
+  if (dist !== "TODAS") filtrados = filtrados.filter(t => t.distribuidora === dist);
   if (est !== "TODOS") filtrados = filtrados.filter(t => t.estatus === est);
   if (busq) {
     filtrados = filtrados.filter(t => 
@@ -906,41 +1368,65 @@ function filtrarDeckEnVivo() {
   }
 
   if (filtrados.length === 0) {
-    cont.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:#64748b;">No hay incidencias que coincidan.</div>';
+    cont.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--text-muted);">No hay incidencias que coincidan.</div>';
     return;
   }
 
   filtrados.forEach(t => {
     let statusClass = "status-sin-empezar";
     if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-    if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+    if (t.estatus === 'Por Validar (Mtto Listo)') statusClass = "status-por-validar";
+    if (t.estatus === 'Rechazado / Re-trabajo') statusClass = "status-retrabajo";
+    if (t.estatus === 'Concluido Conforme') statusClass = "status-concluido";
 
     const atraso = parseInt(t.atraso_dias) || 0;
     const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
     const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'Sin fecha';
 
     let fotosHtml = '';
-    if (t.foto_incidencia_1) fotosHtml += `<img src="${t.foto_incidencia_1}" onclick="window.open('${t.foto_incidencia_1}')" title="Foto Reporte 1">`;
-    if (t.foto_incidencia_2) fotosHtml += `<img src="${t.foto_incidencia_2}" onclick="window.open('${t.foto_incidencia_2}')" title="Foto Reporte 2">`;
-    if (t.foto_resolucion_1) fotosHtml += `<img src="${t.foto_resolucion_1}" onclick="window.open('${t.foto_resolucion_1}')" title="Foto Cierre" style="border:2px solid #15803d;">`;
+    if (t.foto_incidencia_1) fotosHtml += `<img src="${t.foto_incidencia_1}" onclick="window.open('${t.foto_incidencia_1}')" title="Foto Inicial">`;
+    if (t.foto_resolucion_1) fotosHtml += `<img src="${t.foto_resolucion_1}" onclick="window.open('${t.foto_resolucion_1}')" title="Solución 1" style="border:2px solid #15803d;">`;
+    if (t.foto_queja_retrabajo) fotosHtml += `<img src="${t.foto_queja_retrabajo}" onclick="window.open('${t.foto_queja_retrabajo}')" title="Queja / Trabajo Mal Hecho" style="border:2px solid #dc2626;">`;
+    if (t.foto_retrabajo) fotosHtml += `<img src="${t.foto_retrabajo}" onclick="window.open('${t.foto_retrabajo}')" title="Re-trabajo" style="border:2px solid #2563eb;">`;
+
+    // Botones dinámicos según estatus
+    let accionesHtml = '';
+    if (t.estatus === 'Rechazado / Re-trabajo') {
+      accionesHtml = `<button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 10px; margin-top:0; background:#dc2626;" onclick="abrirModalRetrabajo('${t.id}')">🔄 Re-trabajo</button>`;
+    } else {
+      accionesHtml = `
+        <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:${t.compromiso_bloqueado ? '#94a3b8' : 'var(--primary)'};" onclick="abrirModalAsignar('${t.id}')">
+          📋 Asignar
+        </button>
+        <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:#15803d;" onclick="abrirModalResolver('${t.id}')">
+          ✅ Entregar
+        </button>
+      `;
+    }
+
+    const esAdmin = (usuarioActual && usuarioActual.rol_interfaz === 'Admin');
 
     cont.innerHTML += `
-      <div class="deck-card flujo-${t.flujo_clientes}">
+      <div class="deck-card flujo-${t.flujo_clientes} ${t.estatus === 'Rechazado / Re-trabajo' ? 'retrabajo-activo' : ''}">
         <div class="deck-header">
           <div>
-            <div class="deck-dist">${t.distribuidora} &bull; ${t.dpto_reporte}</div>
+            <div class="deck-dist">${t.distribuidora} • ${t.dpto_reporte}</div>
             <div class="deck-title">${t.area}</div>
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
             <span class="status-badge ${statusClass}">${t.estatus}</span>
-            <button type="button" class="btn-action-icon btn-action-delete" title="Eliminar como Administrador" onclick="solicitarBorradoRegistro('${t.id}')">🗑️</button>
+            ${esAdmin ? `<button type="button" class="btn-action-icon" style="color:#dc2626;" title="Eliminar como Administrador" onclick="solicitarBorradoRegistro('${t.id}')">🗑️</button>` : ''}
           </div>
         </div>
 
-        <div style="font-size:12px; color:#334155;">${t.descripcion}</div>
+        <div style="font-size:11px; color:#475569;">
+          <strong>Reportó:</strong> ${t.reportado_por_nombre || 'No especificado'} (${t.reportado_por_puesto || '--'})
+        </div>
+
+        <div style="font-size:12px; color:var(--text-main);">${t.descripcion}</div>
 
         <div class="deck-meta">
-          <span>📅 ${fReg}</span> &bull; 
+          <span>📅 ${fReg}</span> • 
           <span>🎯 Entrega: <strong>${fComp}</strong></span>
           ${atraso > 0 ? `<span class="atraso-pill">+${atraso} d atraso</span>` : ''}
         </div>
@@ -948,17 +1434,12 @@ function filtrarDeckEnVivo() {
         <div class="deck-photos">${fotosHtml}</div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f5f9; padding-top:6px; margin-top:4px;">
-          <div style="font-size:10px; color:#64748b;">
+          <div style="font-size:10px; color:var(--text-muted);">
             👤 ${t.responsable_mtto || 'Sin asignar'}<br>
             💰 Cotizado: $${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}
           </div>
           <div style="display:flex; gap:6px;">
-            <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:${t.compromiso_bloqueado ? '#94a3b8' : 'var(--primary)'};" onclick="abrirModalAsignar('${t.id}')">
-              📋 Asignar
-            </button>
-            <button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 8px; margin-top:0; background:#15803d;" onclick="abrirModalResolver('${t.id}')">
-              ✅ Resolver
-            </button>
+            ${accionesHtml}
           </div>
         </div>
       </div>
@@ -966,7 +1447,7 @@ function filtrarDeckEnVivo() {
   });
 }
 
-// 3.1 MODAL ASIGNAR
+// 3.1 ASIGNAR COMPROMISO
 function abrirModalAsignar(id) {
   const t = ticketsEnMemoria.find(item => item.id === id);
   if (!t) return;
@@ -1012,8 +1493,7 @@ async function confirmarYGuardarAsignacion() {
     return;
   }
 
-  const confirma = confirm("⚠️ ATENCIÓN:\nUna vez guardada la fecha compromiso y el costo cotizado, quedarán congelados de forma definitiva.\n\n¿Deseas confirmar la asignación?");
-  if (!confirma) return;
+  if (!confirm("⚠️ ATENCIÓN:\nUna vez guardada la fecha compromiso y el costo cotizado, quedarán congelados de forma definitiva.\n\n¿Deseas confirmar la asignación?")) return;
 
   const btn = document.getElementById("btnGuardarAsignar");
   btn.disabled = true;
@@ -1041,13 +1521,13 @@ async function confirmarYGuardarAsignacion() {
   }
 }
 
-// 3.2 MODAL RESOLVER
+// 3.2 RESOLVER (ENTREGA DE MTTO)
 function abrirModalResolver(id) {
   const t = ticketsEnMemoria.find(item => item.id === id);
   if (!t) return;
 
   document.getElementById("resTicketId").value = t.id;
-  document.getElementById("modalResolverTitulo").innerText = `Cierre: ${t.distribuidora} - ${t.area}`;
+  document.getElementById("modalResolverTitulo").innerText = `Entrega: ${t.distribuidora} - ${t.area}`;
   document.getElementById("resCostoReal").value = t.costo_real > 0 ? t.costo_real : (t.costo_estimado || "0.00");
 
   document.getElementById("fileRes1").value = "";
@@ -1070,13 +1550,13 @@ async function guardarResolucionTicket() {
     return;
   }
   if (!fileR1 && (!t || !t.foto_resolucion_1)) {
-    alert("Debes cargar obligatoriamente la Foto de Cierre 1 como comprobante.");
+    alert("Debes cargar la Foto de Cierre 1 como comprobante.");
     return;
   }
 
   const btn = document.getElementById("btnGuardarResolver");
   btn.disabled = true;
-  btn.innerText = "Cerrando ticket...";
+  btn.innerText = "Entregando...";
 
   try {
     let updatePayload = {
@@ -1094,19 +1574,71 @@ async function guardarResolucionTicket() {
     const { error } = await sb.from('incidencias_mtto').update(updatePayload).eq('id', id);
     if (error) throw error;
 
-    mostrarToast("Incidencia Resuelta", "El ticket quedó cerrado y con fecha/hora estampada.");
+    mostrarToast("Trabajo Entregado", "El ticket quedó listo para validación del solicitante.");
     cerrarModal('modalResolver');
     cargarConsolaMtto();
   } catch (err) {
-    alert("Error al cerrar: " + err.message);
+    alert("Error al entregar: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerText = "✅ Concluir Ticket";
+    btn.innerText = "📤 Entregar para Validación";
+  }
+}
+
+// 3.3 RE-TRABAJO MTTO
+function abrirModalRetrabajo(id) {
+  document.getElementById("retTicketId").value = id;
+  document.getElementById("retCosto").value = "0.00";
+  document.getElementById("retNotas").value = "";
+  document.getElementById("prevRetrabajo").style.display = "none";
+  document.getElementById("modalRetrabajo").classList.add("open");
+}
+
+async function guardarRetrabajoMtto() {
+  const id = document.getElementById("retTicketId").value;
+  const cRet = parseFloat(document.getElementById("retCosto").value) || 0;
+  const notas = document.getElementById("retNotas").value.trim();
+  const fileRet = document.getElementById("fileRetrabajo").files[0];
+
+  if (!fileRet) {
+    alert("Debes cargar la nueva fotografía de la corrección terminada.");
+    return;
+  }
+  if (!notas) {
+    alert("Explica qué trabajos adicionales se ejecutaron para corregir la falla.");
+    return;
+  }
+
+  const btn = document.getElementById("btnGuardarRetrabajo");
+  btn.disabled = true;
+  btn.innerText = "Guardando corrección...";
+
+  try {
+    const urlRet = await subirImagenASupabase(fileRet, "retrabajos");
+
+    const { error } = await sb.from('incidencias_mtto').update({
+      costo_retrabajo: cRet,
+      foto_retrabajo: urlRet,
+      notas_retrabajo: notas,
+      // Se reinicia calificación para que el usuario vuelva a validar
+      calificacion_estrellas: null
+    }).eq('id', id);
+
+    if (error) throw error;
+
+    mostrarToast("Re-trabajo Entregado", "El folio volvió a estatus Por Validar.");
+    cerrarModal('modalRetrabajo');
+    cargarConsolaMtto();
+  } catch (err) {
+    alert("Error: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "🔄 Re-entregar Trabajo";
   }
 }
 
 // ==========================================
-// 4. DASHBOARD GENERAL (CON BOTÓN DE OJO 👁️)
+// 4. DASHBOARD EJECUTIVO
 // ==========================================
 async function cargarDashboardMtto() {
   try {
@@ -1115,31 +1647,39 @@ async function cargarDashboardMtto() {
     ticketsEnMemoria = ordenarPorFlujo(data || []);
 
     let total = ticketsEnMemoria.length;
-    let resueltos = 0, sinEmpezar = 0, enProceso = 0;
+    let resueltos = 0, sinEmpezar = 0, enProceso = 0, retrabajos = 0;
     let altoSinEmpezar = 0;
-    let atrasados = 0;
-    let gastoEstimado = 0, gastoReal = 0;
+    let gastoEstimado = 0, gastoRealTotal = 0;
+    let sumaEstrellas = 0, countEstrellas = 0;
 
     ticketsEnMemoria.forEach(t => {
-      if (t.estatus === 'Resuelto') resueltos++;
+      if (t.estatus === 'Concluido Conforme') resueltos++;
+      else if (t.estatus === 'Rechazado / Re-trabajo') retrabajos++;
       else if (t.estatus === 'En proceso') enProceso++;
       else {
         sinEmpezar++;
         if (t.flujo_clientes === 'Alto') altoSinEmpezar++;
       }
 
-      const diasAtraso = parseInt(t.atraso_dias) || 0;
-      if (diasAtraso > 0 && t.estatus !== 'Resuelto') atrasados++;
-
       gastoEstimado += parseFloat(t.costo_estimado) || 0;
-      gastoReal += parseFloat(t.costo_real) || 0;
+      gastoRealTotal += parseFloat(t.costo_total_acumulado) || 0;
+
+      if (t.calificacion_estrellas) {
+        sumaEstrellas += parseInt(t.calificacion_estrellas);
+        countEstrellas++;
+      }
     });
 
     document.getElementById("kpiTotalTickets").innerText = total;
-    document.getElementById("kpiDesgloseTickets").innerText = `${sinEmpezar} Sin empezar | ${enProceso} Proceso | ${resueltos} Resueltas`;
+    document.getElementById("kpiDesgloseTickets").innerText = `${sinEmpezar} Sin empezar | ${enProceso} Proceso | ${resueltos} Concluidas`;
     document.getElementById("kpiAltoFlujoSinEmpezar").innerText = altoSinEmpezar;
-    document.getElementById("kpiTicketsAtrasados").innerText = atrasados;
-    document.getElementById("kpiGastoTotal").innerText = `$${gastoReal.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+    document.getElementById("kpiDashRetrabajos").innerText = retrabajos;
+
+    const promEstrellas = countEstrellas > 0 ? (sumaEstrellas / countEstrellas).toFixed(1) : "0.0";
+    document.getElementById("kpiSatisfaccionProm").innerText = `${promEstrellas} ★`;
+    document.getElementById("kpiTotalEvaluados").innerText = `${countEstrellas} de ${total} calificados`;
+
+    document.getElementById("kpiGastoTotal").innerText = `$${gastoRealTotal.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
     document.getElementById("kpiEstimadoVsReal").innerText = `Cotizado: $${gastoEstimado.toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
 
     filtrarDashboardTabla();
@@ -1157,48 +1697,59 @@ function filtrarDashboardTabla() {
   if (estFiltro !== "TODOS") lista = lista.filter(t => t.estatus === estFiltro);
 
   if (lista.length === 0) {
-    tb.innerHTML = '<tr><td colspan="10" class="text-center" style="padding:15px; color:#64748b;">No hay incidencias con este estatus.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="11" class="text-center" style="padding:18px; color:var(--text-muted);">No hay incidencias con este estatus.</td></tr>';
     return;
   }
 
   lista.forEach(t => {
     let statusClass = "status-sin-empezar";
     if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-    if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+    if (t.estatus === 'Por Validar (Mtto Listo)') statusClass = "status-por-validar";
+    if (t.estatus === 'Rechazado / Re-trabajo') statusClass = "status-retrabajo";
+    if (t.estatus === 'Concluido Conforme') statusClass = "status-concluido";
 
     const diasAtraso = parseInt(t.atraso_dias) || 0;
     const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
     const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : '--';
+    const solicitante = t.reportado_por_nombre ? `${t.reportado_por_nombre} (${t.reportado_por_puesto})` : t.dpto_reporte;
 
     tb.innerHTML += `<tr>
       <td>${fReg}</td>
       <td><strong>${t.distribuidora}</strong></td>
       <td><strong>${t.area}</strong></td>
-      <td><span style="font-weight:700; color:var(--flujo-${t.flujo_clientes});">${t.flujo_clientes}</span></td>
+      <td><span style="font-size:10px; color:#475569;">${solicitante}</span></td>
       <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
       <td>${fComp}</td>
       <td>${diasAtraso > 0 ? `<span class="atraso-pill">+${diasAtraso} d</span>` : '0 d'}</td>
       <td style="text-align:right;">$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
-      <td style="text-align:right; font-weight:700; color:#15803d;">$${(parseFloat(t.costo_real) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+      <td style="text-align:right; font-weight:700; color:var(--primary);">$${(parseFloat(t.costo_total_acumulado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
+      <td style="text-align:center; font-weight:800; color:#f59e0b;">${t.calificacion_estrellas ? t.calificacion_estrellas + ' ★' : '--'}</td>
       <td style="text-align:center;">
-        <button type="button" class="btn-action-icon" title="Ver Expediente Completo" onclick="abrirModalExpediente('${t.id}')">👁️</button>
+        <button type="button" class="btn-action-icon" title="Ver Expediente" onclick="abrirModalExpediente('${t.id}')">👁️</button>
       </td>
     </tr>`;
   });
 }
 
-// 4.1 VISOR DE EXPEDIENTE COMPLETO (EL OJO)
+// 4.1 VISOR DE EXPEDIENTE (EL OJO)
 function abrirModalExpediente(id) {
-  const t = ticketsEnMemoria.find(item => item.id === id);
+  const t = (consultaPublicaEnMemoria.concat(ticketsEnMemoria)).find(item => item.id === id);
   if (!t) return;
 
   document.getElementById("expAgenciaArea").innerText = `${t.distribuidora} - ${t.area}`;
   const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
   document.getElementById("expFechaFolio").innerText = `Reportado el: ${fReg} | Departamento: ${t.dpto_reporte} | Tipo: ${t.tipo}`;
 
+  document.getElementById("expReportante").innerText = t.reportado_por_nombre || 'No especificado';
+  document.getElementById("expPuesto").innerText = t.reportado_por_puesto || t.dpto_reporte;
+  document.getElementById("expTel").innerText = t.reportado_por_telefono || 'Sin teléfono';
+
   let statusClass = "status-sin-empezar";
   if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-  if (t.estatus === 'Resuelto') statusClass = "status-resuelto";
+  if (t.estatus === 'Por Validar (Mtto Listo)') statusClass = "status-por-validar";
+  if (t.estatus === 'Rechazado / Re-trabajo') statusClass = "status-retrabajo";
+  if (t.estatus === 'Concluido Conforme') statusClass = "status-concluido";
+
   const stEl = document.getElementById("expBadgeEstatus");
   stEl.innerText = t.estatus;
   stEl.className = `status-badge ${statusClass}`;
@@ -1209,19 +1760,29 @@ function abrirModalExpediente(id) {
 
   const atrEl = document.getElementById("expBadgeAtraso");
   const diasAtraso = parseInt(t.atraso_dias) || 0;
-  if (diasAtraso > 0 && t.estatus !== 'Resuelto') {
+  if (diasAtraso > 0 && t.estatus !== 'Concluido Conforme') {
     atrEl.classList.remove("hidden");
     atrEl.innerText = `⚠️ Retraso: ${diasAtraso} días`;
   } else {
     atrEl.classList.add("hidden");
   }
 
+  const calEl = document.getElementById("expBadgeCalificacion");
+  if (t.calificacion_estrellas) {
+    calEl.innerText = `${t.calificacion_estrellas} ★ (${t.calificacion_estrellas >= 3 ? 'Aprobado' : 'Rechazado'})`;
+  } else {
+    calEl.innerText = 'Sin calificar';
+  }
+
   document.getElementById("expDescripcion").innerText = t.descripcion || 'Sin descripción';
-  document.getElementById("expComentarios").innerText = t.comentarios ? `Nota: ${t.comentarios}` : '';
+  document.getElementById("expComentarios").innerText = t.comentarios ? `Nota inicial: ${t.comentarios}` : '';
   document.getElementById("expResponsable").innerText = t.responsable_mtto || 'Sin asignar';
   document.getElementById("expCompromiso").innerText = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'Sin fecha';
-  document.getElementById("expCotizado").innerText = `$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
-  document.getElementById("expReal").innerText = `$${(parseFloat(t.costo_real) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
+
+  document.getElementById("expCotizado").innerText = `$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}`;
+  document.getElementById("expReal").innerText = `$${(parseFloat(t.costo_real) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}`;
+  document.getElementById("expRetrabajoCost").innerText = `$${(parseFloat(t.costo_retrabajo) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}`;
+  document.getElementById("expTotalAcum").innerText = `$${(parseFloat(t.costo_total_acumulado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})} MXN`;
 
   // Fotos Iniciales
   const fRepBox = document.getElementById("expFotosReporte");
@@ -1229,53 +1790,64 @@ function abrirModalExpediente(id) {
   if (t.foto_incidencia_1) fRepBox.innerHTML += `<img src="${t.foto_incidencia_1}" onclick="window.open('${t.foto_incidencia_1}')" title="Foto 1">`;
   if (t.foto_incidencia_2) fRepBox.innerHTML += `<img src="${t.foto_incidencia_2}" onclick="window.open('${t.foto_incidencia_2}')" title="Foto 2">`;
   if (t.foto_incidencia_3) fRepBox.innerHTML += `<img src="${t.foto_incidencia_3}" onclick="window.open('${t.foto_incidencia_3}')" title="Foto 3">`;
-  if (!t.foto_incidencia_1) fRepBox.innerHTML = '<span style="font-size:11px; color:#94a3b8; font-style:italic;">Sin fotos registradas</span>';
+  if (!t.foto_incidencia_1) fRepBox.innerHTML = '<span style="font-size:11px; color:var(--text-soft); font-style:italic;">Sin fotos registradas</span>';
 
-  // Fotos Cierre
+  // Fotos Cierre Mtto
   const fCieBox = document.getElementById("expFotosCierre");
   fCieBox.innerHTML = "";
-  if (t.foto_resolucion_1) fCieBox.innerHTML += `<img src="${t.foto_resolucion_1}" onclick="window.open('${t.foto_resolucion_1}')" title="Foto Cierre 1" style="border:2px solid #15803d;">`;
-  if (t.foto_resolucion_2) fCieBox.innerHTML += `<img src="${t.foto_resolucion_2}" onclick="window.open('${t.foto_resolucion_2}')" title="Foto Cierre 2" style="border:2px solid #15803d;">`;
-  if (t.foto_resolucion_3) fCieBox.innerHTML += `<img src="${t.foto_resolucion_3}" onclick="window.open('${t.foto_resolucion_3}')" title="Foto Cierre 3" style="border:2px solid #15803d;">`;
+  if (t.foto_resolucion_1) fCieBox.innerHTML += `<img src="${t.foto_resolucion_1}" onclick="window.open('${t.foto_resolucion_1}')" title="Foto Solución 1" style="border:2px solid #15803d;">`;
+  if (t.foto_resolucion_2) fCieBox.innerHTML += `<img src="${t.foto_resolucion_2}" onclick="window.open('${t.foto_resolucion_2}')" title="Foto Solución 2" style="border:2px solid #15803d;">`;
   
   const fHoraEl = document.getElementById("expFechaHoraCierre");
   if (t.foto_resolucion_1) {
     const fHora = t.fecha_hora_resolucion ? new Date(t.fecha_hora_resolucion).toLocaleString('es-MX') : (t.fecha_resolucion || '');
-    fHoraEl.innerText = `Sello de resolución: ${fHora}`;
+    fHoraEl.innerText = `Sello de entrega: ${fHora}`;
   } else {
-    fCieBox.innerHTML = '<span style="font-size:11px; color:#94a3b8; font-style:italic;">Pendiente de resolver</span>';
+    fCieBox.innerHTML = '<span style="font-size:11px; color:var(--text-soft); font-style:italic;">Pendiente de entregar</span>';
     fHoraEl.innerText = '';
+  }
+
+  // Fotos Queja
+  const boxQ = document.getElementById("boxExpQuejaVisual");
+  if (t.calificacion_estrellas && t.calificacion_estrellas <= 2) {
+    boxQ.classList.remove("hidden");
+    document.getElementById("expTextoQueja").innerText = `"${t.retroalimentacion_usuario || 'Sin comentario detallado'}"`;
+    const fQuejaBox = document.getElementById("expFotosQueja");
+    fQuejaBox.innerHTML = t.foto_queja_retrabajo ? `<img src="${t.foto_queja_retrabajo}" onclick="window.open('${t.foto_queja_retrabajo}')" style="border:2px solid #dc2626;">` : '<span>Sin foto</span>';
+  } else {
+    boxQ.classList.add("hidden");
+  }
+
+  // Fotos Re-trabajo
+  const boxR = document.getElementById("boxExpRetrabajoVisual");
+  if (t.foto_retrabajo) {
+    boxR.classList.remove("hidden");
+    document.getElementById("expTextoRetrabajo").innerText = `"${t.notas_retrabajo || 'Corrección aplicada'}"`;
+    document.getElementById("expFotosRetrabajo").innerHTML = `<img src="${t.foto_retrabajo}" onclick="window.open('${t.foto_retrabajo}')" style="border:2px solid #2563eb;">`;
+  } else {
+    boxR.classList.add("hidden");
   }
 
   document.getElementById("modalExpediente").classList.add("open");
 }
 
-// ==========================================
-// 5. BORRADO EXCLUSIVO CON RLS CORREGIDO
-// ==========================================
+// 5. BORRADO EXCLUSIVO (ADMIN)
 async function solicitarBorradoRegistro(id) {
-  const clave = prompt("⚠️ ACCIÓN RESERVADA PARA ADMINISTRACIÓN\nIngresa la clave maestra para eliminar definitivamente este registro:");
+  const clave = prompt("⚠️ ACCIÓN RESERVADA PARA ADMINISTRACIÓN\nIngresa la clave maestra para eliminar definitivamente:");
   if (clave === CLAVE_ADMIN_BORRADO) {
-    const confirma = confirm("¿Estás 100% seguro de eliminar este ticket y todo su historial de la base de datos?");
-    if (!confirma) return;
+    if (!confirm("¿Estás seguro de eliminar este ticket y todo su historial de la base de datos?")) return;
 
     try {
-      // Elimina directamente por la llave primaria única (id UUID)
-      const { error } = await sb
-        .from('incidencias_mtto')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await sb.from('incidencias_mtto').delete().eq('id', id);
       if (error) throw error;
-
-      mostrarToast("Registro Eliminado", "La incidencia fue borrada de la base de datos.");
+      mostrarToast("Registro Eliminado", "La incidencia fue purgada de la base de datos.");
       cargarConsolaMtto();
       cargarDashboardMtto();
     } catch (err) {
       alert("Error al eliminar: " + err.message);
     }
   } else if (clave !== null) {
-    alert("Clave de administrador incorrecta. Eliminación denegada.");
+    alert("Clave incorrecta. Eliminación denegada.");
   }
 }
 </script>
