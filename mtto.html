@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Control de Incidencias & Mantenimiento | Grupo CER</title>
-  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -235,7 +233,31 @@
     }
     .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(11, 30, 66, 0.35); filter: brightness(1.05); }
 
-    /* CONSOLA DE TRABAJO */
+    /* ======================================================= */
+    /* PESTAÑAS (TABS) EN CONSOLA DE TRABAJO                   */
+    /* ======================================================= */
+    .tabs-estatus-container {
+      display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px 2px;
+      border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px;
+    }
+    .tab-btn {
+      height: 38px; padding: 0 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong); background: rgba(255, 255, 255, 0.7);
+      color: var(--text-muted); font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+      white-space: nowrap; transition: all 0.2s ease; flex-shrink: 0;
+    }
+    .tab-btn:hover { background: #ffffff; color: var(--primary); transform: translateY(-1px); }
+    .tab-btn.active {
+      background: var(--primary); color: #ffffff; border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(11, 30, 66, 0.2);
+    }
+    .tab-badge {
+      padding: 2px 6px; border-radius: 999px; font-size: 9px; font-weight: 800;
+      background: rgba(0, 0, 0, 0.08); color: inherit;
+    }
+    .tab-btn.active .tab-badge { background: rgba(255, 255, 255, 0.25); color: #ffffff; }
+
     .legend-bar {
       display: flex; gap: 14px; background: rgba(255, 255, 255, 0.65); padding: 10px 16px; border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle); font-size: 11px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;
@@ -315,9 +337,7 @@
     }
     .hidden { display: none !important; }
 
-    /* ======================================================= */
-    /* REGLAS RESPONSIVAS EXCLUSIVAS PARA MÓVIL (PANTALLAS CHICAS) */
-    /* ======================================================= */
+    /* REGLAS RESPONSIVAS MÓVIL */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .app-sidebar {
@@ -333,41 +353,14 @@
       .col-6, .col-4 { flex: 0 0 100% !important; width: 100% !important; }
       .criticidad-cards-container { grid-template-columns: 1fr !important; }
 
-      /* CORRECCIÓN CONSOLA EN CELULAR */
-      #viewConsola .kpi-container {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 10px !important;
-      }
-
-      .deck-grid {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-      }
-
-      .deck-card {
-        min-width: 0 !important;
-        width: 100% !important;
-        padding: 14px 12px !important;
-      }
+      .deck-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+      .deck-card { min-width: 0 !important; width: 100% !important; padding: 14px 12px !important; }
 
       #viewConsola .glass-canvas > div[style*="display: flex; gap: 8px;"] {
-        flex-direction: column !important;
-        gap: 8px !important;
+        flex-direction: column !important; gap: 8px !important;
       }
-
-      #filtroConsolaDist,
-      #filtroConsolaEstatus,
-      #busquedaConsolaTexto {
-        min-width: 100% !important;
-        width: 100% !important;
-      }
-
-      .legend-bar {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 6px !important;
-        padding: 10px 12px !important;
-      }
+      #filtroConsolaDist, #busquedaConsolaTexto { min-width: 100% !important; width: 100% !important; }
+      .legend-bar { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; padding: 10px 12px !important; }
     }
   </style>
 
@@ -437,12 +430,18 @@
       </div>
       <div class="col-6 form-group">
         <label class="form-label">Fecha Compromiso Tentativa *</label>
-        <input type="date" id="asigFechaCompromiso">
+        <input type="date" id="asigFechaCompromiso" onchange="verificarHolguraFecha(this)">
       </div>
       <div class="col-6 form-group">
         <label class="form-label">Costo Estimado / Cotización (MXN) *</label>
         <input type="number" id="asigCostoEstimado" placeholder="0.00" min="0" step="0.01">
       </div>
+
+      <!-- ADVERTENCIA DE HOLGURA (> 14 DÍAS) -->
+      <div class="col-12 hidden" id="boxAlertaHolgura" style="background:#fffbeb; border:1.5px solid #fde68a; border-radius:8px; padding:10px; font-size:11px; color:#b45309; line-height:1.4;">
+        ⚠️ <strong>Atención de Plazo:</strong> Estás seleccionando una fecha compromiso a <strong id="lblDiasHolgura">X</strong> días naturales (más de 2 semanas). Este plazo prolongado quedará registrado en el Dashboard de supervisión.
+      </div>
+
       <div class="col-12 form-group">
         <label class="form-label">Notas y Comentarios Operativos</label>
         <textarea id="asigComentarios" placeholder="Detalles de materiales o refacciones..."></textarea>
@@ -510,18 +509,25 @@
 <!-- MODAL 3: EVALUACIÓN DE SATISFACCIÓN (EL CLIENTE INTERNO CIERRA O RECHAZA) -->
 <div class="modal-overlay" id="modalEvaluacion">
   <div class="modal-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
       <h3 style="font-size: 13px; color: var(--primary); text-transform: uppercase;">Validación de Entrega de Trabajo</h3>
       <button type="button" style="border:none; background:none; font-size:16px; cursor:pointer;" onclick="cerrarModal('modalEvaluacion')">✕</button>
     </div>
 
     <input type="hidden" id="evalTicketId">
-    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; text-align: center;">
-      Califica el resultado del mantenimiento realizado en tu área:
+    
+    <!-- GUÍA CLARA Y EMPÁTICA DE CALIFICACIÓN -->
+    <div style="background:rgba(237, 242, 249, 0.7); border:1px solid #bfdbfe; border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:11px; color:#1e40af; line-height:1.4;">
+      <strong>Guía de Evaluación:</strong>
+      <ul style="margin-left: 16px; margin-top: 4px;">
+        <li>⭐⭐⭐⭐⭐ <strong>Excelente:</strong> Trabajo realizado en tiempo y con acabados óptimos.</li>
+        <li>⭐⭐⭐ / ⭐⭐⭐⭐ <strong>Aceptable con Observaciones:</strong> El problema quedó resuelto, pero existen detalles menores por mejorar.</li>
+        <li>⭐ / ⭐⭐ <strong>Requiere Re-trabajo:</strong> El resultado no resolvió la falla o no cumple estándares de calidad. Se solicitará corrección y se notificará a Dirección.</li>
+      </ul>
     </div>
 
     <!-- SELECTOR DE ESTRELLAS -->
-    <div style="text-align: center; margin-bottom: 14px;">
+    <div style="text-align: center; margin-bottom: 12px;">
       <div class="star-rating" id="contenedorEstrellas">
         <span onclick="seleccionarEstrella(1)">★</span>
         <span onclick="seleccionarEstrella(2)">★</span>
@@ -535,7 +541,7 @@
     <div class="form-grid">
       <div class="col-12 form-group hidden" id="boxRetroComentario">
         <label class="form-label" id="lblRetroComentario">Comentario / Observaciones *</label>
-        <textarea id="evalComentario" placeholder="Explica detalladamente qué faltó o por qué no quedó resuelto..."></textarea>
+        <textarea id="evalComentario" placeholder="Describe detalladamente qué faltó o por qué requiere corrección..."></textarea>
       </div>
 
       <!-- FOTO EVIDENCIA DE QUEJA (SOLO 1 O 2 ESTRELLAS) -->
@@ -568,9 +574,13 @@
 
     <input type="hidden" id="retTicketId">
     <div class="form-grid">
-      <div class="col-12 form-group">
-        <label class="form-label">Costo Adicional Incurrido por Re-trabajo (MXN) *</label>
-        <input type="number" id="retCosto" placeholder="0.00 (Se sumará al costo original)" min="0" step="0.01">
+      <div class="col-6 form-group">
+        <label class="form-label">Nueva Fecha Compromiso Re-trabajo *</label>
+        <input type="date" id="retFechaCompromiso" required>
+      </div>
+      <div class="col-6 form-group">
+        <label class="form-label">Costo Adicional Re-trabajo (MXN) *</label>
+        <input type="number" id="retCosto" placeholder="0.00" min="0" step="0.01">
       </div>
       <div class="col-12 form-group">
         <label class="form-label">Notas de Corrección Ejecutada *</label>
@@ -625,9 +635,10 @@
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; font-size: 11px;">
       <div style="background:#fff; border:1px solid var(--border-subtle); padding:10px; border-radius:var(--radius-sm);">
-        <span style="font-weight:700; color:var(--text-muted);">Asignación:</span><br>
+        <span style="font-weight:700; color:var(--text-muted);">Asignación y Tiempos:</span><br>
         👤 Técnico: <strong id="expResponsable">--</strong><br>
-        📅 Compromiso: <strong id="expCompromiso">--</strong>
+        📅 Compromiso: <strong id="expCompromiso">--</strong><br>
+        ⏱️ Tiempo Total: <strong id="expTiempoTotal" style="color:var(--primary);">--</strong>
       </div>
       <div style="background:#fff; border:1px solid var(--border-subtle); padding:10px; border-radius:var(--radius-sm);">
         <span style="font-weight:700; color:var(--text-muted);">Finanzas:</span><br>
@@ -939,34 +950,33 @@
       <div class="header-branding" style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
         <div>
           <h1>Consola Operativa de Mantenimiento</h1>
-          <p>Gestiona fechas compromiso inmutables, resoluciones preliminares y atiende re-trabajos.</p>
+          <p>Organiza la atención seleccionando directamente la pestaña del estatus correspondiente.</p>
         </div>
         <button type="button" class="btn-submit" style="width: auto; height: 36px; padding: 0 14px; font-size: 11px; margin-top: 0;" onclick="cargarConsolaMtto()">
           🔄 Actualizar
         </button>
       </div>
 
-      <div class="kpi-container" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 14px;">
-        <div class="kpi-card" style="border-left: 4px solid var(--flujo-alto);">
-          <span class="kpi-title">Sin Empezar</span>
-          <span class="kpi-value" id="kpiConsolaSinEmpezar" style="color: #b91c1c;">0</span>
-          <span class="kpi-subtext">Por asignar</span>
-        </div>
-        <div class="kpi-card" style="border-left: 4px solid var(--flujo-medio);">
-          <span class="kpi-title">En Proceso</span>
-          <span class="kpi-value" id="kpiConsolaEnProceso" style="color: #b45309;">0</span>
-          <span class="kpi-subtext">Con compromiso</span>
-        </div>
-        <div class="kpi-card" style="border-left: 4px solid var(--flujo-alto); background: var(--flujo-alto-soft);">
-          <span class="kpi-title" style="color: #b91c1c;">Re-trabajos</span>
-          <span class="kpi-value" id="kpiConsolaRetrabajos" style="color: var(--flujo-alto);">0</span>
-          <span class="kpi-subtext" style="color: #b91c1c;">Rechazados por cliente</span>
-        </div>
-        <div class="kpi-card" style="border-left: 4px solid var(--flujo-bajo);">
-          <span class="kpi-title">Concluidas</span>
-          <span class="kpi-value" id="kpiConsolaTerminadas" style="color: var(--flujo-bajo);">0</span>
-          <span class="kpi-subtext">Aprobadas</span>
-        </div>
+      <!-- BOTONERA DE PESTAÑAS (TABS) POR ESTATUS -->
+      <div class="tabs-estatus-container" id="tabsConsolaEstatus">
+        <button type="button" class="tab-btn active" onclick="seleccionarTabEstatus('TODOS', this)">
+          Todos <span class="tab-badge" id="badgeTabTodos">0</span>
+        </button>
+        <button type="button" class="tab-btn" onclick="seleccionarTabEstatus('Sin empezar', this)">
+          Sin empezar <span class="tab-badge" id="badgeTabSinEmp">0</span>
+        </button>
+        <button type="button" class="tab-btn" onclick="seleccionarTabEstatus('En proceso', this)">
+          En proceso <span class="tab-badge" id="badgeTabEnProc">0</span>
+        </button>
+        <button type="button" class="tab-btn" onclick="seleccionarTabEstatus('En espera de calificación', this)">
+          En espera de calificación <span class="tab-badge" id="badgeTabEsperando">0</span>
+        </button>
+        <button type="button" class="tab-btn" onclick="seleccionarTabEstatus('En re-trabajo', this)">
+          En re-trabajo <span class="tab-badge" id="badgeTabRetrab">0</span>
+        </button>
+        <button type="button" class="tab-btn" onclick="seleccionarTabEstatus('Concluido', this)">
+          Concluido <span class="tab-badge" id="badgeTabConcluido">0</span>
+        </button>
       </div>
 
       <div class="legend-bar">
@@ -984,15 +994,7 @@
           <option value="Chetumal">Chetumal Automotores</option>
           <option value="Millenium">Millenium Motors</option>
         </select>
-        <select id="filtroConsolaEstatus" style="flex: 1; min-width: 160px; height: 38px;" onchange="filtrarDeckEnVivo()">
-          <option value="TODOS">Todos los Estatus</option>
-          <option value="Sin empezar">Sin empezar</option>
-          <option value="En proceso">En proceso</option>
-          <option value="Por Validar (Mtto Listo)">Por Validar</option>
-          <option value="Rechazado / Re-trabajo">Re-trabajo Requerido</option>
-          <option value="Concluido Conforme">Concluido</option>
-        </select>
-        <input type="text" id="busquedaConsolaTexto" placeholder="🔍 Buscar por palabra clave..." 
+        <input type="text" id="busquedaConsolaTexto" placeholder="🔍 Buscar por palabra clave en la consola..." 
                style="flex: 2; min-width: 200px; height: 38px;" oninput="filtrarDeckEnVivo()">
       </div>
 
@@ -1008,7 +1010,7 @@
       <div class="header-branding">
         <img src="logo-grupocer.png" alt="Grupo CER" onerror="this.style.display='none'">
         <h1>Tablero Ejecutivo & Alertas de Mantenimiento</h1>
-        <p>Auditoría de cumplimiento de compromisos, gastos reales y evaluación de calidad interna.</p>
+        <p>Auditoría de tiempos de ciclo totales, atrasos de compromiso y calidad de resolución.</p>
       </div>
 
       <div class="kpi-container">
@@ -1022,15 +1024,15 @@
           <span class="kpi-value" id="kpiAltoFlujoSinEmpezar" style="color: #b91c1c;">0</span>
           <span class="kpi-subtext" style="color: #b91c1c;">Flujo Alto Sin Asignar</span>
         </div>
-        <div class="kpi-card" style="border-left: 4px solid var(--flujo-alto);">
-          <span class="kpi-title" style="color: #b91c1c;">Re-trabajos Activos</span>
-          <span class="kpi-value" id="kpiDashRetrabajos" style="color: #dc2626;">0</span>
-          <span class="kpi-subtext">Trabajos rechazados</span>
+        <div class="kpi-card" style="border-left: 4px solid var(--accent);">
+          <span class="kpi-title">Tiempo Prom. de Resolución</span>
+          <span class="kpi-value" id="kpiTiempoPromedioResolucion" style="color: var(--accent);">0.0 d</span>
+          <span class="kpi-subtext">Lead Time promedio</span>
         </div>
         <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
           <span class="kpi-title">Satisfacción Promedio</span>
           <span class="kpi-value" id="kpiSatisfaccionProm" style="color: #d97706;">0.0 ★</span>
-          <span class="kpi-subtext" id="kpiTotalEvaluados">0 reportes calificados</span>
+          <span class="kpi-subtext" id="kpiTotalEvaluados">0 calificados</span>
         </div>
         <div class="kpi-card">
           <span class="kpi-title">Gasto Real Acumulado</span>
@@ -1047,13 +1049,13 @@
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             <label class="form-label" style="margin:0;">Filtrar:</label>
-            <select id="filtroDashboardEstatus" style="width: 170px; height: 34px; font-size:11px;" onchange="filtrarDashboardTabla()">
+            <select id="filtroDashboardEstatus" style="width: 190px; height: 34px; font-size:11px;" onchange="filtrarDashboardTabla()">
               <option value="TODOS">Todos los estatus</option>
               <option value="Sin empezar">Sin empezar</option>
               <option value="En proceso">En proceso</option>
-              <option value="Por Validar (Mtto Listo)">Por Validar</option>
-              <option value="Rechazado / Re-trabajo">Rechazado / Re-trabajo</option>
-              <option value="Concluido Conforme">Concluido Conforme</option>
+              <option value="En espera de calificación">En espera de calificación</option>
+              <option value="En re-trabajo">En re-trabajo</option>
+              <option value="Concluido">Concluido</option>
             </select>
           </div>
         </div>
@@ -1067,8 +1069,7 @@
                 <th>Área / Falla</th>
                 <th>Solicitante</th>
                 <th>Estatus</th>
-                <th>Compromiso</th>
-                <th>Atraso</th>
+                <th>Tiempos (Ciclo / Atraso)</th>
                 <th style="text-align: right;">Cotizado</th>
                 <th style="text-align: right;">Costo Total</th>
                 <th style="text-align: center;">Calificación</th>
@@ -1076,7 +1077,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="11" class="text-center" style="padding:18px; color:var(--text-muted);">Cargando incidencias...</td></tr>
+              <tr><td colspan="10" class="text-center" style="padding:18px; color:var(--text-muted);">Cargando incidencias...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1091,6 +1092,7 @@ let ticketsEnMemoria = [];
 let consultaPublicaEnMemoria = [];
 let filtroMisReportesActivo = false;
 let calificacionSeleccionada = 0;
+let estatusTabActual = 'TODOS';
 
 window.onload = function() {
   verificarSesion();
@@ -1125,6 +1127,23 @@ function seleccionarCriticidad(card, valor) {
   document.querySelectorAll('.criticidad-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
   document.getElementById('valorFlujo').value = valor;
+}
+
+function verificarHolguraFecha(input) {
+  if (!input.value) return;
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+  const seleccion = new Date(input.value + "T00:00:00");
+  const diffTiempo = seleccion.getTime() - hoy.getTime();
+  const diffDias = Math.ceil(diffTiempo / (1000 * 60 * 60 * 24));
+
+  const boxAlerta = document.getElementById("boxAlertaHolgura");
+  if (diffDias > 14) {
+    document.getElementById("lblDiasHolgura").innerText = diffDias;
+    boxAlerta.classList.remove("hidden");
+  } else {
+    boxAlerta.classList.add("hidden");
+  }
 }
 
 async function subirImagenASupabase(file, carpeta = "reportes") {
@@ -1355,9 +1374,9 @@ function filtrarConsultaPublicaEnVivo() {
   filtrados.forEach(t => {
     let statusClass = "status-sin-empezar";
     if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-    if (t.estatus === 'Por Validar (Mtto Listo)') statusClass = "status-por-validar";
-    if (t.estatus === 'Rechazado / Re-trabajo') statusClass = "status-retrabajo";
-    if (t.estatus === 'Concluido Conforme') statusClass = "status-concluido";
+    if (t.estatus === 'En espera de calificación') statusClass = "status-por-validar";
+    if (t.estatus === 'En re-trabajo') statusClass = "status-retrabajo";
+    if (t.estatus === 'Concluido') statusClass = "status-concluido";
 
     const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
     const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'En revisión';
@@ -1366,7 +1385,7 @@ function filtrarConsultaPublicaEnVivo() {
     let btnEvaluarHtml = '<span style="color:var(--text-soft); font-size:10px;">--</span>';
     const esMio = (usuarioActual && t.reportado_por_email === usuarioActual.email_corporativo);
 
-    if (t.estatus === 'Por Validar (Mtto Listo)' && esMio) {
+    if (t.estatus === 'En espera de calificación' && esMio) {
       btnEvaluarHtml = `<button type="button" class="btn-submit" style="height:26px; font-size:10px; padding:0 10px; margin:0; background:#f59e0b;" onclick="abrirModalEvaluacion('${t.id}')">⭐ Evaluar</button>`;
     } else if (t.calificacion_estrellas) {
       btnEvaluarHtml = `<span style="font-weight:800; color:#f59e0b;">${t.calificacion_estrellas} ★</span>`;
@@ -1387,7 +1406,7 @@ function filtrarConsultaPublicaEnVivo() {
   });
 }
 
-// 2.1 EVALUACIÓN Y ESCALAMIENTO
+// 2.1 EVALUACIÓN Y NOTIFICACIÓN
 function abrirModalEvaluacion(id) {
   document.getElementById("evalTicketId").value = id;
   calificacionSeleccionada = 0;
@@ -1409,7 +1428,7 @@ function seleccionarEstrella(num) {
   const lblDiag = document.getElementById("lblDiagnosticoEstrellas");
 
   if (num === 5) {
-    lblDiag.innerText = "⭐⭐⭐⭐⭐ Excelente / Trabajo 100% Conforme";
+    lblDiag.innerText = "⭐⭐⭐⭐⭐ Excelente / Trabajo Conforme";
     lblDiag.style.color = "var(--flujo-bajo)";
     boxCom.classList.add("hidden");
     boxQueja.classList.add("hidden");
@@ -1420,10 +1439,10 @@ function seleccionarEstrella(num) {
     document.getElementById("lblRetroComentario").innerText = "Comentario de Observación Obligatorio *";
     boxQueja.classList.add("hidden");
   } else if (num >= 1) {
-    lblDiag.innerText = "⚠️ Trabajo Deficiente / Rechazado (Escalamiento a Dirección)";
+    lblDiag.innerText = "⚠️ Requiere Re-trabajo (Escalamiento a Dirección)";
     lblDiag.style.color = "var(--flujo-alto)";
     boxCom.classList.remove("hidden");
-    document.getElementById("lblRetroComentario").innerText = "Motivo del Rechazo (Obligatorio) *";
+    document.getElementById("lblRetroComentario").innerText = "Motivo de la Falla No Resuelta *";
     boxQueja.classList.remove("hidden");
   }
 }
@@ -1444,7 +1463,7 @@ async function guardarEvaluacionSolicitante() {
     return;
   }
   if (calificacionSeleccionada <= 2 && !fileQ) {
-    alert("Para reportar un trabajo deficiente debes anexar obligatoriamente la fotografía de evidencia.");
+    alert("Para reportar un trabajo que requiere re-trabajo debes adjuntar la fotografía de evidencia.");
     return;
   }
 
@@ -1455,12 +1474,16 @@ async function guardarEvaluacionSolicitante() {
     let urlFotoQueja = null;
     if (fileQ) urlFotoQueja = await subirImagenASupabase(fileQ, "quejas");
 
-    const payload = {
+    let payload = {
       calificacion_estrellas: calificacionSeleccionada,
       retroalimentacion_usuario: comentario || null,
       foto_queja_retrabajo: urlFotoQueja,
       fecha_evaluacion: new Date().toISOString()
     };
+
+    if (calificacionSeleccionada <= 2) {
+      payload.fecha_rechazo_retrabajo = new Date().toISOString();
+    }
 
     const { error } = await sb.from('incidencias_mtto').update(payload).eq('id', id);
     if (error) throw error;
@@ -1485,17 +1508,17 @@ function dispararCorreoEscalamientoDireccion(ticket, queja, urlFoto) {
   const asunto = encodeURIComponent(`🚨 ESCALAMIENTO | Trabajo Deficiente Mtto en ${ticket.distribuidora} - ${ticket.area}`);
   const cuerpo = encodeURIComponent(
     `ATENCIÓN DIRECCIÓN GENERAL Y CALIDAD:\n\n` +
-    `Se ha reportado un trabajo DEFICIENTE de mantenimiento calificado con ${calificacionSeleccionada} estrella(s).\n\n` +
+    `Se ha reportado un trabajo que REQUIERE RE-TRABAJO calificado con ${calificacionSeleccionada} estrella(s).\n\n` +
     `--- DETALLES DEL REPORTE ---\n` +
     `• Agencia / Área: ${ticket.distribuidora} - ${ticket.area}\n` +
     `• Solicitante: ${ticket.reportado_por_nombre} (${ticket.reportado_por_puesto})\n` +
     `• Técnico Asignado: ${ticket.responsable_mtto || 'Sin asignar'}\n` +
     `• Costo Incurrido Preliminar: $${ticket.costo_real} MXN\n\n` +
-    `--- MOTIVO DE LA QUEJA ---\n` +
+    `--- MOTIVO DEL RECHAZO ---\n` +
     `"${queja}"\n\n` +
     `• Evidencia del trabajo mal hecho: ${urlFoto || 'Sin foto'}\n` +
     `• Foto solución previa de Mtto: ${ticket.foto_resolucion_1 || 'Sin foto'}\n\n` +
-    `El folio ha sido retornado a Mantenimiento con estatus de RE-TRABAJO obligatorio.`
+    `El folio ha sido retornado a Mantenimiento con estatus de EN RE-TRABAJO prioritario.`
   );
 
   const cc = CORREOS_COPIA.join(",");
@@ -1503,43 +1526,53 @@ function dispararCorreoEscalamientoDireccion(ticket, queja, urlFoto) {
   window.open(enlaceMailto, '_blank');
 }
 
-// 3. CONSOLA MTTO
+// 3. CONSOLA DE TRABAJO (CON TABS EN LUGAR DE SELECT)
 async function cargarConsolaMtto() {
   try {
     const { data, error } = await sb.from('vista_incidencias_mtto').select('*');
     if (error) throw error;
     ticketsEnMemoria = ordenarPorFlujo(data || []);
-    actualizarContadoresConsola();
+    actualizarBadgesTabsConsola();
     filtrarDeckEnVivo();
   } catch (err) {
     console.error(err);
   }
 }
 
-function actualizarContadoresConsola() {
-  let sinEmp = 0, enProc = 0, retrab = 0, term = 0;
+function actualizarBadgesTabsConsola() {
+  let sinEmp = 0, enProc = 0, esperando = 0, retrab = 0, concluidos = 0;
   ticketsEnMemoria.forEach(t => {
-    if (t.estatus === 'Concluido Conforme') term++;
-    else if (t.estatus === 'Rechazado / Re-trabajo') retrab++;
+    if (t.estatus === 'Concluido') concluidos++;
+    else if (t.estatus === 'En re-trabajo') retrab++;
+    else if (t.estatus === 'En espera de calificación') esperando++;
     else if (t.estatus === 'En proceso') enProc++;
     else sinEmp++;
   });
-  document.getElementById("kpiConsolaSinEmpezar").innerText = sinEmp;
-  document.getElementById("kpiConsolaEnProceso").innerText = enProc;
-  document.getElementById("kpiConsolaRetrabajos").innerText = retrab;
-  document.getElementById("kpiConsolaTerminadas").innerText = term;
+
+  document.getElementById("badgeTabTodos").innerText = ticketsEnMemoria.length;
+  document.getElementById("badgeTabSinEmp").innerText = sinEmp;
+  document.getElementById("badgeTabEnProc").innerText = enProc;
+  document.getElementById("badgeTabEsperando").innerText = esperando;
+  document.getElementById("badgeTabRetrab").innerText = retrab;
+  document.getElementById("badgeTabConcluido").innerText = concluidos;
+}
+
+function seleccionarTabEstatus(estatus, btn) {
+  estatusTabActual = estatus;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtrarDeckEnVivo();
 }
 
 function filtrarDeckEnVivo() {
   const dist = document.getElementById("filtroConsolaDist").value;
-  const est = document.getElementById("filtroConsolaEstatus").value;
   const busq = document.getElementById("busquedaConsolaTexto").value.toLowerCase().trim();
   const cont = document.getElementById("contenedorDeckMtto");
   cont.innerHTML = "";
 
   let filtrados = ticketsEnMemoria;
   if (dist !== "TODAS") filtrados = filtrados.filter(t => t.distribuidora === dist);
-  if (est !== "TODOS") filtrados = filtrados.filter(t => t.estatus === est);
+  if (estatusTabActual !== "TODOS") filtrados = filtrados.filter(t => t.estatus === estatusTabActual);
   if (busq) {
     filtrados = filtrados.filter(t => 
       (t.area && t.area.toLowerCase().includes(busq)) || 
@@ -1549,18 +1582,19 @@ function filtrarDeckEnVivo() {
   }
 
   if (filtrados.length === 0) {
-    cont.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--text-muted);">No hay incidencias que coincidan.</div>';
+    cont.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--text-muted);">No hay incidencias en esta sección.</div>';
     return;
   }
 
   filtrados.forEach(t => {
     let statusClass = "status-sin-empezar";
     if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-    if (t.estatus === 'Por Validar (Mtto Listo)') statusClass = "status-por-validar";
-    if (t.estatus === 'Rechazado / Re-trabajo') statusClass = "status-retrabajo";
-    if (t.estatus === 'Concluido Conforme') statusClass = "status-concluido";
+    if (t.estatus === 'En espera de calificación') statusClass = "status-por-validar";
+    if (t.estatus === 'En re-trabajo') statusClass = "status-retrabajo";
+    if (t.estatus === 'Concluido') statusClass = "status-concluido";
 
     const atraso = parseInt(t.atraso_dias) || 0;
+    const diasTotales = parseInt(t.dias_totales_resolucion) || 0;
     const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
     const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'Sin fecha';
 
@@ -1570,8 +1604,11 @@ function filtrarDeckEnVivo() {
     if (t.foto_queja_retrabajo) fotosHtml += `<img src="${t.foto_queja_retrabajo}" onclick="window.open('${t.foto_queja_retrabajo}')" title="Queja" style="border:2px solid #dc2626;">`;
     if (t.foto_retrabajo) fotosHtml += `<img src="${t.foto_retrabajo}" onclick="window.open('${t.foto_retrabajo}')" title="Re-trabajo" style="border:2px solid #2563eb;">`;
 
+    // BLOQUEO INMUTABLE SI ESTÁ CONCLUIDO
     let accionesHtml = '';
-    if (t.estatus === 'Rechazado / Re-trabajo') {
+    if (t.estatus === 'Concluido') {
+      accionesHtml = `<span style="font-size:10px; font-weight:800; color:#15803d;">🔒 Concluido e Inmutable</span>`;
+    } else if (t.estatus === 'En re-trabajo') {
       accionesHtml = `<button type="button" class="btn-submit" style="width:auto; height:28px; font-size:10px; padding:0 10px; margin-top:0; background:var(--flujo-alto);" onclick="abrirModalRetrabajo('${t.id}')">🔄 Re-trabajo</button>`;
     } else {
       accionesHtml = `
@@ -1587,7 +1624,7 @@ function filtrarDeckEnVivo() {
     const esAdmin = (usuarioActual && usuarioActual.rol_interfaz === 'Admin');
 
     cont.innerHTML += `
-      <div class="deck-card flujo-${t.flujo_clientes} ${t.estatus === 'Rechazado / Re-trabajo' ? 'retrabajo-activo' : ''}">
+      <div class="deck-card flujo-${t.flujo_clientes} ${t.estatus === 'En re-trabajo' ? 'retrabajo-activo' : ''}">
         <div class="deck-header">
           <div>
             <div class="deck-dist">${t.distribuidora} • ${t.dpto_reporte}</div>
@@ -1607,8 +1644,9 @@ function filtrarDeckEnVivo() {
 
         <div class="deck-meta">
           <span>📅 ${fReg}</span> • 
-          <span>🎯 Entrega: <strong>${fComp}</strong></span>
-          ${atraso > 0 ? `<span class="atraso-pill">+${atraso} d atraso</span>` : ''}
+          <span>🎯 Entrega: <strong>${fComp}</strong></span><br>
+          <span>⏱️ <strong>${diasTotales} días totales</strong></span>
+          ${atraso > 0 ? `<span class="atraso-pill">+${atraso} d atraso</span>` : '<span style="font-size:9px; color:#059669; font-weight:700;">(A tiempo)</span>'}
         </div>
 
         <div class="deck-photos">${fotosHtml}</div>
@@ -1618,7 +1656,7 @@ function filtrarDeckEnVivo() {
             👤 ${t.responsable_mtto || 'Sin asignar'}<br>
             💰 Cotizado: $${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}
           </div>
-          <div style="display:flex; gap:6px;">
+          <div style="display:flex; gap:6px; align-items:center;">
             ${accionesHtml}
           </div>
         </div>
@@ -1630,7 +1668,7 @@ function filtrarDeckEnVivo() {
 // 3.1 MODAL ASIGNAR
 function abrirModalAsignar(id) {
   const t = ticketsEnMemoria.find(item => item.id === id);
-  if (!t) return;
+  if (!t || t.estatus === 'Concluido') return;
 
   document.getElementById("asigTicketId").value = t.id;
   document.getElementById("modalAsignarTitulo").innerText = `${t.distribuidora} - ${t.area}`;
@@ -1638,6 +1676,7 @@ function abrirModalAsignar(id) {
   document.getElementById("asigFechaCompromiso").value = t.fecha_compromiso || "";
   document.getElementById("asigCostoEstimado").value = t.costo_estimado || "0.00";
   document.getElementById("asigComentarios").value = t.comentarios || "";
+  document.getElementById("boxAlertaHolgura").classList.add("hidden");
 
   const fCompInp = document.getElementById("asigFechaCompromiso");
   const cEstInp = document.getElementById("asigCostoEstimado");
@@ -1664,6 +1703,7 @@ function abrirModalAsignar(id) {
 
 async function confirmarYGuardarAsignacion() {
   const id = document.getElementById("asigTicketId").value;
+  const t = ticketsEnMemoria.find(item => item.id === id);
   const resp = document.getElementById("asigResponsable").value.trim();
   const fComp = document.getElementById("asigFechaCompromiso").value;
   const cEst = parseFloat(document.getElementById("asigCostoEstimado").value) || 0;
@@ -1690,6 +1730,11 @@ async function confirmarYGuardarAsignacion() {
 
     if (error) throw error;
 
+    // Disparar correo de seguimiento al solicitante
+    if (t && t.reportado_por_email) {
+      notificarCompromisoAlSolicitante(t, resp, fComp);
+    }
+
     mostrarToast("Compromiso Congelado", "La incidencia pasó a En Proceso.");
     cerrarModal('modalAsignar');
     cargarConsolaMtto();
@@ -1701,10 +1746,25 @@ async function confirmarYGuardarAsignacion() {
   }
 }
 
-// 3.2 MODAL RESOLVER
+function notificarCompromisoAlSolicitante(ticket, tecnico, fecha) {
+  const fMex = new Date(fecha + "T00:00:00").toLocaleDateString('es-MX');
+  const asunto = encodeURIComponent(`[Grupo CER MTTO] Programación de Reporte: ${ticket.distribuidora} - ${ticket.area}`);
+  const cuerpo = encodeURIComponent(
+    `Hola ${ticket.reportado_por_nombre}:\n\n` +
+    `Te informamos que tu reporte de mantenimiento ha sido asignado y programado:\n\n` +
+    `• Ubicación: ${ticket.distribuidora} - ${ticket.area}\n` +
+    `• Falla reportada: ${ticket.descripcion}\n` +
+    `• Técnico asignado: ${tecnico}\n` +
+    `• Fecha tentativa de entrega: ${fMex}\n\n` +
+    `Te notificaremos cuando el trabajo esté concluido para tu visto bueno.`
+  );
+  window.open(`mailto:${ticket.reportado_por_email}?subject=${asunto}&body=${cuerpo}`, '_blank');
+}
+
+// 3.2 MODAL RESOLVER (ENTREGA MTTO)
 function abrirModalResolver(id) {
   const t = ticketsEnMemoria.find(item => item.id === id);
-  if (!t) return;
+  if (!t || t.estatus === 'Concluido') return;
 
   document.getElementById("resTicketId").value = t.id;
   document.getElementById("modalResolverTitulo").innerText = `Entrega: ${t.distribuidora} - ${t.area}`;
@@ -1721,9 +1781,9 @@ function abrirModalResolver(id) {
 
 async function guardarResolucionTicket() {
   const id = document.getElementById("resTicketId").value;
+  const t = ticketsEnMemoria.find(item => item.id === id);
   const cReal = parseFloat(document.getElementById("resCostoReal").value) || 0;
   const fileR1 = document.getElementById("fileRes1").files[0];
-  const t = ticketsEnMemoria.find(item => item.id === id);
 
   if (cReal <= 0) {
     alert("Debes indicar el Costo Real Incurrido mayor a $0.");
@@ -1754,7 +1814,12 @@ async function guardarResolucionTicket() {
     const { error } = await sb.from('incidencias_mtto').update(updatePayload).eq('id', id);
     if (error) throw error;
 
-    mostrarToast("Trabajo Entregado", "El ticket quedó listo para validación del solicitante.");
+    // Disparar correo para que el solicitante califique
+    if (t && t.reportado_por_email) {
+      notificarEntregaAlSolicitante(t);
+    }
+
+    mostrarToast("Trabajo Entregado", "El ticket quedó en espera de calificación del solicitante.");
     cerrarModal('modalResolver');
     cargarConsolaMtto();
   } catch (err) {
@@ -1765,9 +1830,25 @@ async function guardarResolucionTicket() {
   }
 }
 
+function notificarEntregaAlSolicitante(ticket) {
+  const asunto = encodeURIComponent(`[Grupo CER MTTO] Trabajo Terminado - Califica tu reporte en ${ticket.area}`);
+  const cuerpo = encodeURIComponent(
+    `Hola ${ticket.reportado_por_nombre}:\n\n` +
+    `El equipo de mantenimiento ha marcado como RESUELTO el reporte en ${ticket.distribuidora} - ${ticket.area}.\n\n` +
+    `Por favor ingresa a la plataforma en la pestaña 'Consultar Existentes' para evaluar el trabajo con estrellas y cerrar formalmente el folio:\n\n` +
+    `Portal: https://marcot-pm.github.io/ActivacionesGrupoCER/mtto.html\n\n` +
+    `¡Gracias por ayudarnos a mantener la calidad de nuestras instalaciones!`
+  );
+  window.open(`mailto:${ticket.reportado_por_email}?subject=${asunto}&body=${cuerpo}`, '_blank');
+}
+
 // 3.3 RE-TRABAJO MTTO
 function abrirModalRetrabajo(id) {
+  const t = ticketsEnMemoria.find(item => item.id === id);
+  if (!t || t.estatus === 'Concluido') return;
+
   document.getElementById("retTicketId").value = id;
+  document.getElementById("retFechaCompromiso").value = "";
   document.getElementById("retCosto").value = "0.00";
   document.getElementById("retNotas").value = "";
   document.getElementById("prevRetrabajo").style.display = "none";
@@ -1776,12 +1857,18 @@ function abrirModalRetrabajo(id) {
 
 async function guardarRetrabajoMtto() {
   const id = document.getElementById("retTicketId").value;
+  const t = ticketsEnMemoria.find(item => item.id === id);
+  const fCompRet = document.getElementById("retFechaCompromiso").value;
   const cRet = parseFloat(document.getElementById("retCosto").value) || 0;
   const notas = document.getElementById("retNotas").value.trim();
   const fileRet = document.getElementById("fileRetrabajo").files[0];
 
+  if (!fCompRet) {
+    alert("Debes indicar la nueva fecha compromiso del re-trabajo.");
+    return;
+  }
   if (!fileRet) {
-    alert("Debes cargar la nueva fotografía de la corrección terminada.");
+    alert("Debes cargar la fotografía de la corrección terminada.");
     return;
   }
   if (!notas) {
@@ -1797,15 +1884,21 @@ async function guardarRetrabajoMtto() {
     const urlRet = await subirImagenASupabase(fileRet, "retrabajos");
 
     const { error } = await sb.from('incidencias_mtto').update({
+      fecha_compromiso_retrabajo: fCompRet,
+      fecha_entrega_retrabajo: new Date().toISOString().split('T')[0],
       costo_retrabajo: cRet,
       foto_retrabajo: urlRet,
       notas_retrabajo: notas,
-      calificacion_estrellas: null
+      calificacion_estrellas: null // Se reinicia para que vuelva a evaluar
     }).eq('id', id);
 
     if (error) throw error;
 
-    mostrarToast("Re-trabajo Entregado", "El folio volvió a estatus Por Validar.");
+    if (t && t.reportado_por_email) {
+      notificarEntregaAlSolicitante(t);
+    }
+
+    mostrarToast("Re-trabajo Entregado", "El folio volvió a En espera de calificación.");
     cerrarModal('modalRetrabajo');
     cargarConsolaMtto();
   } catch (err) {
@@ -1824,16 +1917,20 @@ async function cargarDashboardMtto() {
     ticketsEnMemoria = ordenarPorFlujo(data || []);
 
     let total = ticketsEnMemoria.length;
-    let resueltos = 0, sinEmpezar = 0, enProceso = 0, retrabajos = 0;
+    let concluidos = 0, sinEmpezar = 0, enProceso = 0;
     let altoSinEmpezar = 0;
     let gastoEstimado = 0, gastoRealTotal = 0;
     let sumaEstrellas = 0, countEstrellas = 0;
+    let sumaLeadTime = 0, countLeadTime = 0;
 
     ticketsEnMemoria.forEach(t => {
-      if (t.estatus === 'Concluido Conforme') resueltos++;
-      else if (t.estatus === 'Rechazado / Re-trabajo') retrabajos++;
-      else if (t.estatus === 'En proceso') enProceso++;
-      else {
+      if (t.estatus === 'Concluido') {
+        concluidos++;
+        sumaLeadTime += parseInt(t.dias_totales_resolucion) || 0;
+        countLeadTime++;
+      } else if (t.estatus === 'En proceso') {
+        enProceso++;
+      } else if (t.estatus === 'Sin empezar') {
         sinEmpezar++;
         if (t.flujo_clientes === 'Alto') altoSinEmpezar++;
       }
@@ -1848,9 +1945,11 @@ async function cargarDashboardMtto() {
     });
 
     document.getElementById("kpiTotalTickets").innerText = total;
-    document.getElementById("kpiDesgloseTickets").innerText = `${sinEmpezar} Sin empezar | ${enProceso} Proceso | ${resueltos} Concluidas`;
+    document.getElementById("kpiDesgloseTickets").innerText = `${sinEmpezar} Sin empezar | ${enProceso} Proceso | ${concluidos} Concluidas`;
     document.getElementById("kpiAltoFlujoSinEmpezar").innerText = altoSinEmpezar;
-    document.getElementById("kpiDashRetrabajos").innerText = retrabajos;
+
+    const promLeadTime = countLeadTime > 0 ? (sumaLeadTime / countLeadTime).toFixed(1) : "0.0";
+    document.getElementById("kpiTiempoPromedioResolucion").innerText = `${promLeadTime} d`;
 
     const promEstrellas = countEstrellas > 0 ? (sumaEstrellas / countEstrellas).toFixed(1) : "0.0";
     document.getElementById("kpiSatisfaccionProm").innerText = `${promEstrellas} ★`;
@@ -1874,20 +1973,20 @@ function filtrarDashboardTabla() {
   if (estFiltro !== "TODOS") lista = lista.filter(t => t.estatus === estFiltro);
 
   if (lista.length === 0) {
-    tb.innerHTML = '<tr><td colspan="11" class="text-center" style="padding:18px; color:var(--text-muted);">No hay incidencias con este estatus.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="10" class="text-center" style="padding:18px; color:var(--text-muted);">No hay incidencias con este estatus.</td></tr>';
     return;
   }
 
   lista.forEach(t => {
     let statusClass = "status-sin-empezar";
     if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-    if (t.estatus === 'Por Validar (Mtto Listo)') statusClass = "status-por-validar";
-    if (t.estatus === 'Rechazado / Re-trabajo') statusClass = "status-retrabajo";
-    if (t.estatus === 'Concluido Conforme') statusClass = "status-concluido";
+    if (t.estatus === 'En espera de calificación') statusClass = "status-por-validar";
+    if (t.estatus === 'En re-trabajo') statusClass = "status-retrabajo";
+    if (t.estatus === 'Concluido') statusClass = "status-concluido";
 
-    const diasAtraso = parseInt(t.atraso_dias) || 0;
+    const atraso = parseInt(t.atraso_dias) || 0;
+    const diasTotales = parseInt(t.dias_totales_resolucion) || 0;
     const fReg = new Date(t.fecha_reporte).toLocaleDateString('es-MX');
-    const fComp = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : '--';
     const solicitante = t.reportado_por_nombre ? `${t.reportado_por_nombre} (${t.reportado_por_puesto})` : t.dpto_reporte;
 
     tb.innerHTML += `<tr>
@@ -1896,8 +1995,10 @@ function filtrarDashboardTabla() {
       <td><strong>${t.area}</strong></td>
       <td><span style="font-size:10px; color:#475569;">${solicitante}</span></td>
       <td><span class="status-badge ${statusClass}">${t.estatus}</span></td>
-      <td>${fComp}</td>
-      <td>${diasAtraso > 0 ? `<span class="atraso-pill">+${diasAtraso} d</span>` : '0 d'}</td>
+      <td>
+        <strong>${diasTotales} d totales</strong><br>
+        ${atraso > 0 ? `<span class="atraso-pill">+${atraso} d atraso</span>` : '<span style="font-size:10px; color:#059669; font-weight:700;">A tiempo</span>'}
+      </td>
       <td style="text-align:right;">$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
       <td style="text-align:right; font-weight:700; color:var(--primary);">$${(parseFloat(t.costo_total_acumulado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}</td>
       <td style="text-align:center; font-weight:800; color:#f59e0b;">${t.calificacion_estrellas ? t.calificacion_estrellas + ' ★' : '--'}</td>
@@ -1923,9 +2024,9 @@ function abrirModalExpediente(id) {
 
   let statusClass = "status-sin-empezar";
   if (t.estatus === 'En proceso') statusClass = "status-en-proceso";
-  if (t.estatus === 'Por Validar (Mtto Listo)') statusClass = "status-por-validar";
-  if (t.estatus === 'Rechazado / Re-trabajo') statusClass = "status-retrabajo";
-  if (t.estatus === 'Concluido Conforme') statusClass = "status-concluido";
+  if (t.estatus === 'En espera de calificación') statusClass = "status-por-validar";
+  if (t.estatus === 'En re-trabajo') statusClass = "status-retrabajo";
+  if (t.estatus === 'Concluido') statusClass = "status-concluido";
 
   const stEl = document.getElementById("expBadgeEstatus");
   stEl.innerText = t.estatus;
@@ -1937,7 +2038,7 @@ function abrirModalExpediente(id) {
 
   const atrEl = document.getElementById("expBadgeAtraso");
   const diasAtraso = parseInt(t.atraso_dias) || 0;
-  if (diasAtraso > 0 && t.estatus !== 'Concluido Conforme') {
+  if (diasAtraso > 0 && t.estatus !== 'Concluido') {
     atrEl.classList.remove("hidden");
     atrEl.innerText = `⚠️ Retraso: ${diasAtraso} días`;
   } else {
@@ -1946,7 +2047,7 @@ function abrirModalExpediente(id) {
 
   const calEl = document.getElementById("expBadgeCalificacion");
   if (t.calificacion_estrellas) {
-    calEl.innerText = `${t.calificacion_estrellas} ★ (${t.calificacion_estrellas >= 3 ? 'Aprobado' : 'Rechazado'})`;
+    calEl.innerText = `${t.calificacion_estrellas} ★ (${t.calificacion_estrellas >= 3 ? 'Aprobado' : 'Re-trabajo'})`;
   } else {
     calEl.innerText = 'Sin calificar';
   }
@@ -1955,6 +2056,7 @@ function abrirModalExpediente(id) {
   document.getElementById("expComentarios").innerText = t.comentarios ? `Nota inicial: ${t.comentarios}` : '';
   document.getElementById("expResponsable").innerText = t.responsable_mtto || 'Sin asignar';
   document.getElementById("expCompromiso").innerText = t.fecha_compromiso ? new Date(t.fecha_compromiso + "T00:00:00").toLocaleDateString('es-MX') : 'Sin fecha';
+  document.getElementById("expTiempoTotal").innerText = `${t.dias_totales_resolucion || 0} días`;
 
   document.getElementById("expCotizado").innerText = `$${(parseFloat(t.costo_estimado) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}`;
   document.getElementById("expReal").innerText = `$${(parseFloat(t.costo_real) || 0).toLocaleString("es-MX", {minimumFractionDigits: 2})}`;
